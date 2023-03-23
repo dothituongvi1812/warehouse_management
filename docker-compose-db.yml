@@ -1,0 +1,22 @@
+version: '3.9'
+services:
+  db:
+    image: postgres:14.2-alpine
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=mypassword
+    ports:
+      - '5432:5432'
+    restart: always
+
+    volumes:
+      - ./db:/var/lib/postgresql/data
+
+    networks:
+      - java-project
+
+networks:
+  java-project:
+    external:
+      name: java-project
+

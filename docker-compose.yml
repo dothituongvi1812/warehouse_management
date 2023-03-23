@@ -1,0 +1,24 @@
+version: '3.3'
+services:
+  app:
+    image: 'phungvantrongnghia1/warehuose-management:latest'
+    build:
+      context: .
+    container_name: java-warehuose
+    ports:
+        - 8081:8080
+    environment:
+        # - SPRING_DATASOURCE_URL=jdbc:postgresql://172.18.0.2:5432/db_warehouse_management
+        - SPRING_DATASOURCE_URL=jdbc:postgresql://172.20.0.2:5432/db_warehouse_management
+        - SPRING_DATASOURCE_USERNAME=postgres
+        - SPRING_DATASOURCE_PASSWORD=mypassword
+        - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+
+    networks:
+      - java-project
+
+networks:
+  java-project:
+    external:
+      name: java-project
+
