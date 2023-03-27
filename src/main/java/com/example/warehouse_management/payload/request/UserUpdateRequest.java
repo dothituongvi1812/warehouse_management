@@ -14,5 +14,4 @@ public class UserUpdateRequest {
     private String fullName;
     private String sex;
     private Set<Role> roles;
-    private boolean enabled;
 }

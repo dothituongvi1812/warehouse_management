@@ -26,6 +26,11 @@ public class GoodsServicesImpl implements GoodsServices {
     private ModelMapper modelMapper=new ModelMapper();
     @Override
     public GoodsResponse addGoods(GoodsRequest goodsRequest) {
+        GoodsResponse response=mapperGoodResponse(createGoods(goodsRequest));
+        return response;
+    }
+    @Override
+    public Goods createGoods(GoodsRequest goodsRequest) {
         Category category=categoryRepository.findByCode(goodsRequest.getCategoryCode());
         if(category==null){
             throw new NotFoundGlobalException("Không tìm thấy loại hàng hoá");
@@ -40,8 +45,7 @@ public class GoodsServicesImpl implements GoodsServices {
         goods.setUnit(EUnit.THUNG);
         goods.setVolume(goodsRequest.getHeight()*goodsRequest.getWidth()*goodsRequest.getLength());
         Goods goodSave=goodsRepository.save(goods);
-        GoodsResponse response=mapperGoodResponse(goodSave);
-        return response;
+        return goodSave;
     }
 
     @Override
@@ -75,7 +79,7 @@ public class GoodsServicesImpl implements GoodsServices {
         return goods;
     }
 
-    private GoodsResponse mapperGoodResponse(Goods goods){
+    public GoodsResponse mapperGoodResponse(Goods goods){
         String unit="";
         if(goods.getUnit().equals(EUnit.THUNG)){
             unit="Thùng";

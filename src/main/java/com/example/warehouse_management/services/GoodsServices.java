@@ -8,6 +8,7 @@ import java.util.List;
 
 public interface GoodsServices {
     public GoodsResponse addGoods(GoodsRequest goodsRequest);
+    public Goods createGoods(GoodsRequest goodsRequest);
     public List<GoodsResponse> getAll();
     public GoodsResponse getByCode(String code);
     public List<GoodsResponse> searchByCodeOrName(String keyword);

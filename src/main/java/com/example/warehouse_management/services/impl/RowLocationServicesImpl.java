@@ -71,16 +71,6 @@ public class RowLocationServicesImpl implements RowLocationServices {
     }
 
     @Override
-    public List<RowLocation> findByStatusTrongAndConTrong() {
-        return rowLocationRepository.findByStatusTrongAndConTrong();
-    }
-
-    @Override
-    public List<RowLocation> findByGoodsName(List<String> goodsName) {
-        return rowLocationRepository.findByGoodsName(goodsName);
-    }
-
-    @Override
     public RowLocationResponse getByCode(String code) {
         return mapperRowLocationResponse(findRowLocationByCode(code));
     }

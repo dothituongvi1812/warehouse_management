@@ -12,7 +12,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class WarehouseResponse {
-    private String id;
+    private Long id;
+    private String code;
     private Location location;
     private String name;
     private EStatusStorage status;

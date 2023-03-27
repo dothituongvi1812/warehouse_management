@@ -167,9 +167,6 @@ public class UserServicesImpl implements UserServices {
         if(!ObjectsUtils.equal(user.getSex(),userUpdateRequest.getSex())){
             user.setSex(userUpdateRequest.getSex());
         }
-        if(!ObjectsUtils.equalBool(user.isEnabled(),userUpdateRequest.isEnabled())){
-            user.setEnabled(userUpdateRequest.isEnabled());
-        }
         if(!ObjectsUtils.equal(user.getFullName(),userUpdateRequest.getFullName())){
             user.setFullName(userUpdateRequest.getFullName());
         }
