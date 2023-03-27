@@ -20,7 +20,11 @@ public class ColumnLocationOfShelfController {
         return new ResponseEntity(columnLocationServices.addColumns(columnLocationRequest),HttpStatus.OK);
     }
     @GetMapping("/get-all")
-    public ResponseEntity<List<ColumnLocationResponse>>findAll(){
-        return new ResponseEntity(columnLocationServices.findAll(), HttpStatus.OK);
+    public ResponseEntity<List<ColumnLocationResponse>>getAll(){
+        return new ResponseEntity(columnLocationServices.getAll(), HttpStatus.OK);
+    }
+    @GetMapping("/get-by/{code}")
+    public ResponseEntity<ColumnLocationResponse>getByCode(@PathVariable String code){
+        return new ResponseEntity(columnLocationServices.getByCode(code),HttpStatus.OK);
     }
 }

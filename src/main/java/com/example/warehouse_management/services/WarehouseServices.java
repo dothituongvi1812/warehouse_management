@@ -9,4 +9,5 @@ import java.util.List;
 public interface WarehouseServices {
     public WarehouseResponse addWarehouse(WarehouseRequest request);
     public List<WarehouseResponse> findAll();
+    public WarehouseResponse findByCode(String code);
 }

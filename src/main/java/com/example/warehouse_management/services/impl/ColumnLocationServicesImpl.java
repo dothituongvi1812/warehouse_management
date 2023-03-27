@@ -46,9 +46,13 @@ public class ColumnLocationServicesImpl implements ColumnLocationServices {
         // khi chia phải là số nguyên
         double lengthColumn=columnLocationRequest.getLength();
         double lengthShelf=shelveStorage.getLength();
-        if (!(lengthColumn <= lengthShelf && lengthShelf % lengthColumn == 0)) {
-            throw new NotEnoughSpaceException("Chiều dài của cột phải nhỏ hơn hoặc bằng chiều dài của kệ");
+        if(!(lengthColumn <= lengthShelf)){
+            throw new NotEnoughSpaceException("Chiều dài của cột phải nhỏ hơn hoặc bằng chiều dài của kệ là: "+lengthShelf);
         }
+        if(!(lengthShelf % lengthColumn == 0)){
+            throw new NotEnoughSpaceException("Chiều dài của cột không phù hợp. Chiều dài của kệ là: "+lengthShelf);
+        }
+
         int numberColumn= (int) (shelveStorage.getLength()/columnLocationRequest.getLength());
         int numberColumnCurrent=columnLocationRepository.findAll().size();
         String code ="CL000";
@@ -67,12 +71,20 @@ public class ColumnLocationServicesImpl implements ColumnLocationServices {
     }
 
     @Override
-    public List<ColumnLocationResponse> findAll() {
+    public List<ColumnLocationResponse> getAll() {
             List<ColumnLocationResponse> responseList =columnLocationRepository.findAll().stream()
                     .map(columnLocation ->mapperColumnLocationResponse(columnLocation) )
                     .collect(Collectors.toList());
         return responseList;
     }
+
+    @Override
+    public ColumnLocationResponse getByCode(String code) {
+        ColumnLocation columnLocation=columnLocationRepository.findByCode(code);
+        ColumnLocationResponse response=mapperColumnLocationResponse(columnLocation);
+        return response;
+    }
+
     private String generateShelveId(){
         Random rnd = new Random();
         String code = String.format("%04d",rnd.nextInt(999999));

@@ -63,7 +63,7 @@ public class RowLocationServicesImpl implements RowLocationServices {
     }
 
     @Override
-    public List<RowLocationResponse> findAll() {
+    public List<RowLocationResponse> getAll() {
         List<RowLocationResponse> responseList = rowLocationRepository.findAll().stream().
                 map(rowLocation ->mapperRowLocationResponse(rowLocation))
                 .collect(Collectors.toList());
@@ -78,6 +78,20 @@ public class RowLocationServicesImpl implements RowLocationServices {
     @Override
     public List<RowLocation> findByGoodsName(List<String> goodsName) {
         return rowLocationRepository.findByGoodsName(goodsName);
+    }
+
+    @Override
+    public RowLocationResponse getByCode(String code) {
+        return mapperRowLocationResponse(findRowLocationByCode(code));
+    }
+
+    @Override
+    public RowLocation findRowLocationByCode(String code) {
+        RowLocation rowLocation = rowLocationRepository.findByCode(code);
+        if(rowLocation==null)
+            throw new NotFoundGlobalException("Không tìm thấy vị trí "+code);
+
+        return rowLocation ;
     }
 
     private String generateRowLocationName(int numberRow){

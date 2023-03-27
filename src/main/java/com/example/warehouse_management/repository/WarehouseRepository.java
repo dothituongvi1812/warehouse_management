@@ -11,4 +11,5 @@ import java.util.Optional;
 public interface WarehouseRepository extends CrudRepository<Warehouse,Long> {
     Warehouse findWarehouseByCode(String code);
     List<Warehouse> findAll();
+    Warehouse findTopByOrderByIdDesc();
 }

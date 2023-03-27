@@ -11,4 +11,5 @@ public interface CategoryServices {
     public CategoryResponse addCategory(CategoryRequest request);
     public List<CategoryResponse> findAll();
     public Category findCategoryByCode(String code);
+    public CategoryResponse getByCode(String code);
 }

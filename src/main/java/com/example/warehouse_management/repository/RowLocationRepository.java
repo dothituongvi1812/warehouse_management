@@ -15,4 +15,5 @@ public interface RowLocationRepository extends CrudRepository<RowLocation,Long> 
     List<RowLocation> findByStatusTrongAndConTrong();
     @Query("SELECT rl from RowLocation rl join Goods g ON rl.goods.id = g.id where g.name in :goodsName")
     List<RowLocation> findByGoodsName(List<String> goodsName);
+    RowLocation findByCode(String code);
 }

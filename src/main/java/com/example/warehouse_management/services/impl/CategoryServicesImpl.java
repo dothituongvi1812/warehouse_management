@@ -27,7 +27,7 @@ public class CategoryServicesImpl implements CategoryServices {
         category.setCode(code);
         category.setName(request.getName());
         category.setDescription(request.getDescription());
-        CategoryResponse response =modelMapper.map(categoryRepository.save(category),CategoryResponse.class);
+        CategoryResponse response =mapperCategoryResponse(categoryRepository.save(category));
 
         return response;
     }
@@ -35,8 +35,8 @@ public class CategoryServicesImpl implements CategoryServices {
     @Override
     public List<CategoryResponse> findAll() {
         List<CategoryResponse> categoryResponses =categoryRepository.findAll().stream()
-                .map(e-> new CategoryResponse(e.getCode(),e.getName(),e.getDescription())
-                ).collect(Collectors.toList());
+                .map(e->mapperCategoryResponse(e))
+                .collect(Collectors.toList());
         return categoryResponses;
     }
 
@@ -48,9 +48,18 @@ public class CategoryServicesImpl implements CategoryServices {
         return category;
     }
 
+    @Override
+    public CategoryResponse getByCode(String code) {
+        return mapperCategoryResponse(findCategoryByCode(code));
+    }
+
     private String generateCategoryCode(){
         Random rnd = new Random();
         String code = String.format("L"+String.format("%04d",rnd.nextInt(999999)));
         return code;
+    }
+    private CategoryResponse mapperCategoryResponse(Category category){
+        CategoryResponse categoryResponse= modelMapper.map(category,CategoryResponse.class);
+        return categoryResponse;
     }
 }

@@ -9,8 +9,10 @@ import java.util.List;
 
 public interface RowLocationServices {
     public List<RowLocationResponse> addRowLocations(RowLocationRequest request);
-    public List<RowLocationResponse> findAll();
+    public List<RowLocationResponse> getAll();
     public List<RowLocation> findByStatusTrongAndConTrong();
     public List<RowLocation> findByGoodsName(List<String> goodsName);
+    public RowLocationResponse getByCode(String code);
+    public RowLocation findRowLocationByCode(String code);
 
 }

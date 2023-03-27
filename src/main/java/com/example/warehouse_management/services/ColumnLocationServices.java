@@ -11,5 +11,6 @@ import java.util.List;
 
 public interface ColumnLocationServices {
     public List<ColumnLocationResponse> addColumns(ColumnLocationRequest columnLocationRequest);
-    public List<ColumnLocationResponse> findAll();
+    public List<ColumnLocationResponse> getAll();
+    public ColumnLocationResponse getByCode(String code);
 }

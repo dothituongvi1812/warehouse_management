@@ -17,9 +17,12 @@ public class CategoryController {
     public ResponseEntity addCategory(@RequestBody CategoryRequest request){
         return new ResponseEntity(categoryServices.addCategory(request), HttpStatus.OK);
     }
-    @GetMapping("/")
+    @GetMapping("/get-all")
     public ResponseEntity getAll(){
         return new ResponseEntity(categoryServices.findAll(), HttpStatus.OK);
     }
-
+    @GetMapping("/get-by/{code}")
+    public ResponseEntity getByCode(@PathVariable String code){
+        return new ResponseEntity(categoryServices.getByCode(code), HttpStatus.OK);
+    }
 }

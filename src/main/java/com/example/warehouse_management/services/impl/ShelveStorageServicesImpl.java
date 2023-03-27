@@ -55,6 +55,19 @@ public class ShelveStorageServicesImpl implements ShelveStorageServices {
         return shelveStorageResponseList;
     }
 
+    @Override
+    public ShelveStorage findShelveStorageByCode(String code) {
+        ShelveStorage shelveStorage=shelfStorageRepository.findByCode(code);
+        if(shelveStorage==null)
+            throw new NotFoundGlobalException("Không tìm thấy kệ "+code);
+        return shelveStorage;
+    }
+
+    @Override
+    public ShelveStorageResponse getByCode(String code) {
+        return mapperShelveStorageResponse(findShelveStorageByCode(code));
+    }
+
     private String generateShelveId(){
         Random rnd = new Random();
         String code = String.format("%04d",rnd.nextInt(999999));

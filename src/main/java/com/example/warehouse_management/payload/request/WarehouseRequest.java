@@ -16,5 +16,6 @@ public class WarehouseRequest {
     private double heightShelf;//
     private double lengthShelf;
     private int numberOfFloor;
+    private double lengthOfColumn;
 
 }

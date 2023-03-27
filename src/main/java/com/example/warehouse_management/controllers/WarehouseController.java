@@ -21,7 +21,12 @@ public class WarehouseController {
         return new ResponseEntity(warehouseServices.addWarehouse(request), HttpStatus.OK);
     }
     @GetMapping("/get-all")
-    public ResponseEntity<List<WarehouseResponse>> findAll(){
+    public ResponseEntity<List<WarehouseResponse>> getAll(){
         return new ResponseEntity(warehouseServices.findAll(), HttpStatus.OK);
     }
+    @GetMapping("/get-by/{code}")
+    public ResponseEntity<WarehouseResponse> getByCode(@PathVariable String code){
+        return new ResponseEntity(warehouseServices.findByCode(code), HttpStatus.OK);
+    }
+
 }

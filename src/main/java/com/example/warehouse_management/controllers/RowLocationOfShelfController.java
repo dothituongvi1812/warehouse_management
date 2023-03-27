@@ -21,8 +21,12 @@ public class RowLocationOfShelfController {
         return new ResponseEntity(rowLocationServices.addRowLocations(request), HttpStatus.OK);
     }
     @GetMapping("/get-all")
-    public ResponseEntity<List<RowLocationResponse>>findAll(){
-        return new ResponseEntity(rowLocationServices.findAll(), HttpStatus.OK);
+    public ResponseEntity<List<RowLocationResponse>>getAll(){
+        return new ResponseEntity(rowLocationServices.getAll(), HttpStatus.OK);
+    }
+    @GetMapping("/get-by/{code}")
+    public ResponseEntity<RowLocationResponse>getByCode(@PathVariable String code){
+        return new ResponseEntity(rowLocationServices.getByCode(code), HttpStatus.OK);
     }
 
 }
