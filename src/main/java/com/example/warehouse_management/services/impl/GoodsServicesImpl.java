@@ -12,6 +12,7 @@ import com.example.warehouse_management.services.GoodsServices;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -35,17 +36,21 @@ public class GoodsServicesImpl implements GoodsServices {
         if(category==null){
             throw new NotFoundGlobalException("Không tìm thấy loại hàng hoá");
         }
-        Goods goods =new Goods();
-        goods.setCode(generateGoodCode());
-        goods.setCategory(category);
-        goods.setName(goodsRequest.getName());
-        goods.setHeight(goodsRequest.getHeight());
-        goods.setWidth(goodsRequest.getWidth());
-        goods.setLength(goodsRequest.getLength());
-        goods.setUnit(EUnit.THUNG);
-        goods.setVolume(goodsRequest.getHeight()*goodsRequest.getWidth()*goodsRequest.getLength());
-        Goods goodSave=goodsRepository.save(goods);
-        return goodSave;
+        Goods goodSearch = goodsRepository.findByName(goodsRequest.getName());
+        if(ObjectUtils.isEmpty(goodSearch)){
+            Goods goods =new Goods();
+            goods.setCode(generateGoodCode());
+            goods.setCategory(category);
+            goods.setName(goodsRequest.getName());
+            goods.setHeight(goodsRequest.getHeight());
+            goods.setWidth(goodsRequest.getWidth());
+            goods.setLength(goodsRequest.getLength());
+            goods.setUnit(EUnit.THUNG);
+            goods.setVolume(goodsRequest.getHeight()*goodsRequest.getWidth()*goodsRequest.getLength());
+            Goods goodSave=goodsRepository.save(goods);
+            return goodSave;
+        }
+       return goodSearch;
     }
 
     @Override

@@ -7,6 +7,7 @@ import com.example.warehouse_management.models.warehouse.ColumnLocation;
 import com.example.warehouse_management.models.warehouse.RowLocation;
 import com.example.warehouse_management.models.warehouse.ShelveStorage;
 import com.example.warehouse_management.payload.request.RowLocationRequest;
+import com.example.warehouse_management.payload.response.GoodsResponse;
 import com.example.warehouse_management.payload.response.RowLocationResponse;
 import com.example.warehouse_management.repository.ColumnLocationRepository;
 import com.example.warehouse_management.repository.RowLocationRepository;
@@ -15,6 +16,8 @@ import com.example.warehouse_management.services.RowLocationServices;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -84,6 +87,11 @@ public class RowLocationServicesImpl implements RowLocationServices {
         return rowLocation ;
     }
 
+    @Override
+    public RowLocationResponse mapperRowLocation(RowLocation rowLocation) {
+        return mapperRowLocationResponse(rowLocation);
+    }
+
     private String generateRowLocationName(int numberRow){
         String name ="";
         switch (numberRow){
@@ -118,9 +126,18 @@ public class RowLocationServicesImpl implements RowLocationServices {
         }
         RowLocationResponse rowLocationResponseMapper=modelMapper.map(rowLocation,RowLocationResponse.class);
         rowLocationResponseMapper.setStatus(status);
-        rowLocationResponseMapper.setColumnLocationCode(rowLocation.getColumnLocation().getCode());
-        rowLocationResponseMapper.setColumnLocationName(rowLocation.getColumnLocation().getName());
-
+        rowLocationResponseMapper.setCodeRow(rowLocation.getCode());
+        rowLocationResponseMapper.setNameRow(rowLocation.getName());
+        rowLocationResponseMapper.setCodeColumn(rowLocation.getColumnLocation().getCode());
+        rowLocationResponseMapper.setNameColumn(rowLocation.getColumnLocation().getName());
+        rowLocationResponseMapper.setCodeShelf(rowLocation.getColumnLocation().getShelveStorage().getCode());
+        rowLocationResponseMapper.setNameShelf(rowLocation.getColumnLocation().getShelveStorage().getName());
+        rowLocationResponseMapper.setNameWarehouse(rowLocation.getColumnLocation().getShelveStorage().getWarehouse().getName());
+        rowLocationResponseMapper.setCodeWarehouse(rowLocation.getColumnLocation().getShelveStorage().getWarehouse().getCode());
+        if(ObjectUtils.isEmpty(rowLocation.getGoods()))
+            rowLocationResponseMapper.setGoods(null);
+        else
+            rowLocationResponseMapper.setGoods(modelMapper.map(rowLocation.getGoods(), GoodsResponse.class));
         return rowLocationResponseMapper;
     }
 }

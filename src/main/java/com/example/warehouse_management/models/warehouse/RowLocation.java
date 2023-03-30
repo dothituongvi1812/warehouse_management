@@ -20,6 +20,7 @@ import java.util.Date;
 public class RowLocation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
     @Column(unique = true)
     private String code;

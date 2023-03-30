@@ -13,5 +13,5 @@ public interface RowLocationServices {
 
     public RowLocationResponse getByCode(String code);
     public RowLocation findRowLocationByCode(String code);
-
+    public RowLocationResponse mapperRowLocation(RowLocation rowLocation);
 }

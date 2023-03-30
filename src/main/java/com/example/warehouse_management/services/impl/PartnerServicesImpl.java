@@ -8,6 +8,7 @@ import com.example.warehouse_management.services.PartnerServices;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 
 import java.util.List;
 import java.util.Random;
@@ -21,13 +22,17 @@ public class PartnerServicesImpl implements PartnerServices {
     private ModelMapper modelMapper=new ModelMapper();
     @Override
     public Partner addPartner(PartnerRequest partnerRequest) {
-        Partner partner =new Partner();
-        partner.setCode(generatePartnerCode());
-        partner.setAddress(partnerRequest.getAddress());
-        partner.setName(partnerRequest.getName());
-        partner.setPhone(partnerRequest.getPhone());
-        Partner savePartner=partnerRepository.save(partner);
-        return savePartner;
+        Partner partnerSearch=partnerRepository.findByName(partnerRequest.getName());
+        if (ObjectUtils.isEmpty(partnerSearch)){
+            Partner partner =new Partner();
+            partner.setCode(generatePartnerCode());
+            partner.setAddress(partnerRequest.getAddress());
+            partner.setName(partnerRequest.getName());
+            partner.setPhone(partnerRequest.getPhone());
+            Partner savePartner=partnerRepository.save(partner);
+            return savePartner;
+        }
+        return partnerSearch;
     }
 
     @Override

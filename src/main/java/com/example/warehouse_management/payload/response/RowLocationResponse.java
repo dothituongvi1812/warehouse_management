@@ -16,12 +16,19 @@ import javax.persistence.Enumerated;
 @AllArgsConstructor
 public class RowLocationResponse {
     private Long id;
-    private String code;
-    private String name;
+    private String codeRow;
+    private String nameRow;
     private double length;
     private double width;
     private double height;
     private String status;
-    private String columnLocationCode;
-    private String columnLocationName;
+    private String nameWarehouse;
+    private String codeWarehouse;
+    private String codeShelf;
+    private String nameShelf;
+    private String codeColumn;
+    private String nameColumn;
+    private GoodsResponse goods;
+    private int maxCapacity;
+    private int currentCapacity;
 }

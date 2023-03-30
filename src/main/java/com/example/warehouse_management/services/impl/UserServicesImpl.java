@@ -161,8 +161,29 @@ public class UserServicesImpl implements UserServices {
             throw new NotFoundGlobalException("Không tìm thấy thông tin nhân viên");
         }
 
-        if(!ObjectsUtils.equalSet(user.getRoles(),userUpdateRequest.getRoles())){
-            user.setRoles(userUpdateRequest.getRoles());
+        Set<Role> roles = new HashSet<>();
+        if (userUpdateRequest.getRole() == null) {
+            Role userRole = roleRepository.findByName(ERole.USER)
+                    .orElseThrow(() -> new NotFoundGlobalException("Error: Role is not found."));
+            roles.add(userRole);
+        } else {
+
+                switch (userUpdateRequest.getRole()) {
+                    case "admin":
+                    case "Admin":
+                    case "ADMIN":
+                        Role adminRole = roleRepository.findByName(ERole.ADMIN)
+                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+                        roles.add(adminRole);
+                        break;
+                    default:
+                        Role userRole = roleRepository.findByName(ERole.USER)
+                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+                        roles.add(userRole);
+                }
+        }
+        if(!ObjectsUtils.equalSet(user.getRoles(),roles)){
+            user.setRoles(roles);
         }
         if(!ObjectsUtils.equal(user.getSex(),userUpdateRequest.getSex())){
             user.setSex(userUpdateRequest.getSex());
@@ -206,5 +227,6 @@ public class UserServicesImpl implements UserServices {
         return userCode;
 
     }
+
 
 }

@@ -21,7 +21,7 @@ public class InventoryReceiptVoucherResponse {
 
     private String code;
     private Set<ReceiptVoucherDetailResponse> receiptVoucherDetailResponses;
-    private User createdBy;
-    private Partner partner;
+    private String createdBy;
+    private PartnerResponse partner;
     private Date createDate;
 }

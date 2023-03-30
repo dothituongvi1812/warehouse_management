@@ -37,5 +37,4 @@ public class InventoryReceiptVoucher {
 
     private Date createDate;
 
-    private String rowLocationOfShelfCode;
 }
