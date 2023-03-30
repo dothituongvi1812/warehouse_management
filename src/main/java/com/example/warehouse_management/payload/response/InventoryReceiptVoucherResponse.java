@@ -20,7 +20,7 @@ import java.util.Set;
 public class InventoryReceiptVoucherResponse {
 
     private String code;
-    private Set<ReceiptVoucherDetailResponse> receiptVoucherDetailResponses;
+    private Set<ReceiptVoucherDetailResponse> receiptVoucherDetails;
     private String createdBy;
     private PartnerResponse partner;
     private Date createDate;

@@ -15,7 +15,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class ReceiptVoucherDetailResponse {
 
-    private GoodsResponse goodsResponse;
+    private GoodsResponse goods;
     private LocationInWarehouse locationInWarehouse;
     private int quantity;
 }

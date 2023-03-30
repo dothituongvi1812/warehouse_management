@@ -26,5 +26,8 @@ public class InventoryReceiptVoucherController {
     public ResponseEntity<List<RowLocationResponse>> putTheGoodsOnShelf(@PathVariable String receiptVoucherCode){
         return new ResponseEntity(inventoryReceiptServices.putTheGoodsOnShelf(receiptVoucherCode),HttpStatus.OK);
     }
-
+    @GetMapping("/get-all")
+    public ResponseEntity<List<RowLocationResponse>> getAllSortByDate(){
+        return new ResponseEntity(inventoryReceiptServices.getAllSortedByDate(),HttpStatus.OK);
+    }
 }

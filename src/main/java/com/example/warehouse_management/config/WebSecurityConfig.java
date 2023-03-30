@@ -1,7 +1,6 @@
 package com.example.warehouse_management.config;
 
 
-import com.example.warehouse_management.models.type.ERole;
 import com.example.warehouse_management.security.jwt.AuthEntryPointJwt;
 import com.example.warehouse_management.security.jwt.AuthTokenFilter;
 import com.example.warehouse_management.security.services.UserDetailsServiceImpl;
@@ -20,12 +19,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
-import java.util.Arrays;
-import java.util.List;
 
 @Configuration
 @Order(Ordered.HIGHEST_PRECEDENCE)
@@ -84,7 +77,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(AUTH_WHITELIST).permitAll()
 //                .antMatchers("/api/register").hasAuthority(ERole.ADMIN.name())
                 .antMatchers("/api/register").permitAll()
-                .antMatchers("/api/user/**").permitAll()
+                .antMatchers("/api/user/**").authenticated()
                 .antMatchers("/api/auth/login").permitAll()
                 .antMatchers("/api/**").authenticated()
                 .antMatchers("/api/auth/reset-password").authenticated()

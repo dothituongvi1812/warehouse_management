@@ -44,4 +44,17 @@ public interface RowLocationRepository extends CrudRepository<RowLocation,Long> 
                     "and rl.code not in :codeRowLocations")
     public List<RowLocation> findByStatusAndRemainingVolumeAndGoodsName(String goodsName,double volumeGoods , List<String> codeRowLocations);
 
+    @Query(nativeQuery = true,
+            value = "select * from row_locations rl \n" +
+                    "where rl.status ='TRONG' and rl.code not in :codeRowLocations\n" +
+                    "order by rl.id asc limit 1")
+    RowLocation findTopOneByStatusTrong(List<String> codeRowLocations );
+
+    @Query(nativeQuery = true,
+            value = "select * from row_locations rl \n" +
+                    "where rl.status ='TRONG' and rl.code not in :codeRowLocations\n" +
+                    "order by rl.id asc limit 1")
+    List<RowLocation> findByStatusTrong(List<String> codeRowLocations );
+
+
 }

@@ -25,7 +25,7 @@ public class ReceiptVoucherDetail {
     @MapsId("receiptVoucherId")
     @JoinColumn(name = "receipt_voucher_id")
     private InventoryReceiptVoucher inventoryReceiptVoucher;
-    @OneToOne
+    @ManyToOne
     @MapsId("rowLocationId")
     @JoinColumn(name = "row_location_id")
     private RowLocation rowLocation;
