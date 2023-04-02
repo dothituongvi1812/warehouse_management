@@ -15,7 +15,7 @@ public interface GoodsRepository extends CrudRepository<Goods,Long> {
     Goods findByCode(String code);
     @Query("SELECT g FROM Goods g WHERE g.code LIKE %:keyword% or g.name LIKE %:keyword%")
     List<Goods> findByCodeAndName(@Param("keyword") String keyword);
-
+    @Query("SELECT g FROM Goods g WHERE g.name LIKE %:name%")
     Goods findByName(String name);
 
 }

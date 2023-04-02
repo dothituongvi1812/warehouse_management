@@ -51,7 +51,7 @@ public class AuthController {
         return new ResponseEntity(userServices.authenticationUser(login),HttpStatus.OK);
     }
 
-    @PostMapping({"auth/reset-password"})
+    @PostMapping("auth/reset-password")
     public ResponseEntity<String>updatePassword(@RequestBody @Valid ResetPasswordRequest request, Principal principal){
         request.setEmail(principal.getName());
         if(userServices.resetPassword(request))

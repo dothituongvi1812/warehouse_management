@@ -13,4 +13,5 @@ public interface GoodsServices {
     public GoodsResponse getByCode(String code);
     public List<GoodsResponse> searchByCodeOrName(String keyword);
     public Goods findGoodByCode(String code);
+    public Goods findGoodByName(String name);
 }

@@ -7,6 +7,7 @@ import com.example.warehouse_management.models.warehouse.ColumnLocation;
 import com.example.warehouse_management.models.warehouse.RowLocation;
 import com.example.warehouse_management.models.warehouse.ShelveStorage;
 import com.example.warehouse_management.payload.request.RowLocationRequest;
+import com.example.warehouse_management.payload.request.StatusRequest;
 import com.example.warehouse_management.payload.response.GoodsResponse;
 import com.example.warehouse_management.payload.response.RowLocationResponse;
 import com.example.warehouse_management.repository.ColumnLocationRepository;
@@ -91,6 +92,41 @@ public class RowLocationServicesImpl implements RowLocationServices {
     public RowLocationResponse mapperRowLocation(RowLocation rowLocation) {
         return mapperRowLocationResponse(rowLocation);
     }
+
+    @Override
+    public List<RowLocationResponse> filterStatusByCodeWarehouse(String codeWarehouse, StatusRequest statusRequest) {
+        String request = statusRequest.getStatus();
+        String status="";
+        switch (request){
+            case "Trống":
+            case "trống":
+            case "TRỐNG":
+                status = "TRONG";
+                break;
+            case "Còn chỗ":
+            case "CÒN CHỖ":
+            case "còn chỗ":
+                status = "CONCHO";
+                break;
+            default: status ="DADAY" ;
+        }
+        List<RowLocationResponse> responseList = rowLocationRepository.filterStatusByWarehouseCode(codeWarehouse,status)
+                .stream().map(item->mapperRowLocationResponse(item)).collect(Collectors.toList());
+        return responseList;
+    }
+
+    @Override
+    public List<RowLocation> findAllRowLocationByGoodsCode(String goodCode) {
+        return rowLocationRepository.findByGoodsCode(goodCode);
+    }
+
+    @Override
+    public List<RowLocationResponse> getAllRowLocationByWarehouseCode(String warehouseCode) {
+        List<RowLocationResponse> rowLocationResponses= rowLocationRepository.getAllRowLocationByWarehouseCode(warehouseCode)
+                .stream().map(item->mapperRowLocationResponse(item)).collect(Collectors.toList());
+        return rowLocationResponses;
+    }
+
 
     private String generateRowLocationName(int numberRow){
         String name ="";

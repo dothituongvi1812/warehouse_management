@@ -84,6 +84,15 @@ public class GoodsServicesImpl implements GoodsServices {
         return goods;
     }
 
+    @Override
+    public Goods findGoodByName(String name) {
+        Goods goods =goodsRepository.findByName(name);
+        if(goods==null){
+            throw new NotFoundGlobalException("Không tìm thấy hàng hoá tên "+name);
+        }
+        return goods;
+    }
+
     public GoodsResponse mapperGoodResponse(Goods goods){
         String unit="";
         if(goods.getUnit().equals(EUnit.THUNG)){

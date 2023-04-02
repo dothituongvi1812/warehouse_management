@@ -51,10 +51,25 @@ public interface RowLocationRepository extends CrudRepository<RowLocation,Long> 
     RowLocation findTopOneByStatusTrong(List<String> codeRowLocations );
 
     @Query(nativeQuery = true,
-            value = "select * from row_locations rl \n" +
-                    "where rl.status ='TRONG' and rl.code not in :codeRowLocations\n" +
-                    "order by rl.id asc limit 1")
-    List<RowLocation> findByStatusTrong(List<String> codeRowLocations );
+            value = "select rl.* from row_locations rl \n" +
+                    "join column_locations cl on rl.column_location_id = cl.id \n" +
+                    "join shelve_storages ss on ss.id = cl.shelve_storage_id \n" +
+                    "join warehouse w on w.id =ss.warehouse_id \n" +
+                    "where rl.status =:status and w.code =:code")
+    List<RowLocation> filterStatusByWarehouseCode(String code, String status);
+
+    @Query(nativeQuery = true, value = "select rl.* from row_locations rl \n" +
+            "join goods g ON rl.goods_id = g.id \n" +
+            "where g.code =:goodsCode\n" +
+            "order by rl.current_capacity desc \n")
+    List<RowLocation> findByGoodsCode(String goodsCode);
+    @Query(nativeQuery = true,
+            value = "select rl.* from row_locations rl \n" +
+                    "join column_locations cl on rl.column_location_id = cl.id \n" +
+                    "join shelve_storages ss on ss.id = cl.shelve_storage_id \n" +
+                    "join warehouse w on w.id =ss.warehouse_id \n" +
+                    "where w.code =:code")
+    List<RowLocation> getAllRowLocationByWarehouseCode(String code);
 
 
 }
