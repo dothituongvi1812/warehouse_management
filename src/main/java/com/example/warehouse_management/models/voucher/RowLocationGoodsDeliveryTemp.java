@@ -1,6 +1,8 @@
 package com.example.warehouse_management.models.voucher;
 
+import com.example.warehouse_management.models.goods.GoodsDelivery;
 import com.example.warehouse_management.models.warehouse.RowLocation;
+import com.example.warehouse_management.payload.request.GoodDeliveryRequest;
 import com.example.warehouse_management.payload.request.GoodsRequest;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,7 +14,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class RowLocationGoodsTemp {
+public class RowLocationGoodsDeliveryTemp {
     private RowLocation rowLocation;
-    private GoodsRequest goodsRequest;
+    private GoodsDelivery goodsDelivery;
 }

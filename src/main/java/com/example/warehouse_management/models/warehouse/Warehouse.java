@@ -39,11 +39,6 @@ public class Warehouse {
     private double height;
     private double volume;
     private double acreage;
-
-    private double widthShelve;
-    private double heightShelve;
-    private double lengthShelve;
-    private int numberOfShelve;
     @OneToMany(mappedBy = "warehouse")
     @JsonManagedReference
     private Set<ShelveStorage> shelveStorages;

@@ -3,15 +3,13 @@ package com.example.warehouse_management.controllers;
 import com.example.warehouse_management.payload.request.UserUpdateRequest;
 import com.example.warehouse_management.payload.response.UserResponse;
 import com.example.warehouse_management.services.UserServices;
-import com.example.warehouse_management.services.impl.UserServicesImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
 @RequestMapping ("/api/user")
 public class UserController {

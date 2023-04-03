@@ -74,15 +74,12 @@ public class WarehouseServicesImpl implements WarehouseServices {
         warehouse.setAcreage(request.getLength()* request.getWidth());
         warehouse.setVolume(request.getLength()* request.getWidth()* request.getHeight());
         warehouse.setStatus(EStatusStorage.TRONG);
-        warehouse.setWidthShelve(request.getWidthShelf());
-        warehouse.setLengthShelve(request.getLengthShelf());
-        warehouse.setHeightShelve(request.getHeightShelf());
-        warehouse.setNumberOfShelve(getNumberOfShelve(request.getWidth(), request.getWidthShelf()));
         Warehouse saveResponse=warehouseRepository.save(warehouse);
         WarehouseResponse response=modelMapper.map(saveResponse, WarehouseResponse.class);
+        int numberOfShelve = getNumberOfShelve(request.getWidth(), request.getWidthShelf());
         // xử lý kệ
         int numberShelveInWarehouse = shelveStorageServices.findAll().size();
-        createShelveOfWarehouse(warehouse,numberShelveInWarehouse,warehouse.getNumberOfShelve(),request.getNumberOfFloor());
+        createShelveOfWarehouse(request,warehouse,numberShelveInWarehouse,numberOfShelve,request.getNumberOfFloor());
         //xử lý cột
         List<ShelveStorage> shelveInWarehouse=shelveStorageRepository.findAll();
         createColumnLocationOfShelve(request.getLengthOfColumn(), shelveInWarehouse);
@@ -122,13 +119,13 @@ public class WarehouseServicesImpl implements WarehouseServices {
         String code = String.format("W000%d",id+1);
         return code;
     }
-    private void createShelveOfWarehouse(Warehouse warehouse,int numberShelveInWarehouse,int numberShelveToAdd,int numberOfFloor){
+    private void createShelveOfWarehouse(WarehouseRequest warehouseRequest,Warehouse warehouse,int numberShelveInWarehouse,int numberShelveToAdd,int numberOfFloor){
         for (int i = 0; i < numberShelveToAdd; i++) {
             String nameShelve= "Kệ "+ (i+1);
             String codeShelve ="SS00"+(numberShelveInWarehouse+i+1);
             ShelveStorageRequest shelveStorageRequest=
-                    new ShelveStorageRequest(nameShelve,codeShelve, warehouse.getWidthShelve(),
-                            warehouse.getLengthShelve(),warehouse.getHeightShelve(), numberOfFloor, warehouse.getCode());
+                    new ShelveStorageRequest(nameShelve,codeShelve, warehouseRequest.getWidthShelf(),
+                            warehouseRequest.getLengthShelf(),warehouseRequest.getLengthShelf(), numberOfFloor, warehouse.getCode());
             shelveStorageServices.addShelfStorage(shelveStorageRequest);
         }
     }

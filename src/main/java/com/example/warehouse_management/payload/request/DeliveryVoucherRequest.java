@@ -10,7 +10,8 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 public class DeliveryVoucherRequest {
-    private PartnerRequest partnerRequest;
+    private String partnerName;
     private List<GoodDeliveryRequest> goodsRequests;
     private String email;
+    private String reason;
 }

@@ -71,5 +71,19 @@ public interface RowLocationRepository extends CrudRepository<RowLocation,Long> 
                     "where w.code =:code")
     List<RowLocation> getAllRowLocationByWarehouseCode(String code);
 
+    @Query(nativeQuery = true,value = "select sum(current_capacity)  from row_locations rl \n" +
+            "join goods g ON rl.goods_id = g.id \n" +
+            "where g.name =:goodsName\n" +
+            "group by goods_id ")
+    int getSumCurrentCapacityByGoodsName(String goodsName);
+
+    @Query(nativeQuery = true,value = "select * from row_locations rl  \n" +
+            "join goods g ON rl.goods_id = g.id \n" +
+            "where g.name =:goodsName and (select sum(current_capacity)  from row_locations rl \n" +
+            "join goods g ON rl.goods_id = g.id \n" +
+            "where g.name =:goodsName\n" +
+            "group by goods_id ) >=:quantity\n" +
+            "order by current_capacity desc ")
+    List<RowLocation> findByGoodsNameEnoughToExport(String goodsName, int quantity);
 
 }

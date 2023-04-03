@@ -10,7 +10,6 @@ import com.example.warehouse_management.repository.RoleRepository;
 import com.example.warehouse_management.repository.UserRepository;
 import com.example.warehouse_management.security.jwt.JwtUtils;
 import com.example.warehouse_management.services.UserServices;
-import com.example.warehouse_management.services.impl.UserServicesImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +21,7 @@ import javax.mail.MessagingException;
 import javax.validation.Valid;
 import java.io.UnsupportedEncodingException;
 import java.security.Principal;
-
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
 @RequestMapping("/api")
 public class AuthController {

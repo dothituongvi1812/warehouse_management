@@ -19,7 +19,7 @@ public class RegisterUserRequest {
     @Email(message = "Địa chỉ email không hợp lệ",flags = { Pattern.Flag.CASE_INSENSITIVE })
     private String email;
 
-    private Set<String> roles;
+    private String role;
 
     @NotBlank(message = "Mật khẩu là bắt buộc")
     @Pattern(regexp ="^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$"

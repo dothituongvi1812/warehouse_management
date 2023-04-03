@@ -1,6 +1,7 @@
 package com.example.warehouse_management.models.voucher;
 
 import com.example.warehouse_management.models.goods.Goods;
+import com.example.warehouse_management.models.warehouse.RowLocation;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,5 +25,10 @@ public class DeliveryVoucherDetail {
     @MapsId("deliveryVoucherId")
     @JoinColumn(name = "delivery_voucher_id")
     private InventoryDeliveryVoucher inventoryDeliveryVoucher;
+
+    @ManyToOne
+    @MapsId("rowLocationId")
+    @JoinColumn(name = "row_location_id")
+    private RowLocation rowLocation;
     private int quantity;
 }

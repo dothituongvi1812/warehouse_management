@@ -127,6 +127,16 @@ public class RowLocationServicesImpl implements RowLocationServices {
         return rowLocationResponses;
     }
 
+    @Override
+    public int getSumCurrentCapacityByGoodsName(String goodsName) {
+        return rowLocationRepository.getSumCurrentCapacityByGoodsName(goodsName);
+    }
+
+    @Override
+    public List<RowLocation> findAllByGoodsNameEnoughToExport(String goodsName, int quantity) {
+        return rowLocationRepository.findByGoodsNameEnoughToExport(goodsName,quantity);
+    }
+
 
     private String generateRowLocationName(int numberRow){
         String name ="";

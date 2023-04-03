@@ -22,14 +22,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
-import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
-import org.springframework.web.util.UrlPathHelper;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.security.Security;
 
 @Configuration
 @Order(Ordered.HIGHEST_PRECEDENCE)
@@ -92,7 +84,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/register").permitAll()
                 .antMatchers("/api/user/**").authenticated()
                 .antMatchers("/api/auth/login").permitAll()
-                .antMatchers("/api/**").authenticated()
+                .antMatchers("/api/auth/forget").permitAll()
                 .antMatchers("/api/auth/reset-password").authenticated()
                 .antMatchers("/test/**").authenticated()
                 .antMatchers("/api/category/**").authenticated()

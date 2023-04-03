@@ -81,15 +81,14 @@ public class UserServicesImpl implements UserServices {
         // Create new user's account
         User user = new User(code, registerRequest.getEmail(), encoder.encode(registerRequest.getPassword()),
                 registerRequest.getFullName(),registerRequest.getSex(), true);
-        Set<String> strRoles = registerRequest.getRoles();
+
         Set<Role> roles = new HashSet<>();
-        if (strRoles == null) {
+        if (registerRequest.getRole() == null) {
             Role userRole = roleRepository.findByName(ERole.USER)
                     .orElseThrow(() -> new NotFoundGlobalException("Error: Role is not found."));
             roles.add(userRole);
         } else {
-            strRoles.forEach(role -> {
-                switch (role) {
+                switch (registerRequest.getRole()) {
                     case "admin":
                     case "Admin":
                     case "ADMIN":
@@ -102,7 +101,7 @@ public class UserServicesImpl implements UserServices {
                                 .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
                         roles.add(userRole);
                 }
-            });
+
         }
         user.setRoles(roles);
         user.setCreateDate(new Date());

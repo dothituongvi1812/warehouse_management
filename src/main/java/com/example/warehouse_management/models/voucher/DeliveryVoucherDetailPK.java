@@ -13,17 +13,18 @@ import java.util.Objects;
 public class DeliveryVoucherDetailPK implements Serializable {
     private Long goodsId;
     private Long deliveryVoucherId;
+    private Long rowLocationId;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         DeliveryVoucherDetailPK that = (DeliveryVoucherDetailPK) o;
-        return Objects.equals(goodsId, that.goodsId) && Objects.equals(deliveryVoucherId, that.deliveryVoucherId);
+        return Objects.equals(goodsId, that.goodsId) && Objects.equals(deliveryVoucherId, that.deliveryVoucherId) && Objects.equals(rowLocationId, that.rowLocationId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(goodsId, deliveryVoucherId);
+        return Objects.hash(goodsId, deliveryVoucherId, rowLocationId);
     }
 }

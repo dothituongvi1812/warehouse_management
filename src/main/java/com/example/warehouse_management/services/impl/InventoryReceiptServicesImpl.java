@@ -3,16 +3,14 @@ package com.example.warehouse_management.services.impl;
 import com.example.warehouse_management.exception.NotEnoughSpaceException;
 import com.example.warehouse_management.exception.NotFoundGlobalException;
 import com.example.warehouse_management.models.goods.Goods;
-import com.example.warehouse_management.models.goods.GoodsReceipt;
 import com.example.warehouse_management.models.partner.Partner;
 import com.example.warehouse_management.models.type.EStatusStorage;
-import com.example.warehouse_management.models.type.EUnit;
 import com.example.warehouse_management.models.user.User;
+import com.example.warehouse_management.models.voucher.DeliveryVoucherDetail;
 import com.example.warehouse_management.models.voucher.InventoryReceiptVoucher;
 import com.example.warehouse_management.models.voucher.ReceiptVoucherDetail;
 import com.example.warehouse_management.models.voucher.RowLocationGoodsTemp;
 import com.example.warehouse_management.models.warehouse.RowLocation;
-import com.example.warehouse_management.models.warehouse.Warehouse;
 import com.example.warehouse_management.payload.request.GoodsRequest;
 import com.example.warehouse_management.payload.request.ReceiptVoucherRequest;
 import com.example.warehouse_management.payload.response.*;
@@ -21,6 +19,7 @@ import com.example.warehouse_management.repository.ReceiptVoucherDetailRepositor
 import com.example.warehouse_management.repository.RowLocationRepository;
 import com.example.warehouse_management.repository.UserRepository;
 import com.example.warehouse_management.services.*;
+import com.example.warehouse_management.services.domain.UtillServies;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -80,12 +79,12 @@ public class InventoryReceiptServicesImpl implements InventoryReceiptServices {
                 int quantityRequest = goodsRequest.getQuantity();
                 for (RowLocation rl : rowLocationList) {
                     if (rl.getRemainingVolume() >= volumeGoods) {
-                        RowLocationGoodsTemp rowLocationGoodsTemp = new RowLocationGoodsTemp(rl.getCode(), goodsRequest);
+                        RowLocationGoodsTemp rowLocationGoodsTemp = new RowLocationGoodsTemp(rl, goodsRequest);
                         rowLocationGoodsTempList.add(rowLocationGoodsTemp);
                         rowLocationCodeSelected.add(rl.getCode());
                     } else {
                         int quantityRefill = rl.getMaxCapacity() - rl.getCurrentCapacity();
-                        RowLocationGoodsTemp rowLocationGoodsTemp = new RowLocationGoodsTemp(rl.getCode(),
+                        RowLocationGoodsTemp rowLocationGoodsTemp = new RowLocationGoodsTemp(rl,
                                 new GoodsRequest(goodsRequest.getName(),
                                         goodsRequest.getHeight(), goodsRequest.getWidth(), goodsRequest.getLength(),
                                         goodsRequest.getUnit(), quantityRefill, goodsRequest.getCategoryCode(), goodsRequest.getVolume()));
@@ -100,7 +99,7 @@ public class InventoryReceiptServicesImpl implements InventoryReceiptServices {
                     int maxCapacity = (int) (volumeRowLocation / volume1SP);
                     if (quantityRequest <= maxCapacity) {
                         RowLocation rowLocation1 = rowLocationRepository.findTopOneByStatusTrong(rowLocationCodeSelected);
-                        RowLocationGoodsTemp rowLocationGoodsTemp = new RowLocationGoodsTemp(rowLocation1.getCode(),
+                        RowLocationGoodsTemp rowLocationGoodsTemp = new RowLocationGoodsTemp(rowLocation1,
                                 new GoodsRequest(goodsRequest.getName(),
                                         goodsRequest.getHeight(), goodsRequest.getWidth(), goodsRequest.getLength(),
                                         goodsRequest.getUnit(), quantityRequest, goodsRequest.getCategoryCode(), goodsRequest.getVolume()));
@@ -182,9 +181,7 @@ public class InventoryReceiptServicesImpl implements InventoryReceiptServices {
         response.setCreatedBy(inventoryReceiptVoucher.getCreatedBy().getFullName());
         response.setPartner(modelMapper.map(inventoryReceiptVoucher.getPartner(), PartnerResponse.class));
         Set<ReceiptVoucherDetailResponse> detailResponseSet = inventoryReceiptVoucher
-                .getReceiptVoucherDetails().stream().map(item -> new ReceiptVoucherDetailResponse(goodsServicesImpl.mapperGoodResponse(item.getGoods())
-                        , mapperLocationInWarehouse(item.getRowLocation())
-                        , item.getQuantity()))
+                .getReceiptVoucherDetails().stream().map(item -> mapperReceiptVoucherDetailResponse(item))
                 .collect(Collectors.toSet());
         response.setReceiptVoucherDetails(detailResponseSet);
         return response;
@@ -202,16 +199,6 @@ public class InventoryReceiptServicesImpl implements InventoryReceiptServices {
         return receiptCode + (id + 1);
     }
 
-    private EUnit parseUnitGood(String unit) {
-        EUnit unitGoods = null;
-        switch (unit) {
-            case "Thùng":
-            case "thùng":
-                unitGoods = EUnit.THUNG;
-        }
-        return unitGoods;
-    }
-
     private double[] createArraySize(double width, double height, double length) {
         double[] size = {width, height, length};
         Arrays.sort(size);
@@ -224,19 +211,6 @@ public class InventoryReceiptServicesImpl implements InventoryReceiptServices {
             return true;
         else
             throw new NotEnoughSpaceException(goodsName + "không thể chứa");
-    }
-
-    private LocationInWarehouse mapperLocationInWarehouse(RowLocation rowLocation) {
-        LocationInWarehouse locationInWarehouse = new LocationInWarehouse();
-        locationInWarehouse.setNameRow(rowLocation.getName());
-        locationInWarehouse.setCodeRow(rowLocation.getCode());
-        locationInWarehouse.setNameColumn(rowLocation.getColumnLocation().getName());
-        locationInWarehouse.setCodeColumn(rowLocation.getColumnLocation().getCode());
-        locationInWarehouse.setNameShelf(rowLocation.getColumnLocation().getShelveStorage().getName());
-        locationInWarehouse.setCodeShelf(rowLocation.getColumnLocation().getShelveStorage().getCode());
-        locationInWarehouse.setNameWarehouse(rowLocation.getColumnLocation().getShelveStorage().getWarehouse().getName());
-        locationInWarehouse.setCodeWarehouse(rowLocation.getColumnLocation().getShelveStorage().getWarehouse().getCode());
-        return locationInWarehouse;
     }
 
     private InventoryReceiptVoucher createObjectReceiptVoucher(Partner partner, User user) {
@@ -254,17 +228,22 @@ public class InventoryReceiptServicesImpl implements InventoryReceiptServices {
         receiptVoucherDetail.setInventoryReceiptVoucher(saveInventoryReceiptVoucher);
         receiptVoucherDetail.setGoods(goodsServices.createGoods(rowLocationGoodsTemp.getGoodsRequest()));
         receiptVoucherDetail.setQuantity(rowLocationGoodsTemp.getGoodsRequest().getQuantity());
-        receiptVoucherDetail.setRowLocation(rowLocationServices.findRowLocationByCode(rowLocationGoodsTemp.getRowLocationOfShelfCode()));
+        receiptVoucherDetail.setRowLocation(rowLocationGoodsTemp.getRowLocation());
         receiptVoucherDetailRepository.save(receiptVoucherDetail);
 
         return receiptVoucherDetail;
+    }
+    private ReceiptVoucherDetailResponse mapperReceiptVoucherDetailResponse(ReceiptVoucherDetail receiptVoucherDetail){
+        ReceiptVoucherDetailResponse detailResponse = new ReceiptVoucherDetailResponse(goodsServicesImpl.mapperGoodResponse(
+                receiptVoucherDetail.getGoods()), UtillServies.mapperLocationInWarehouse(receiptVoucherDetail.getRowLocation()),receiptVoucherDetail.getQuantity());
+        return detailResponse;
     }
 
     private void process(GoodsRequest goodsRequest, double volumeGoods, double volumeRowLocation, List<RowLocationGoodsTemp> rowLocationGoodsTempList, List<String> rowLocationCodeSelected) {
         double numberRowLocation = volumeGoods / volumeRowLocation;
         if (numberRowLocation <= 1) {
             RowLocation rowLocationSelected = rowLocationRepository.findTopOneByStatusTrongAndRemainingVolumeGreaterThanEqual(volumeGoods, rowLocationCodeSelected);
-            RowLocationGoodsTemp rowLocationGoodsTemp = new RowLocationGoodsTemp(rowLocationSelected.getCode(), goodsRequest);
+            RowLocationGoodsTemp rowLocationGoodsTemp = new RowLocationGoodsTemp(rowLocationSelected, goodsRequest);
             rowLocationGoodsTempList.add(rowLocationGoodsTemp);
             //selected
             rowLocationCodeSelected.add(rowLocationSelected.getCode());
@@ -279,7 +258,7 @@ public class InventoryReceiptServicesImpl implements InventoryReceiptServices {
                 int quantity = goodsRequest.getQuantity();
                 for (RowLocation rl : rowLocationSelectedList) {
                     RowLocationGoodsTemp rowLocationGoodsTemp = new RowLocationGoodsTemp();
-                    rowLocationGoodsTemp.setRowLocationOfShelfCode(rl.getCode());
+                    rowLocationGoodsTemp.setRowLocation(rl);
                     if (quantity <= maxGoodsShelfContain) {
                         goodsRequest.setQuantity(quantity);
                     } else {

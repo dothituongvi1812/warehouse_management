@@ -1,6 +1,5 @@
 package com.example.warehouse_management.controllers;
 
-import com.example.warehouse_management.models.warehouse.ShelveStorage;
 import com.example.warehouse_management.payload.request.RowLocationRequest;
 import com.example.warehouse_management.payload.request.StatusRequest;
 import com.example.warehouse_management.payload.response.RowLocationResponse;
