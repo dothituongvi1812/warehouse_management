@@ -79,7 +79,7 @@ public class GoodsServicesImpl implements GoodsServices {
     public Goods findGoodByCode(String code) {
         Goods goods=goodsRepository.findByCode(code);
         if(goods==null){
-            throw new NotFoundGlobalException("Không tìm thấy hàng hoá mã "+code);
+            throw new NotFoundGlobalException("Không tìm thấy hàng hoá có mã "+code);
         }
         return goods;
     }

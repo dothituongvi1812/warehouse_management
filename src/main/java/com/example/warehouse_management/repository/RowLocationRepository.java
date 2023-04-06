@@ -75,7 +75,7 @@ public interface RowLocationRepository extends CrudRepository<RowLocation,Long> 
             "join goods g ON rl.goods_id = g.id \n" +
             "where g.name =:goodsName\n" +
             "group by goods_id ")
-    int getSumCurrentCapacityByGoodsName(String goodsName);
+    Integer getSumCurrentCapacityByGoodsName(String goodsName);
 
     @Query(nativeQuery = true,value = "select * from row_locations rl  \n" +
             "join goods g ON rl.goods_id = g.id \n" +

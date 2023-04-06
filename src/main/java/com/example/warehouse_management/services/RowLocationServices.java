@@ -4,6 +4,7 @@ import com.example.warehouse_management.models.warehouse.RowLocation;
 import com.example.warehouse_management.payload.request.RowLocationRequest;
 import com.example.warehouse_management.payload.request.StatusRequest;
 import com.example.warehouse_management.payload.response.RowLocationResponse;
+import io.swagger.models.auth.In;
 
 import java.util.List;
 
@@ -18,6 +19,6 @@ public interface RowLocationServices {
     public List<RowLocationResponse> filterStatusByCodeWarehouse(String codeWarehouse, StatusRequest statusRequest);
     public List<RowLocation> findAllRowLocationByGoodsCode(String goodCode);
     public List<RowLocationResponse> getAllRowLocationByWarehouseCode(String goodCode);
-    public int getSumCurrentCapacityByGoodsName(String warehouseCode);
+    public Integer getSumCurrentCapacityByGoodsName(String goodsName);
     public List<RowLocation> findAllByGoodsNameEnoughToExport(String goodsName,int quantity);
 }

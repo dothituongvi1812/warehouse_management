@@ -5,6 +5,8 @@ import com.example.warehouse_management.payload.request.ReceiptVoucherRequest;
 import com.example.warehouse_management.payload.response.InventoryReceiptVoucherResponse;
 import com.example.warehouse_management.payload.response.RowLocationResponse;
 import com.example.warehouse_management.services.InventoryReceiptServices;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +19,7 @@ import java.util.List;
 @RestController
 @RequestMapping("api/receipt-voucher")
 public class InventoryReceiptVoucherController {
+    private Logger logger = LoggerFactory.getLogger(getClass());
     @Autowired
     InventoryReceiptServices inventoryReceiptServices;
     @PostMapping("/create")

@@ -3,6 +3,8 @@ package com.example.warehouse_management.controllers;
 import com.example.warehouse_management.payload.request.GoodsRequest;
 import com.example.warehouse_management.payload.response.GoodsResponse;
 import com.example.warehouse_management.services.GoodsServices;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +16,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/goods")
 public class GoodsController {
+    private Logger logger = LoggerFactory.getLogger(getClass());
     @Autowired
     GoodsServices goodsServices;
     @PostMapping("/add")

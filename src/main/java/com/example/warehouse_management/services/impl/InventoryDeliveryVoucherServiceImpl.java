@@ -11,6 +11,8 @@ import com.example.warehouse_management.models.user.User;
 import com.example.warehouse_management.models.voucher.*;
 import com.example.warehouse_management.models.warehouse.RowLocation;
 import com.example.warehouse_management.payload.request.DeliveryVoucherRequest;
+import com.example.warehouse_management.payload.request.GoodDeliveryRequest;
+import com.example.warehouse_management.payload.request.GoodsRequest;
 import com.example.warehouse_management.payload.response.*;
 import com.example.warehouse_management.repository.InventoryDeliveryVoucherRepository;
 import com.example.warehouse_management.repository.RowLocationRepository;
@@ -23,6 +25,7 @@ import com.example.warehouse_management.services.domain.UtillServies;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
 import java.text.SimpleDateFormat;
@@ -45,6 +48,12 @@ public class InventoryDeliveryVoucherServiceImpl implements InventoryDeliveryVou
     private ModelMapper modelMapper = new ModelMapper();
     @Override
     public InventoryDeliveryVoucherResponse createInventoryDeliveryVoucher(DeliveryVoucherRequest deliveryVoucherRequest) {
+        //Trước hết kiểm tra các sp nhập vào có trên kệ không
+        for (GoodDeliveryRequest request:deliveryVoucherRequest.getGoodsRequests()) {
+            List<RowLocation> rowLocationList = rowLocationServices.findAllRowLocationByGoodsCode(request.getGoodCode());
+            if(CollectionUtils.isEmpty(rowLocationList))
+                throw new ErrorException("Hàng hoá có mã "+ request.getGoodCode() + " chưa có trên kệ");
+        }
         InventoryDeliveryVoucher inventoryDeliveryVoucher = new InventoryDeliveryVoucher();
         User user = userRepository.findUserByEmail(deliveryVoucherRequest.getEmail());
         Partner partner = partnerServices.findPartnerByPhone(deliveryVoucherRequest.getPartnerPhone());
@@ -54,7 +63,7 @@ public class InventoryDeliveryVoucherServiceImpl implements InventoryDeliveryVou
                 .map(item->new GoodsDelivery(goodsServices.findGoodByCode(item.getGoodCode()), item.getQuantity())).collect(Collectors.toList());
         for (GoodsDelivery goodDelivery:goodsDeliveryList) {
             //tìm những vị trí sao cho số lượng current >=quantity request
-            int sumQuantityOfGoods=rowLocationServices.getSumCurrentCapacityByGoodsName(goodDelivery.getGoods().getName());
+            int sumQuantityOfGoods=rowLocationServices.getSumCurrentCapacityByGoodsName(goodDelivery.getGoods().getName()).intValue();
             if(goodDelivery.getQuantity()>sumQuantityOfGoods){
                 throw new ErrorException("Không đủ số lượng để xuất");
             }

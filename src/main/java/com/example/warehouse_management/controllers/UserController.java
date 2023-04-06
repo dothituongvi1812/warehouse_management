@@ -3,6 +3,8 @@ package com.example.warehouse_management.controllers;
 import com.example.warehouse_management.payload.request.UserUpdateRequest;
 import com.example.warehouse_management.payload.response.UserResponse;
 import com.example.warehouse_management.services.UserServices;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +15,7 @@ import javax.validation.Valid;
 @RestController
 @RequestMapping ("/api/user")
 public class UserController {
+    private Logger logger = LoggerFactory.getLogger(getClass());
     @Autowired
     UserServices userServices;
     @PostMapping("/update/{code}")

@@ -130,8 +130,8 @@ public class RowLocationServicesImpl implements RowLocationServices {
     }
 
     @Override
-    public int getSumCurrentCapacityByGoodsName(String goodsName) {
-        return rowLocationRepository.getSumCurrentCapacityByGoodsName(goodsName);
+    public Integer getSumCurrentCapacityByGoodsName(String goodsName) {
+    return rowLocationRepository.getSumCurrentCapacityByGoodsName(goodsName);
     }
 
     @Override
