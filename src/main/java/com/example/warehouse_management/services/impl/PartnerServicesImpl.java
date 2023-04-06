@@ -37,6 +37,17 @@ public class PartnerServicesImpl implements PartnerServices {
     }
 
     @Override
+    public PartnerResponse createPartner(PartnerRequest partnerRequest) {
+        Partner partner =new Partner();
+        partner.setCode(generatePartnerCode());
+        partner.setAddress(partnerRequest.getAddress());
+        partner.setName(partnerRequest.getName());
+        partner.setPhone(partnerRequest.getPhone());
+        Partner savePartner=partnerRepository.save(partner);
+        return modelMapper.map(savePartner,PartnerResponse.class);
+    }
+
+    @Override
     public List<PartnerResponse> getAll() {
         List<PartnerResponse> responses=partnerRepository.findAll().stream()
                 .map(partner -> modelMapper.map(partner,PartnerResponse.class)).collect(Collectors.toList());

@@ -33,6 +33,7 @@ public class RowLocationServicesImpl implements RowLocationServices {
     ColumnLocationRepository columnLocationRepository;
     @Autowired
     RowLocationRepository rowLocationRepository;
+    @Autowired
     private GoodsServices goodsServices;
     private ModelMapper modelMapper=new ModelMapper();
     @Override

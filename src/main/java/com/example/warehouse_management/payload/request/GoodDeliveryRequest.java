@@ -14,8 +14,8 @@ import javax.validation.constraints.NotBlank;
 @NoArgsConstructor
 @AllArgsConstructor
 public class GoodDeliveryRequest {
+    @NotBlank(message = "Mã hàng hóa không thể trống")
     private String goodCode;
-
     @Min(value = 1,message = "Số lượng hàng hoá phải lớn hơn 0")
     private int quantity;
 }

@@ -255,6 +255,7 @@ public class InventoryReceiptServicesImpl implements InventoryReceiptServices {
         return receiptVoucherDetail;
     }
     private ReceiptVoucherDetailResponse mapperReceiptVoucherDetailResponse(ReceiptVoucherDetail receiptVoucherDetail){
+
         ReceiptVoucherDetailResponse detailResponse = new ReceiptVoucherDetailResponse(goodsServices.mapperGoods(
                 receiptVoucherDetail.getGoods()), UtillServies.mapperLocationInWarehouse(receiptVoucherDetail.getRowLocation()),receiptVoucherDetail.getQuantity());
         return detailResponse;

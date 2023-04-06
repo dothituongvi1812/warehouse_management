@@ -28,6 +28,6 @@ public class InventoryDeliveryVoucherController {
     }
     @GetMapping("/get-delivery-by/{deliveryVoucherCode}")
     public ResponseEntity<?> getDeliveryVoucherByCode(@PathVariable String deliveryVoucherCode){
-        return new ResponseEntity(inventoryDeliveryVoucherServices.exportGoods(deliveryVoucherCode),HttpStatus.OK);
+        return new ResponseEntity(inventoryDeliveryVoucherServices.getDeliveryVoucherByCode(deliveryVoucherCode),HttpStatus.OK);
     }
 }

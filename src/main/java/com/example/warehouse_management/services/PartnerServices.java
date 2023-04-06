@@ -7,7 +7,8 @@ import com.example.warehouse_management.payload.response.PartnerResponse;
 import java.util.List;
 
 public interface PartnerServices {
-     Partner addPartner(PartnerRequest partnerRequest);
+    Partner addPartner(PartnerRequest partnerRequest);
+    PartnerResponse createPartner(PartnerRequest partnerRequest);
     List<PartnerResponse> getAll();
     PartnerResponse getPartnerByCode(String code);
     PartnerResponse getPartnerByPhone(String phone);
