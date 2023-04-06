@@ -15,4 +15,6 @@ public interface InventoryReceiptVoucherRepository extends CrudRepository<Invent
             value = "select * from inventory_receipt_vouchers irv \n" +
                     "order by create_date desc ")
     List<InventoryReceiptVoucher> findAllBySortedCreateDate();
+
+    InventoryReceiptVoucher findInventoryReceiptVoucherByCode(String voucherCode);
 }

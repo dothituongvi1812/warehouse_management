@@ -32,4 +32,8 @@ public class GoodsController {
     public ResponseEntity<List<GoodsResponse>> searchByCodeOrName(@PathVariable String keyword){
         return new ResponseEntity(goodsServices.searchByCodeOrName(keyword),HttpStatus.OK);
     }
+    @GetMapping("/get-all-by/{categoryCode}")
+    public ResponseEntity<List<GoodsResponse>> getAllByCategoryCode(@PathVariable String categoryCode ){
+        return new ResponseEntity(goodsServices.getAllByCategoryCode(categoryCode),HttpStatus.OK);
+    }
 }

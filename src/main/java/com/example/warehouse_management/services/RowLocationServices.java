@@ -18,6 +18,6 @@ public interface RowLocationServices {
     public List<RowLocationResponse> filterStatusByCodeWarehouse(String codeWarehouse, StatusRequest statusRequest);
     public List<RowLocation> findAllRowLocationByGoodsCode(String goodCode);
     public List<RowLocationResponse> getAllRowLocationByWarehouseCode(String goodCode);
-    public int getSumCurrentCapacityByGoodsName(String goodsName);
+    public int getSumCurrentCapacityByGoodsName(String warehouseCode);
     public List<RowLocation> findAllByGoodsNameEnoughToExport(String goodsName,int quantity);
 }

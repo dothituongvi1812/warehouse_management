@@ -12,5 +12,6 @@ public interface PartnerRepository extends CrudRepository<Partner,Long> {
     List<Partner> findAll();
     Partner findByCode(String code);
     Partner findByName(String name);
+    Partner findByPhone(String phone);
 
 }

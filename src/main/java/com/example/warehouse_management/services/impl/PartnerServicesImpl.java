@@ -1,5 +1,6 @@
 package com.example.warehouse_management.services.impl;
 
+import com.example.warehouse_management.exception.NotFoundGlobalException;
 import com.example.warehouse_management.models.partner.Partner;
 import com.example.warehouse_management.payload.request.PartnerRequest;
 import com.example.warehouse_management.payload.response.PartnerResponse;
@@ -22,7 +23,7 @@ public class PartnerServicesImpl implements PartnerServices {
     private ModelMapper modelMapper=new ModelMapper();
     @Override
     public Partner addPartner(PartnerRequest partnerRequest) {
-        Partner partnerSearch=partnerRepository.findByName(partnerRequest.getName());
+        Partner partnerSearch=partnerRepository.findByPhone(partnerRequest.getPhone());
         if (ObjectUtils.isEmpty(partnerSearch)){
             Partner partner =new Partner();
             partner.setCode(generatePartnerCode());
@@ -46,6 +47,20 @@ public class PartnerServicesImpl implements PartnerServices {
     public PartnerResponse getPartnerByCode(String code) {
         PartnerResponse partnerResponse=modelMapper.map(partnerRepository.findByCode(code),PartnerResponse.class);
         return partnerResponse;
+    }
+
+    @Override
+    public PartnerResponse getPartnerByPhone(String phone) {
+        PartnerResponse partnerResponse=modelMapper.map(partnerRepository.findByPhone(phone),PartnerResponse.class);
+        return partnerResponse;
+    }
+
+    @Override
+    public Partner findPartnerByPhone(String phone) {
+        Partner partner = partnerRepository.findByPhone(phone);
+        if(partner==null)
+            throw new NotFoundGlobalException("Không tìm thấy đối tác có số điện thoại"+ phone);
+        return partner;
     }
 
     private String generatePartnerCode(){

@@ -73,7 +73,6 @@ public class WarehouseServicesImpl implements WarehouseServices {
         warehouse.setWidth(request.getWidth());
         warehouse.setAcreage(request.getLength()* request.getWidth());
         warehouse.setVolume(request.getLength()* request.getWidth()* request.getHeight());
-        warehouse.setStatus(EStatusStorage.TRONG);
         Warehouse saveResponse=warehouseRepository.save(warehouse);
         WarehouseResponse response=modelMapper.map(saveResponse, WarehouseResponse.class);
         int numberOfShelve = getNumberOfShelve(request.getWidth(), request.getWidthShelf());
@@ -125,7 +124,7 @@ public class WarehouseServicesImpl implements WarehouseServices {
             String codeShelve ="SS00"+(numberShelveInWarehouse+i+1);
             ShelveStorageRequest shelveStorageRequest=
                     new ShelveStorageRequest(nameShelve,codeShelve, warehouseRequest.getWidthShelf(),
-                            warehouseRequest.getLengthShelf(),warehouseRequest.getLengthShelf(), numberOfFloor, warehouse.getCode());
+                            warehouseRequest.getLengthShelf(),warehouseRequest.getHeightShelf(), numberOfFloor, warehouse.getCode());
             shelveStorageServices.addShelfStorage(shelveStorageRequest);
         }
     }

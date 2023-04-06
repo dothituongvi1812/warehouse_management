@@ -14,4 +14,5 @@ public interface InventoryReceiptServices {
     public List<RowLocationResponse> putTheGoodsOnShelf(String receiptVoucherCode);
     public List<InventoryReceiptVoucherResponse> getAllSortedByDate();
     public List<InventoryReceiptVoucher> getAll();
+    public InventoryReceiptVoucherResponse getReceiptVoucherByCode(String voucherCode);
 }

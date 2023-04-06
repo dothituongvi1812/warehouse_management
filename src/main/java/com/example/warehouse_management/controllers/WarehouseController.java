@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -17,7 +18,7 @@ public class WarehouseController {
     private WarehouseServices warehouseServices;
 
     @PostMapping("/add")
-    public ResponseEntity<WarehouseResponse> addGeneralWarehouse(@RequestBody WarehouseRequest request){
+    public ResponseEntity<WarehouseResponse> addGeneralWarehouse(@Valid @RequestBody WarehouseRequest request){
         return new ResponseEntity(warehouseServices.addWarehouse(request), HttpStatus.OK);
     }
     @GetMapping("/get-all")

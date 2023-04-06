@@ -5,6 +5,6 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class NotEnoughSpaceException extends RuntimeException{
+public class ErrorException extends RuntimeException{
     private String message;
 }

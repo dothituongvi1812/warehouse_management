@@ -21,4 +21,5 @@ public class InventoryDeliveryVoucherResponse {
     private PartnerResponse partner;
     private Date createDate;
     private String reason;
+    String status;
 }

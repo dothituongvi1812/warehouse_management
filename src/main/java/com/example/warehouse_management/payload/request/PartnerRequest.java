@@ -15,6 +15,6 @@ public class PartnerRequest {
     private String name;
     private String address;
     @NotBlank(message = "Số điện thoại không thể trống")
-    @Pattern(regexp = "(84|0[3|5|7|8|9])+([0-9]{8})\\b")
+    @Pattern(regexp = "(84|0[3|5|7|8|9])+([0-9]{8})\\b",message = "Số điện thoại không hợp lệ")
     private String phone;
 }

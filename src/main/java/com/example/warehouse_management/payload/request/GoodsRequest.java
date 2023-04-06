@@ -7,23 +7,27 @@ import lombok.Setter;
 
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.Digits;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class GoodsRequest {
+    @NotBlank(message = "Tên hàng hoá là không thể trống")
     private String name;
-    @DecimalMin(value = "0.1",message = "Height is not valid")
+    @DecimalMin(value = "0.1",message = "Chiều cao phải lớn hơn 0")
     private double height;
-    @DecimalMin(value = "0.1",message = "Width is not valid")
+    @DecimalMin(value = "0.1",message = "Chiều rộng phải lớn hơn 0")
     private double width;
-    @DecimalMin(value = "0.1",message = "Length is not valid")
+    @DecimalMin(value = "0.1",message = "Chiều dài phải lớn hơn 0")
     private double length;
-    @DecimalMin(value = "0.1",message = "Length is not valid")
+    @NotBlank(message = "Đơn vị hàng hoá không thể trống")
     private String unit;
-    @Digits(message = "Quantity must be a number", integer = 8, fraction = 0)
+    @Min(value = 1,message = "Số lượng hàng hoá phải lớn hơn 0")
     private int quantity;
+    @NotBlank(message = "Loại hàng hoá là không thể trống")
     private String categoryCode;
     private double volume;
 

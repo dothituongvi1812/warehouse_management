@@ -26,8 +26,6 @@ public class ShelveStorage {
     private double height;
     private double length;
 
-    @Enumerated(EnumType.STRING)
-    private EStatusStorage status;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "warehouseId")
     private Warehouse warehouse;

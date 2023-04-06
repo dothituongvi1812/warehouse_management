@@ -93,6 +93,18 @@ public class GoodsServicesImpl implements GoodsServices {
         return goods;
     }
 
+    @Override
+    public GoodsResponse mapperGoods(Goods goods) {
+        return mapperGoodResponse(goods);
+    }
+
+    @Override
+    public List<GoodsResponse> getAllByCategoryCode(String categoryCode) {
+        List<GoodsResponse> responseList = goodsRepository.findAllByCategory(categoryCode).stream()
+                .map(item->mapperGoodResponse(item)).collect(Collectors.toList());
+        return responseList;
+    }
+
     public GoodsResponse mapperGoodResponse(Goods goods){
         String unit="";
         if(goods.getUnit().equals(EUnit.THUNG)){

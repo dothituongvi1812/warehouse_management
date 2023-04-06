@@ -1,7 +1,6 @@
 package com.example.warehouse_management.exception;
 
 import com.example.warehouse_management.payload.response.ErrorResponse;
-import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,14 +9,11 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @ControllerAdvice
 @ResponseBody
@@ -36,10 +32,10 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
 
     }
-    @ExceptionHandler(value={ NotEnoughSpaceException.class })
-    public ResponseEntity<?> handleExceptionA(NotEnoughSpaceException e) {
-        ErrorResponse errorResponse =ErrorResponse.builder().statusCode(HttpStatus.IM_USED.value()).message(e.getMessage()).build();
-        return new ResponseEntity<>(errorResponse,new HttpHeaders(),HttpStatus.IM_USED);
+    @ExceptionHandler(value={ ErrorException.class })
+    public ResponseEntity<?> handleExceptionA(ErrorException e) {
+        ErrorResponse errorResponse =ErrorResponse.builder().statusCode(HttpStatus.BAD_REQUEST.value()).message(e.getMessage()).build();
+        return new ResponseEntity<>(errorResponse,new HttpHeaders(),HttpStatus.BAD_REQUEST);
 
 
     }

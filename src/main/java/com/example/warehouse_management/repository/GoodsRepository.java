@@ -17,5 +17,9 @@ public interface GoodsRepository extends CrudRepository<Goods,Long> {
     List<Goods> findByCodeAndName(@Param("keyword") String keyword);
     @Query("SELECT g FROM Goods g WHERE g.name LIKE %:name%")
     Goods findByName(String name);
+    @Query(nativeQuery = true,value = "select * from goods g \n" +
+            "join category c on g.category_id = c.id \n" +
+            "where c.code =:categoryCode")
+    List<Goods> findAllByCategory(String categoryCode);
 
 }

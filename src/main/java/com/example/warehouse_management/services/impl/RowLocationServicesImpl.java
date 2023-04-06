@@ -13,6 +13,7 @@ import com.example.warehouse_management.payload.response.RowLocationResponse;
 import com.example.warehouse_management.repository.ColumnLocationRepository;
 import com.example.warehouse_management.repository.RowLocationRepository;
 import com.example.warehouse_management.repository.ShelveStorageRepository;
+import com.example.warehouse_management.services.GoodsServices;
 import com.example.warehouse_management.services.RowLocationServices;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +33,7 @@ public class RowLocationServicesImpl implements RowLocationServices {
     ColumnLocationRepository columnLocationRepository;
     @Autowired
     RowLocationRepository rowLocationRepository;
-
+    private GoodsServices goodsServices;
     private ModelMapper modelMapper=new ModelMapper();
     @Override
     public List<RowLocationResponse> addRowLocations(RowLocationRequest request) {
@@ -54,7 +55,7 @@ public class RowLocationServicesImpl implements RowLocationServices {
             rowLocation.setLength(columnLocation.getLength());
             rowLocation.setVolume(volume);
             rowLocation.setRemainingVolume(volume);
-            rowLocation.setStatus(EStatusStorage.TRONG);
+            rowLocation.setStatus(EStatusStorage.EMPTY);
             rowLocation.setName(generateRowLocationName(i+1));
             rowLocation.setCode(code+(numberOfRow+i+1));
             rowLocation.setColumnLocation(columnLocation);
@@ -101,14 +102,14 @@ public class RowLocationServicesImpl implements RowLocationServices {
             case "Trống":
             case "trống":
             case "TRỐNG":
-                status = "TRONG";
+                status = EStatusStorage.EMPTY.name();
                 break;
             case "Còn chỗ":
             case "CÒN CHỖ":
             case "còn chỗ":
-                status = "CONCHO";
+                status = EStatusStorage.AVAILABLE.name();
                 break;
-            default: status ="DADAY" ;
+            default: status =EStatusStorage.FULL.name(); ;
         }
         List<RowLocationResponse> responseList = rowLocationRepository.filterStatusByWarehouseCode(codeWarehouse,status)
                 .stream().map(item->mapperRowLocationResponse(item)).collect(Collectors.toList());
@@ -160,13 +161,13 @@ public class RowLocationServicesImpl implements RowLocationServices {
     private RowLocationResponse mapperRowLocationResponse(RowLocation rowLocation){
         String status=null;
         switch (rowLocation.getStatus()){
-            case DADAY:
+            case FULL:
                 status ="Đã đầy";
                 break;
-            case TRONG:
+            case EMPTY:
                 status ="Trống";
                 break;
-            case CONCHO:
+            case AVAILABLE:
                 status="Còn chỗ";
                 break;
         }
@@ -183,7 +184,7 @@ public class RowLocationServicesImpl implements RowLocationServices {
         if(ObjectUtils.isEmpty(rowLocation.getGoods()))
             rowLocationResponseMapper.setGoods(null);
         else
-            rowLocationResponseMapper.setGoods(modelMapper.map(rowLocation.getGoods(), GoodsResponse.class));
+            rowLocationResponseMapper.setGoods(goodsServices.mapperGoods(rowLocation.getGoods()));
         return rowLocationResponseMapper;
     }
 }

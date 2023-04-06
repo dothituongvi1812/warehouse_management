@@ -23,4 +23,8 @@ public class PartnerController {
     public ResponseEntity<PartnerResponse> getPartnerByCode(@PathVariable String code){
         return new ResponseEntity(partnerServices.getPartnerByCode(code),HttpStatus.OK);
     }
+    @GetMapping("/get-by/{phonePartner}")
+    public ResponseEntity<PartnerResponse> getPartnerByPhone(@PathVariable String code){
+        return new ResponseEntity(partnerServices.getPartnerByPhone(code),HttpStatus.OK);
+    }
 }

@@ -10,6 +10,8 @@ import com.example.warehouse_management.repository.RoleRepository;
 import com.example.warehouse_management.repository.UserRepository;
 import com.example.warehouse_management.security.jwt.JwtUtils;
 import com.example.warehouse_management.services.UserServices;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +27,7 @@ import java.security.Principal;
 @RestController
 @RequestMapping("/api")
 public class AuthController {
+    private Logger logger = LoggerFactory.getLogger(getClass());
     @Autowired
     UserServices userServices;
     @Autowired
@@ -41,12 +44,13 @@ public class AuthController {
 
     @Autowired
     JwtUtils jwtUtils;
-    @PostMapping("register")
+    @PostMapping("/register")
     public ResponseEntity<UserResponse> registerUser(@Valid @RequestBody RegisterUserRequest registerRequest) throws MessagingException, UnsupportedEncodingException {
         return new ResponseEntity(userServices.registerUser(registerRequest),HttpStatus.OK) ;
     }
     @PostMapping("auth/login")
     public ResponseEntity<JwtResponse> authenticationUser(@RequestBody LoginRequest login){
+        logger.info("auth/login");
         return new ResponseEntity(userServices.authenticationUser(login),HttpStatus.OK);
     }
 

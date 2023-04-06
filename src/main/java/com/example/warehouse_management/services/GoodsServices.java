@@ -14,4 +14,6 @@ public interface GoodsServices {
     public List<GoodsResponse> searchByCodeOrName(String keyword);
     public Goods findGoodByCode(String code);
     public Goods findGoodByName(String name);
+    public GoodsResponse mapperGoods(Goods goods);
+    public List<GoodsResponse> getAllByCategoryCode(String categoryCode);
 }

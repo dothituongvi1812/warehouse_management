@@ -1,6 +1,7 @@
 package com.example.warehouse_management.models.voucher;
 
 import com.example.warehouse_management.models.partner.Partner;
+import com.example.warehouse_management.models.type.EStatusOfVoucher;
 import com.example.warehouse_management.models.user.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -34,7 +35,9 @@ public class InventoryReceiptVoucher {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "partnerId")
     private Partner partner;
-
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20)
+    private EStatusOfVoucher status;
     private Date createDate;
 
 }

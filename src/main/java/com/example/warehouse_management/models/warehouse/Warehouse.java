@@ -29,8 +29,6 @@ public class Warehouse {
     private String code;
     @Column(columnDefinition = "text",length = 255)
     private String name;
-    @Enumerated(EnumType.STRING)
-    private EStatusStorage status;
     @Type(type = "jsonb")
     @Column(name = "location", columnDefinition = "jsonb")
     private Location location;

@@ -4,12 +4,17 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.validation.Valid;
 import java.util.List;
+import java.util.Set;
+
 @Getter
 @Setter
 @NoArgsConstructor
 public class ReceiptVoucherRequest {
+    @Valid
     private PartnerRequest partnerRequest;
-    private List<GoodsRequest> goodsRequests;
+    @Valid
+    private Set<GoodsRequest> goodsRequests;
     private String email;
 }

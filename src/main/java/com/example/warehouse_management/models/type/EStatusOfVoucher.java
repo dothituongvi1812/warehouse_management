@@ -1,8 +1,9 @@
 package com.example.warehouse_management.models.type;
 
 public enum EStatusOfVoucher {
-    TUCHOI,
-    THANHCONG,
-    TRIHOAN
+    NOT_YET_IMPORTED,
+    IMPORTED,
+    NOT_YET_EXPORTED,
+    EXPORTED,
 
 }

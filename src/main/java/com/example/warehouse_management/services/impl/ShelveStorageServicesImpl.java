@@ -40,7 +40,6 @@ public class ShelveStorageServicesImpl implements ShelveStorageServices {
             shelveStorage.setHeight(request.getHeight());
             shelveStorage.setLength(request.getLength());
             shelveStorage.setWidth(request.getWidth());
-            shelveStorage.setStatus(EStatusStorage.TRONG);
             shelveStorage.setNumberOfFloors(request.getNumberOfFloor());
             shelveStorage.setWarehouse(warehouse);
 

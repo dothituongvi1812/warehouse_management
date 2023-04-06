@@ -1,20 +1,14 @@
 package com.example.warehouse_management.services.impl;
 
-import com.example.warehouse_management.exception.NotEnoughSpaceException;
+import com.example.warehouse_management.exception.ErrorException;
 import com.example.warehouse_management.exception.NotFoundGlobalException;
-import com.example.warehouse_management.models.type.EStatusStorage;
 import com.example.warehouse_management.models.warehouse.ColumnLocation;
 import com.example.warehouse_management.models.warehouse.ShelveStorage;
-import com.example.warehouse_management.models.warehouse.Warehouse;
 import com.example.warehouse_management.payload.request.ColumnLocationRequest;
-import com.example.warehouse_management.payload.request.ShelveStorageRequest;
 import com.example.warehouse_management.payload.response.ColumnLocationResponse;
-import com.example.warehouse_management.payload.response.ShelveStorageResponse;
 import com.example.warehouse_management.repository.ColumnLocationRepository;
 import com.example.warehouse_management.repository.ShelveStorageRepository;
-import com.example.warehouse_management.repository.WarehouseRepository;
 import com.example.warehouse_management.services.ColumnLocationServices;
-import com.example.warehouse_management.services.ShelveStorageServices;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -47,10 +41,10 @@ public class ColumnLocationServicesImpl implements ColumnLocationServices {
         double lengthColumn=columnLocationRequest.getLength();
         double lengthShelf=shelveStorage.getLength();
         if(!(lengthColumn <= lengthShelf)){
-            throw new NotEnoughSpaceException("Chiều dài của cột phải nhỏ hơn hoặc bằng chiều dài của kệ là: "+lengthShelf);
+            throw new ErrorException("Chiều dài của cột phải nhỏ hơn hoặc bằng chiều dài của kệ là: "+lengthShelf);
         }
         if(!(lengthShelf % lengthColumn == 0)){
-            throw new NotEnoughSpaceException("Chiều dài của cột không phù hợp. Chiều dài của kệ là: "+lengthShelf);
+            throw new ErrorException("Chiều dài của cột không phù hợp. Chiều dài của kệ là: "+lengthShelf);
         }
 
         int numberColumn= (int) (shelveStorage.getLength()/columnLocationRequest.getLength());
@@ -58,7 +52,6 @@ public class ColumnLocationServicesImpl implements ColumnLocationServices {
         String code ="CL000";
         for (int i = 0; i < numberColumn; i++) {
             ColumnLocation columnLocation =new ColumnLocation();
-            columnLocation.setStatus(EStatusStorage.TRONG);
             columnLocation.setShelveStorage(shelveStorage);
             columnLocation.setLength(columnLocationRequest.getLength());
             columnLocation.setName(generateColumnLocationName(i+1));
@@ -119,20 +112,7 @@ public class ColumnLocationServicesImpl implements ColumnLocationServices {
 
     }
     private ColumnLocationResponse mapperColumnLocationResponse(ColumnLocation columnLocation){
-        String status=null;
-        switch (columnLocation.getStatus()){
-            case DADAY:
-                status ="Đã đầy";
-                break;
-            case TRONG:
-                status ="Trống";
-                break;
-            case CONCHO:
-                status="Còn chỗ";
-                break;
-        }
         ColumnLocationResponse columnLocationResponse =modelMapper.map(columnLocation,ColumnLocationResponse.class);
-        columnLocationResponse.setStatus(status);
         columnLocationResponse.setShelfStorageCode(columnLocation.getShelveStorage().getCode());
         columnLocationResponse.setShelfStorageName(columnLocation.getShelveStorage().getName());
 

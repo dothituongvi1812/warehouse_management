@@ -10,4 +10,6 @@ public interface PartnerServices {
      Partner addPartner(PartnerRequest partnerRequest);
     List<PartnerResponse> getAll();
     PartnerResponse getPartnerByCode(String code);
+    PartnerResponse getPartnerByPhone(String phone);
+    Partner findPartnerByPhone(String phone);
 }

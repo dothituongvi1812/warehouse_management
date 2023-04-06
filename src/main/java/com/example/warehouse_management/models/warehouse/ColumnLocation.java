@@ -23,9 +23,6 @@ public class ColumnLocation {
     private String code;
     private String name;
     private double length;
-    @Enumerated(EnumType.STRING)
-    private EStatusStorage status;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name ="shelveStorageId" )
     private ShelveStorage shelveStorage;

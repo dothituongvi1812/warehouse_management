@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.validation.constraints.Digits;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 
 @Getter
 @Setter
@@ -13,6 +15,7 @@ import javax.validation.constraints.Digits;
 @AllArgsConstructor
 public class GoodDeliveryRequest {
     private String goodCode;
-    @Digits(message = "Quantity must be a number", integer = 8, fraction = 0)
+
+    @Min(value = 1,message = "Số lượng hàng hoá phải lớn hơn 0")
     private int quantity;
 }

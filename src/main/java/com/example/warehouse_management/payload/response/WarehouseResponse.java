@@ -16,7 +16,6 @@ public class WarehouseResponse {
     private String code;
     private Location location;
     private String name;
-    private EStatusStorage status;
     private Double length;
     private Double width;
     private Double height;

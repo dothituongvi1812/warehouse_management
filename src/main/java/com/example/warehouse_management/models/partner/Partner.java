@@ -21,6 +21,7 @@ public class Partner {
     @Column(columnDefinition = "text",length = 255)
     private String name;
     private String address;
+    @Column(unique = true)
     private String phone;
     @OneToMany(mappedBy = "partner")
     private Set<InventoryDeliveryVoucher> inventoryDeliveryVouchers;
