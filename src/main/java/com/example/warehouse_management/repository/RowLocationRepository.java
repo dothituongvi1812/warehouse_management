@@ -3,6 +3,8 @@ package com.example.warehouse_management.repository;
 import com.example.warehouse_management.models.partner.Partner;
 import com.example.warehouse_management.models.warehouse.RowLocation;
 import lombok.NonNull;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -16,6 +18,7 @@ import java.util.Set;
 
 @Repository
 public interface RowLocationRepository extends CrudRepository<RowLocation,Long> {
+    Page<RowLocation> findAll(Pageable pageable);
     List<RowLocation> findAll();
     @Query("SELECT rl FROM RowLocation rl WHERE rl.status ='EMPTY' OR rl.status='AVAILABLE' ")
     List<RowLocation> findByStatusTrongAndConTrong();
@@ -70,7 +73,7 @@ public interface RowLocationRepository extends CrudRepository<RowLocation,Long> 
                     "join shelve_storages ss on ss.id = cl.shelve_storage_id \n" +
                     "join warehouse w on w.id =ss.warehouse_id \n" +
                     "where w.code =:code")
-    List<RowLocation> getAllRowLocationByWarehouseCode(String code);
+    Page<RowLocation> getAllRowLocationByWarehouseCode(String code,Pageable pageable);
 
     @Query(nativeQuery = true,value = "select sum(current_capacity)  from row_locations rl \n" +
             "join goods g ON rl.goods_id = g.id \n" +

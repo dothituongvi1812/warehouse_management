@@ -1,6 +1,8 @@
 package com.example.warehouse_management.repository;
 
 import com.example.warehouse_management.models.goods.Goods;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -11,7 +13,7 @@ import java.util.List;
 @Repository
 public interface GoodsRepository extends CrudRepository<Goods,Long> {
     Goods findTopByOrderByIdDesc();
-    List<Goods> findAll();
+    Page<Goods> findAll(Pageable pageable);
     Goods findByCode(String code);
     @Query("SELECT g FROM Goods g WHERE g.code LIKE %:keyword% or g.name LIKE %:keyword%")
     List<Goods> findByCodeAndName(@Param("keyword") String keyword);

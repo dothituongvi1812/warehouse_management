@@ -4,14 +4,20 @@ import com.example.warehouse_management.exception.NotFoundGlobalException;
 import com.example.warehouse_management.models.goods.Category;
 import com.example.warehouse_management.models.goods.Goods;
 import com.example.warehouse_management.models.type.EUnit;
+import com.example.warehouse_management.models.warehouse.RowLocation;
 import com.example.warehouse_management.payload.request.GoodsAddRequest;
 import com.example.warehouse_management.payload.request.GoodsRequest;
 import com.example.warehouse_management.payload.response.GoodsResponse;
+import com.example.warehouse_management.payload.response.RowLocationResponse;
 import com.example.warehouse_management.repository.CategoryRepository;
 import com.example.warehouse_management.repository.GoodsRepository;
 import com.example.warehouse_management.services.GoodsServices;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
@@ -57,12 +63,14 @@ public class GoodsServicesImpl implements GoodsServices {
     }
 
     @Override
-    public List<GoodsResponse> getAll() {
-        List<GoodsResponse> goodsResponse = goodsRepository.findAll().stream()
-                .map(goods -> mapperGoodResponse(goods))
-                .collect(Collectors.toList());
+    public Page<GoodsResponse> getAll(Integer page,Integer size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Goods> goodsPage= goodsRepository.findAll(pageable);
+        Page<GoodsResponse> pages = new PageImpl<GoodsResponse>(goodsPage.getContent()
+                .stream().map(this::mapperGoodResponse).collect(Collectors.toList()), pageable,
+                goodsPage.getTotalElements());
 
-        return goodsResponse;
+        return pages;
     }
 
     @Override

@@ -15,8 +15,13 @@ import com.example.warehouse_management.repository.RowLocationRepository;
 import com.example.warehouse_management.repository.ShelveStorageRepository;
 import com.example.warehouse_management.services.GoodsServices;
 import com.example.warehouse_management.services.RowLocationServices;
+import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
@@ -44,6 +49,7 @@ public class RowLocationServicesImpl implements RowLocationServices {
         }
         ShelveStorage shelveStorage =columnLocation.getShelveStorage();
         int numberOfFloor=shelveStorage.getNumberOfFloors();
+        Pageable pageable =PageRequest.of(0,0);
         int numberOfRow=rowLocationRepository.findAll().size();
         String code ="HL000";
         for (int i = 0; i < numberOfFloor; i++) {
@@ -68,11 +74,14 @@ public class RowLocationServicesImpl implements RowLocationServices {
     }
 
     @Override
-    public List<RowLocationResponse> getAll() {
-        List<RowLocationResponse> responseList = rowLocationRepository.findAll().stream().
-                map(rowLocation ->mapperRowLocationResponse(rowLocation))
-                .collect(Collectors.toList());
-        return responseList;
+    public Page<RowLocationResponse> getAll(Integer page, Integer size) {
+        Pageable pageable = PageRequest.of(page,size);
+        Page<RowLocation> rowLocations= rowLocationRepository.findAll(pageable);
+        Page<RowLocationResponse> pages = new PageImpl<RowLocationResponse>(rowLocations.getContent()
+                .stream().map(this::mapperRowLocationResponse).collect(Collectors.toList()), pageable,
+                rowLocations.getTotalElements());
+
+        return pages;
     }
 
     @Override
@@ -122,10 +131,12 @@ public class RowLocationServicesImpl implements RowLocationServices {
     }
 
     @Override
-    public List<RowLocationResponse> getAllRowLocationByWarehouseCode(String warehouseCode) {
-        List<RowLocationResponse> rowLocationResponses= rowLocationRepository.getAllRowLocationByWarehouseCode(warehouseCode)
-                .stream().map(item->mapperRowLocationResponse(item)).collect(Collectors.toList());
-        return rowLocationResponses;
+    public Page<RowLocationResponse> getAllRowLocationByWarehouseCode(String warehouseCode,Integer page,Integer size) {
+        Pageable pageable = PageRequest.of(page,size);
+        Page<RowLocation> rowLocations= rowLocationRepository.getAllRowLocationByWarehouseCode(warehouseCode,pageable);
+        Page<RowLocationResponse> pages= new PageImpl<>(rowLocations.getContent().stream().map(this::mapperRowLocationResponse).collect(Collectors.toList()),
+                pageable,rowLocations.getTotalElements());
+        return pages;
     }
 
     @Override

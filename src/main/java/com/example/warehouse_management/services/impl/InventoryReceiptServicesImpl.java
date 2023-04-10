@@ -22,6 +22,10 @@ import com.example.warehouse_management.services.*;
 import com.example.warehouse_management.services.domain.UtillServies;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
@@ -66,7 +70,7 @@ public class InventoryReceiptServicesImpl implements InventoryReceiptServices {
         User user = userRepository.findUserByEmail(receiptVoucherRequest.getEmail());
         //process
         List<RowLocationGoodsTemp> rowLocationGoodsTempList = new ArrayList<>();
-        List<InventoryReceiptVoucher> receiptVouchers = receiptVoucherRepository.findAllBySortedCreateDate();
+        List<InventoryReceiptVoucher> receiptVouchers = receiptVoucherRepository.findAll();
         List<String> rowLocationCodeSelected = new ArrayList<>();
         receiptVouchers.stream().filter(item ->item.getStatus().equals(EStatusOfVoucher.NOT_YET_IMPORTED))
                 .forEach(item->item.getReceiptVoucherDetails().forEach(e->rowLocationCodeSelected.add(e.getRowLocation().getCode())));
@@ -171,15 +175,19 @@ public class InventoryReceiptServicesImpl implements InventoryReceiptServices {
     }
 
     @Override
-    public List<InventoryReceiptVoucherResponse> getAllSortedByDate() {
-        List<InventoryReceiptVoucherResponse> responseList = getAll().stream()
-                .map(item->mapperInventoryReceiptVoucher(item)).collect(Collectors.toList());
-        return responseList;
+    public Page<InventoryReceiptVoucherResponse> getAllSortedByDate(Integer page, Integer size) {
+        Pageable pageable = PageRequest.of(page,size);
+        Page<InventoryReceiptVoucher> vouchers = receiptVoucherRepository.findAllBySortedCreateDate(pageable);
+        Page<InventoryReceiptVoucherResponse> pages = new PageImpl<InventoryReceiptVoucherResponse>(vouchers.getContent()
+                .stream().map(this::mapperInventoryReceiptVoucher).collect(Collectors.toList()), pageable,
+                vouchers.getTotalElements());
+        return pages;
+
     }
 
     @Override
     public List<InventoryReceiptVoucher> getAll() {
-        return receiptVoucherRepository.findAllBySortedCreateDate();
+        return receiptVoucherRepository.findAll();
     }
 
     @Override

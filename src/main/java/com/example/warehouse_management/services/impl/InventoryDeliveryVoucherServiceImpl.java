@@ -24,6 +24,10 @@ import com.example.warehouse_management.services.RowLocationServices;
 import com.example.warehouse_management.services.domain.UtillServies;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
@@ -148,10 +152,13 @@ public class InventoryDeliveryVoucherServiceImpl implements InventoryDeliveryVou
     }
 
     @Override
-    public List<InventoryDeliveryVoucherResponse> getAllSortedByDate() {
-        List<InventoryDeliveryVoucherResponse> responseList = deliveryVoucherRepository.findAll().stream()
-                .map(item->mapperInventoryDeliveryVoucher(item)).collect(Collectors.toList());
-        return responseList;
+    public Page<InventoryDeliveryVoucherResponse> getAllSortedByDate(Integer page,Integer size) {
+        Pageable pageable = PageRequest.of(page,size);
+        Page<InventoryDeliveryVoucher> vouchers= deliveryVoucherRepository.findAll(pageable);
+        Page<InventoryDeliveryVoucherResponse> pages = new PageImpl<InventoryDeliveryVoucherResponse>(vouchers.getContent()
+                .stream().map(this::mapperInventoryDeliveryVoucher).collect(Collectors.toList()), pageable,
+                vouchers.getTotalElements());
+        return pages;
     }
 
     private String generateDeliveryVoucher() {

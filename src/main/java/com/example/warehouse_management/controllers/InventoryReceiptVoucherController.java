@@ -39,8 +39,8 @@ public class InventoryReceiptVoucherController {
         return new ResponseEntity(inventoryReceiptServices.putTheGoodsOnShelf(receiptVoucherCode),HttpStatus.OK);
     }
     @GetMapping("/get-all")
-    public ResponseEntity<List<InventoryReceiptVoucherResponse>> getAllSortByDate(){
+    public ResponseEntity<List<InventoryReceiptVoucherResponse>> getAllSortByDate(@RequestParam Integer page, @RequestParam Integer size){
         logger.info("api/receipt-voucher/get-all");
-        return new ResponseEntity(inventoryReceiptServices.getAllSortedByDate(),HttpStatus.OK);
+        return new ResponseEntity(inventoryReceiptServices.getAllSortedByDate(page,size),HttpStatus.OK);
     }
 }

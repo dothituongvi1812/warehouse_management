@@ -1,6 +1,8 @@
 package com.example.warehouse_management.repository;
 
 import com.example.warehouse_management.models.voucher.InventoryReceiptVoucher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
@@ -14,7 +16,8 @@ public interface InventoryReceiptVoucherRepository extends CrudRepository<Invent
     @Query(nativeQuery = true,
             value = "select * from inventory_receipt_vouchers irv \n" +
                     "order by create_date desc ")
-    List<InventoryReceiptVoucher> findAllBySortedCreateDate();
+    Page<InventoryReceiptVoucher> findAllBySortedCreateDate(Pageable pageable);
+    List<InventoryReceiptVoucher>  findAll();
 
     InventoryReceiptVoucher findInventoryReceiptVoucherByCode(String voucherCode);
 }
