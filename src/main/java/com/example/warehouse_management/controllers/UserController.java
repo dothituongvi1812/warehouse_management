@@ -20,14 +20,17 @@ public class UserController {
     UserServices userServices;
     @PostMapping("/update/{code}")
     public ResponseEntity updateUser(@PathVariable String code, @RequestBody @Valid UserUpdateRequest userUpdateRequest){
+        logger.info("update/"+code);
         return new ResponseEntity(userServices.updateUser(code,userUpdateRequest), HttpStatus.OK);
     }
     @GetMapping("/get-all")
     public ResponseEntity getAll(){
+        logger.info("/get-all/");
         return new ResponseEntity(userServices.getAll(),HttpStatus.OK);
     }
     @GetMapping("/get-by/{code}")
     public ResponseEntity<UserResponse> getUserByCode(@PathVariable String code){
+        logger.info("/get-by/"+code);
         return new ResponseEntity(userServices.findUserByCode(code),HttpStatus.OK);
     }
 }

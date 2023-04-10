@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @Repository
@@ -85,5 +86,9 @@ public interface RowLocationRepository extends CrudRepository<RowLocation,Long> 
             "group by goods_id ) >=:quantity\n" +
             "order by current_capacity desc ")
     List<RowLocation> findByGoodsNameEnoughToExport(String goodsName, int quantity);
+
+    @Query(nativeQuery = true,value = "select status,count(status) from row_locations rl \n" +
+            "group by status ")
+    List<Object[]> reportStockPosition();
 
 }

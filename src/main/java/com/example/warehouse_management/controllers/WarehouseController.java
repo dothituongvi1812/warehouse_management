@@ -22,14 +22,17 @@ public class WarehouseController {
 
     @PostMapping("/add")
     public ResponseEntity<WarehouseResponse> addGeneralWarehouse(@Valid @RequestBody WarehouseRequest request){
+        logger.info("/add");
         return new ResponseEntity(warehouseServices.addWarehouse(request), HttpStatus.OK);
     }
     @GetMapping("/get-all")
     public ResponseEntity<List<WarehouseResponse>> getAll(){
+        logger.info("/get-all");
         return new ResponseEntity(warehouseServices.findAll(), HttpStatus.OK);
     }
     @GetMapping("/get-by/{code}")
     public ResponseEntity<WarehouseResponse> getByCode(@PathVariable String code){
+        logger.info("get-by/"+code);
         return new ResponseEntity(warehouseServices.findByCode(code), HttpStatus.OK);
     }
 

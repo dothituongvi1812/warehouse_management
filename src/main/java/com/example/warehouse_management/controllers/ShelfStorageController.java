@@ -20,10 +20,12 @@ public class ShelfStorageController {
 
     @GetMapping("/get-all")
     public ResponseEntity<List<ShelveStorageResponse>>getAll(){
+        logger.info("/get-all");
         return new ResponseEntity(shelveStorageServices.findAll(), HttpStatus.OK);
     }
     @GetMapping("/get-by/{code}")
     public ResponseEntity<ShelveStorageResponse> getByCode(@PathVariable String code){
+        logger.info("/get-by/"+code);
         return new ResponseEntity(shelveStorageServices.getByCode(code),HttpStatus.OK);
     }
 }

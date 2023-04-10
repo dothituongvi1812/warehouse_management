@@ -21,19 +21,23 @@ public class PartnerController {
     PartnerServices partnerServices;
     @PostMapping("/create")
     public ResponseEntity<PartnerResponse> createPartner(@Valid @RequestBody PartnerRequest partnerRequest){
+        logger.info("/create");
         return new ResponseEntity(partnerServices.createPartner(partnerRequest),HttpStatus.OK);
     }
 
     @GetMapping("/get-all")
     public ResponseEntity<List<PartnerResponse>> getAll(){
+        logger.info("/get-all");
         return new ResponseEntity(partnerServices.getAll(),HttpStatus.OK);
     }
     @GetMapping("/get-by/{code}")
     public ResponseEntity<PartnerResponse> getPartnerByCode(@PathVariable String code){
+        logger.info("/get-by"+code);
         return new ResponseEntity(partnerServices.getPartnerByCode(code),HttpStatus.OK);
     }
-    @GetMapping("/get-by/{phonePartner}")
-    public ResponseEntity<PartnerResponse> getPartnerByPhone(@PathVariable String code){
-        return new ResponseEntity(partnerServices.getPartnerByPhone(code),HttpStatus.OK);
+    @GetMapping("/get-by-phone/{phonePartner}")
+    public ResponseEntity<PartnerResponse> getPartnerByPhone(@PathVariable String phonePartner){
+        logger.info("/get-by-phone"+phonePartner);
+        return new ResponseEntity(partnerServices.getPartnerByPhone(phonePartner),HttpStatus.OK);
     }
 }

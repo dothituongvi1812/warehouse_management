@@ -4,6 +4,7 @@ import com.example.warehouse_management.exception.NotFoundGlobalException;
 import com.example.warehouse_management.models.goods.Category;
 import com.example.warehouse_management.models.goods.Goods;
 import com.example.warehouse_management.models.type.EUnit;
+import com.example.warehouse_management.payload.request.GoodsAddRequest;
 import com.example.warehouse_management.payload.request.GoodsRequest;
 import com.example.warehouse_management.payload.response.GoodsResponse;
 import com.example.warehouse_management.repository.CategoryRepository;
@@ -26,7 +27,8 @@ public class GoodsServicesImpl implements GoodsServices {
 
     private ModelMapper modelMapper=new ModelMapper();
     @Override
-    public GoodsResponse addGoods(GoodsRequest goodsRequest) {
+    public GoodsResponse addGoods(GoodsAddRequest goodsAddRequest) {
+        GoodsRequest goodsRequest  = modelMapper.map(goodsAddRequest,GoodsRequest.class);
         GoodsResponse response=mapperGoodResponse(createGoods(goodsRequest));
         return response;
     }
@@ -36,6 +38,7 @@ public class GoodsServicesImpl implements GoodsServices {
         if(category==null){
             throw new NotFoundGlobalException("Không tìm thấy loại hàng hoá");
         }
+        System.out.println("--------------category.getGoods()" +category.getGoods());
         Goods goodSearch = goodsRepository.findByName(goodsRequest.getName());
         if(ObjectUtils.isEmpty(goodSearch)){
             Goods goods =new Goods();

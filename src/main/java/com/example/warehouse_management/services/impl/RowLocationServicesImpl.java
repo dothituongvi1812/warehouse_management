@@ -21,9 +21,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.math.BigInteger;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -137,6 +136,25 @@ public class RowLocationServicesImpl implements RowLocationServices {
     @Override
     public List<RowLocation> findAllByGoodsNameEnoughToExport(String goodsName, int quantity) {
         return rowLocationRepository.findByGoodsNameEnoughToExport(goodsName,quantity);
+    }
+
+    @Override
+    public Map<String, Integer> reportStockPosition() {
+       Map<String,Integer> map = new HashMap<>();
+        List<Object[]> list = rowLocationRepository.reportStockPosition();
+        for (Object[] ob : list){
+            String key = (String)ob[0];
+            if(key.equals(EStatusStorage.FULL.name()))
+                key="Đã đầy";
+            else if(key.equals(EStatusStorage.EMPTY.name()))
+                key="Trống";
+            else
+                key ="Còn chỗ";
+            Integer value = ((BigInteger) ob[1]).intValue();
+            map.put(key,value);
+
+        }
+        return map;
     }
 
 

@@ -46,6 +46,7 @@ public class AuthController {
     JwtUtils jwtUtils;
     @PostMapping("/register")
     public ResponseEntity<UserResponse> registerUser(@Valid @RequestBody RegisterUserRequest registerRequest) throws MessagingException, UnsupportedEncodingException {
+        logger.info("/register");
         return new ResponseEntity(userServices.registerUser(registerRequest),HttpStatus.OK) ;
     }
     @PostMapping("auth/login")
@@ -56,6 +57,7 @@ public class AuthController {
 
     @PostMapping("auth/reset-password")
     public ResponseEntity<String>updatePassword(@RequestBody @Valid ResetPasswordRequest request, Principal principal){
+        logger.info("auth/reset-password");
         request.setEmail(principal.getName());
         if(userServices.resetPassword(request))
             return new ResponseEntity<>("Mật khẩu của bạn đã được thay đổi",HttpStatus.ACCEPTED);
@@ -63,6 +65,7 @@ public class AuthController {
     }
     @PostMapping("/auth/forget")
     public ResponseEntity forgetPassword(@RequestBody ForgetPasswordRequest request){
+        logger.info("/auth/forget");
         return new ResponseEntity(userServices.forgetPassword(request.getEmail()),HttpStatus.NO_CONTENT);
     }
 

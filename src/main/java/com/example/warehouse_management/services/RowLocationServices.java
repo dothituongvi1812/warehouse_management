@@ -7,6 +7,7 @@ import com.example.warehouse_management.payload.response.RowLocationResponse;
 import io.swagger.models.auth.In;
 
 import java.util.List;
+import java.util.Map;
 
 
 public interface RowLocationServices {
@@ -21,4 +22,5 @@ public interface RowLocationServices {
     public List<RowLocationResponse> getAllRowLocationByWarehouseCode(String goodCode);
     public Integer getSumCurrentCapacityByGoodsName(String goodsName);
     public List<RowLocation> findAllByGoodsNameEnoughToExport(String goodsName,int quantity);
+    public Map<String,Integer> reportStockPosition();
 }

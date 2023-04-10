@@ -1,5 +1,6 @@
 package com.example.warehouse_management.controllers;
 
+import com.example.warehouse_management.payload.request.GoodsAddRequest;
 import com.example.warehouse_management.payload.request.GoodsRequest;
 import com.example.warehouse_management.payload.response.GoodsResponse;
 import com.example.warehouse_management.services.GoodsServices;
@@ -20,23 +21,28 @@ public class GoodsController {
     @Autowired
     GoodsServices goodsServices;
     @PostMapping("/add")
-    public ResponseEntity<GoodsResponse> addGoods(@RequestBody @Valid  GoodsRequest goodsRequest){
+    public ResponseEntity<GoodsResponse> addGoods(@RequestBody @Valid GoodsAddRequest goodsRequest){
+        logger.info("/add");
         return new ResponseEntity(goodsServices.addGoods(goodsRequest), HttpStatus.OK);
     }
     @GetMapping("/get-all")
     public ResponseEntity<List<GoodsResponse>> getAll(){
+        logger.info("/get-all");
         return new ResponseEntity(goodsServices.getAll(),HttpStatus.OK);
     }
     @GetMapping("/get-by/{code}")
     public ResponseEntity<GoodsResponse> getByCode(@PathVariable String code){
+        logger.info("/get-by/"+code);
         return new ResponseEntity(goodsServices.getByCode(code),HttpStatus.OK);
     }
     @GetMapping("/search/{keyword}")
     public ResponseEntity<List<GoodsResponse>> searchByCodeOrName(@PathVariable String keyword){
+        logger.info("/search/"+keyword);
         return new ResponseEntity(goodsServices.searchByCodeOrName(keyword),HttpStatus.OK);
     }
     @GetMapping("/get-all-by/{categoryCode}")
     public ResponseEntity<List<GoodsResponse>> getAllByCategoryCode(@PathVariable String categoryCode ){
+        logger.info("/get-all-by/"+categoryCode);
         return new ResponseEntity(goodsServices.getAllByCategoryCode(categoryCode),HttpStatus.OK);
     }
 }

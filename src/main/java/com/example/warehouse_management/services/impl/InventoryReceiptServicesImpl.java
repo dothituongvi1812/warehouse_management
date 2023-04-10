@@ -66,8 +66,12 @@ public class InventoryReceiptServicesImpl implements InventoryReceiptServices {
         User user = userRepository.findUserByEmail(receiptVoucherRequest.getEmail());
         //process
         List<RowLocationGoodsTemp> rowLocationGoodsTempList = new ArrayList<>();
+        List<InventoryReceiptVoucher> receiptVouchers = receiptVoucherRepository.findAllBySortedCreateDate();
         List<String> rowLocationCodeSelected = new ArrayList<>();
-        rowLocationCodeSelected.add("");
+        receiptVouchers.stream().filter(item ->item.getStatus().equals(EStatusOfVoucher.NOT_YET_IMPORTED))
+                .forEach(item->item.getReceiptVoucherDetails().forEach(e->rowLocationCodeSelected.add(e.getRowLocation().getCode())));
+        if(CollectionUtils.isEmpty(rowLocationCodeSelected))
+           rowLocationCodeSelected.add("");
         for (GoodsRequest goodsRequest : receiptVoucherRequest.getGoodsRequests()) {
             List<RowLocation> rowLocationList = rowLocationRepository.findByGoodsName(goodsRequest.getName(), rowLocationCodeSelected);
             double volumeGoods = goodsRequest.getVolume() * goodsRequest.getQuantity();
@@ -123,6 +127,7 @@ public class InventoryReceiptServicesImpl implements InventoryReceiptServices {
         Set<ReceiptVoucherDetail> receiptVoucherDetailSet = new HashSet<>();
         for (RowLocationGoodsTemp item : rowLocationGoodsTempList) {
             ReceiptVoucherDetail receiptVoucherDetail = createObjectReceiptVoucherDetail(saveInventoryReceiptVoucher, item);
+            System.out.println("==========="+receiptVoucherDetail.getGoods().toString());
             receiptVoucherDetailSet.add(receiptVoucherDetail);
         }
         saveInventoryReceiptVoucher.setReceiptVoucherDetails(receiptVoucherDetailSet);

@@ -52,7 +52,7 @@ public class InventoryDeliveryVoucherServiceImpl implements InventoryDeliveryVou
         for (GoodDeliveryRequest request:deliveryVoucherRequest.getGoodsRequests()) {
             List<RowLocation> rowLocationList = rowLocationServices.findAllRowLocationByGoodsCode(request.getGoodCode());
             if(CollectionUtils.isEmpty(rowLocationList))
-                throw new ErrorException("Hàng hoá có mã "+ request.getGoodCode() + " chưa có trên kệ");
+                throw new ErrorException("Hàng hoá có mã "+ request.getGoodCode() + " chưa nhập vào kho");
         }
         InventoryDeliveryVoucher inventoryDeliveryVoucher = new InventoryDeliveryVoucher();
         User user = userRepository.findUserByEmail(deliveryVoucherRequest.getEmail());
@@ -145,6 +145,13 @@ public class InventoryDeliveryVoucherServiceImpl implements InventoryDeliveryVou
         if(ObjectUtils.isEmpty(deliveryVoucher))
             throw new NotFoundGlobalException("Không tìm thấy phiếu xuất "+deliveryVoucherCode);
         return mapperInventoryDeliveryVoucher(deliveryVoucher);
+    }
+
+    @Override
+    public List<InventoryDeliveryVoucherResponse> getAllSortedByDate() {
+        List<InventoryDeliveryVoucherResponse> responseList = deliveryVoucherRepository.findAll().stream()
+                .map(item->mapperInventoryDeliveryVoucher(item)).collect(Collectors.toList());
+        return responseList;
     }
 
     private String generateDeliveryVoucher() {

@@ -21,23 +21,33 @@ public class RowLocationOfShelfController {
     private RowLocationServices rowLocationServices;
     @PostMapping("/add")
     public ResponseEntity<RowLocationResponse> addRowLocation(@RequestBody RowLocationRequest request){
+        logger.info("/add");
         return new ResponseEntity(rowLocationServices.addRowLocations(request), HttpStatus.OK);
     }
     @GetMapping("/get-all")
     public ResponseEntity<List<RowLocationResponse>>getAll(){
+        logger.info("/get-all");
         return new ResponseEntity(rowLocationServices.getAll(), HttpStatus.OK);
     }
     @GetMapping("/get-by/{code}")
     public ResponseEntity<RowLocationResponse>getByCode(@PathVariable String code){
+        logger.info("/get-by"+code);
         return new ResponseEntity(rowLocationServices.getByCode(code), HttpStatus.OK);
     }
     @GetMapping("/filter-status-by/{codeWarehouse}")
     public ResponseEntity<RowLocationResponse>filterByStatus(@PathVariable String codeWarehouse, @RequestBody StatusRequest statusRequest){
+        logger.info("/filter-status-by/"+codeWarehouse);
         return new ResponseEntity(rowLocationServices.filterStatusByCodeWarehouse(codeWarehouse,statusRequest),HttpStatus.OK);
     }
     @GetMapping("/get-all-by/{codeWarehouse}")
     public ResponseEntity<RowLocationResponse>getAllByCodeWarehouse(@PathVariable String codeWarehouse){
+        logger.info("/get-all-by/"+codeWarehouse);
         return new ResponseEntity(rowLocationServices.getAllRowLocationByWarehouseCode(codeWarehouse),HttpStatus.OK);
+    }
+    @GetMapping("/report-stock-position")
+    public ResponseEntity<?>reportStockPosition(){
+        logger.info("/report-stock-position");
+        return new ResponseEntity<>(rowLocationServices.reportStockPosition(),HttpStatus.OK);
     }
 
 }
