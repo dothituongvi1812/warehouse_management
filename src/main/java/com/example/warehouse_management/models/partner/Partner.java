@@ -1,5 +1,6 @@
 package com.example.warehouse_management.models.partner;
 
+import com.example.warehouse_management.models.purchase.PurchaseInvoice;
 import com.example.warehouse_management.models.voucher.InventoryDeliveryVoucher;
 import com.example.warehouse_management.models.voucher.InventoryReceiptVoucher;
 import lombok.Getter;
@@ -27,6 +28,8 @@ public class Partner {
     private Set<InventoryDeliveryVoucher> inventoryDeliveryVouchers;
     @OneToMany(mappedBy = "partner")
     private Set<InventoryReceiptVoucher> inventoryReceiptVouchers;
+    @OneToMany(mappedBy = "partner")
+    private Set<PurchaseInvoice> purchaseInvoices;
 
 
 }
