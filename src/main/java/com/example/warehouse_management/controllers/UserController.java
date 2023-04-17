@@ -11,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
+
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
 @RequestMapping ("/api/user")
@@ -24,7 +26,7 @@ public class UserController {
         return new ResponseEntity(userServices.updateUser(code,userUpdateRequest), HttpStatus.OK);
     }
     @GetMapping("/get-all")
-    public ResponseEntity getAll(){
+    public ResponseEntity<List<UserResponse>> getAll(){
         logger.info("/get-all/");
         return new ResponseEntity(userServices.getAll(),HttpStatus.OK);
     }
@@ -32,5 +34,9 @@ public class UserController {
     public ResponseEntity<UserResponse> getUserByCode(@PathVariable String code){
         logger.info("/get-by/"+code);
         return new ResponseEntity(userServices.findUserByCode(code),HttpStatus.OK);
+    }
+    @PostMapping("/deactivate-by/{userCode}")
+    public ResponseEntity<String> deactivateByUserCode(@PathVariable String userCode){
+        return new ResponseEntity(userServices.deactivateByUserCode(userCode),HttpStatus.OK);
     }
 }

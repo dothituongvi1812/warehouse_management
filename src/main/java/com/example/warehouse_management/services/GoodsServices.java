@@ -11,11 +11,13 @@ import java.util.List;
 public interface GoodsServices {
     public GoodsResponse addGoods(GoodsAddRequest goodsRequest);
     public Goods createGoods(GoodsRequest goodsRequest);
-    public Page<GoodsResponse> getAll(Integer page, Integer size);
+    public Page<GoodsResponse> getPage(Integer page, Integer size);
     public GoodsResponse getByCode(String code);
     public List<GoodsResponse> searchByCodeOrName(String keyword);
     public Goods findGoodByCode(String code);
     public Goods findGoodByName(String name);
     public GoodsResponse mapperGoods(Goods goods);
     public List<GoodsResponse> getAllByCategoryCode(String categoryCode);
+    public List<GoodsResponse> getAll();
+    public Integer getCurrentQuantityOfGoodsInWarehouse(String goodsCode);
 }

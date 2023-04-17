@@ -1,6 +1,8 @@
 package com.example.warehouse_management.models.purchase;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.Embeddable;
@@ -10,11 +12,12 @@ import java.util.Objects;
 
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @Embeddable
 public class PurchaseDetailPK implements Serializable {
     private Long goodsId;
     private Long purchaseId;
-
 
     @Override
     public boolean equals(Object o) {
@@ -26,6 +29,6 @@ public class PurchaseDetailPK implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(goodsId, receiptVoucherId, rowLocationId);
+        return Objects.hash(goodsId, purchaseId);
     }
 }

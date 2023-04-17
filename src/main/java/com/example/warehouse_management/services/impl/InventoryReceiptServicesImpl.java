@@ -3,21 +3,23 @@ package com.example.warehouse_management.services.impl;
 import com.example.warehouse_management.exception.ErrorException;
 import com.example.warehouse_management.exception.NotFoundGlobalException;
 import com.example.warehouse_management.models.goods.Goods;
+import com.example.warehouse_management.models.goods.GoodsAndBinLocationToCreateVoucher;
 import com.example.warehouse_management.models.partner.Partner;
+import com.example.warehouse_management.models.purchase.PurchaseDetail;
+import com.example.warehouse_management.models.purchase.PurchaseDetailPK;
+import com.example.warehouse_management.models.purchase.PurchaseReceipt;
+import com.example.warehouse_management.models.type.EStatusOfPurchasingGoods;
 import com.example.warehouse_management.models.type.EStatusOfVoucher;
 import com.example.warehouse_management.models.type.EStatusStorage;
 import com.example.warehouse_management.models.user.User;
 import com.example.warehouse_management.models.voucher.InventoryReceiptVoucher;
 import com.example.warehouse_management.models.voucher.ReceiptVoucherDetail;
 import com.example.warehouse_management.models.voucher.RowLocationGoodsTemp;
-import com.example.warehouse_management.models.warehouse.RowLocation;
+import com.example.warehouse_management.models.warehouse.BinLocation;
 import com.example.warehouse_management.payload.request.GoodsRequest;
 import com.example.warehouse_management.payload.request.ReceiptVoucherRequest;
 import com.example.warehouse_management.payload.response.*;
-import com.example.warehouse_management.repository.InventoryReceiptVoucherRepository;
-import com.example.warehouse_management.repository.ReceiptVoucherDetailRepository;
-import com.example.warehouse_management.repository.RowLocationRepository;
-import com.example.warehouse_management.repository.UserRepository;
+import com.example.warehouse_management.repository.*;
 import com.example.warehouse_management.services.*;
 import com.example.warehouse_management.services.domain.UtillServies;
 import org.modelmapper.ModelMapper;
@@ -29,7 +31,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
+import org.springframework.web.bind.annotation.RequestBody;
 
+import javax.validation.Valid;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -41,7 +45,7 @@ public class InventoryReceiptServicesImpl implements InventoryReceiptServices {
     @Autowired
     PartnerServices partnerServices;
     @Autowired
-    RowLocationServices rowLocationServices;
+    BinLocationServices binLocationServices;
     @Autowired
     GoodsServices goodsServices;
     @Autowired
@@ -49,99 +53,73 @@ public class InventoryReceiptServicesImpl implements InventoryReceiptServices {
     @Autowired
     CategoryServices categoryServices;
     @Autowired
-    RowLocationRepository rowLocationRepository;
+    BinLocationRepository binLocationRepository;
     @Autowired
     ReceiptVoucherDetailRepository receiptVoucherDetailRepository;
+    @Autowired
+    PurchaseReceiptServices purchaseReceiptServices;
+    @Autowired
+    PurchaseDetailRepository purchaseDetailRepository;
     private ModelMapper modelMapper = new ModelMapper();
 
     @Override
-    public InventoryReceiptVoucherResponse createReceiptVoucher(ReceiptVoucherRequest receiptVoucherRequest) {
-        // validate good_request
-        RowLocation rowLocation = rowLocationRepository.findTopByOrderByIdDesc();
-        double volumeRowLocation = rowLocation.getVolume();
-        receiptVoucherRequest.getGoodsRequests().stream()
-                .filter(goodsRequest -> compareSizeShelfAndGoods(
-                        createArraySize(rowLocation.getWidth(), rowLocation.getHeight(), rowLocation.getLength()),
-                        createArraySize(goodsRequest.getWidth(), goodsRequest.getHeight(), goodsRequest.getLength()),
-                        goodsRequest.getName()))
-                .collect(Collectors.toList());
-
-        Partner partner = partnerServices.addPartner(receiptVoucherRequest.getPartnerRequest());
-        User user = userRepository.findUserByEmail(receiptVoucherRequest.getEmail());
-        //process
-        List<RowLocationGoodsTemp> rowLocationGoodsTempList = new ArrayList<>();
-        List<InventoryReceiptVoucher> receiptVouchers = receiptVoucherRepository.findAll();
-        List<String> rowLocationCodeSelected = new ArrayList<>();
-        receiptVouchers.stream().filter(item ->item.getStatus().equals(EStatusOfVoucher.NOT_YET_IMPORTED))
-                .forEach(item->item.getReceiptVoucherDetails().forEach(e->rowLocationCodeSelected.add(e.getRowLocation().getCode())));
-        if(CollectionUtils.isEmpty(rowLocationCodeSelected))
-           rowLocationCodeSelected.add("");
-        for (GoodsRequest goodsRequest : receiptVoucherRequest.getGoodsRequests()) {
-            List<RowLocation> rowLocationList = rowLocationRepository.findByGoodsName(goodsRequest.getName(), rowLocationCodeSelected);
-            double volumeGoods = goodsRequest.getVolume() * goodsRequest.getQuantity();
-            if (CollectionUtils.isEmpty(rowLocationList)) {
-                process(goodsRequest,volumeGoods,volumeRowLocation,rowLocationGoodsTempList,rowLocationCodeSelected);
+    public InventoryReceiptVoucherResponse createReceiptVoucher(String purchaseReceiptCode,ReceiptVoucherRequest receiptVoucherRequest) {
+        List<GoodsAndBinLocationToCreateVoucher>  goodsAndBin = receiptVoucherRequest.getGoodsToCreateVoucher();
+        for (int i = 0; i < goodsAndBin.size()-1; i++) {
+            String binCode1 =goodsAndBin.get(i).getBinLocationCode();
+            String binCode2 = goodsAndBin.get(i+1).getBinLocationCode();
+            if(binCode1.equals(binCode2)){
+                throw new ErrorException("Vị trí "+binCode2 +" đã được chọn" );
             }
-            //trường hợp sp muốn nhập có trên kệ rồi
-            else {
-                int quantityRequest = goodsRequest.getQuantity();
-                for (RowLocation rl : rowLocationList) {
-                    if (rl.getRemainingVolume() >= volumeGoods) {
-                        RowLocationGoodsTemp rowLocationGoodsTemp = new RowLocationGoodsTemp(rl, goodsRequest);
-                        rowLocationGoodsTempList.add(rowLocationGoodsTemp);
-                        rowLocationCodeSelected.add(rl.getCode());
-                    } else {
-                        int quantityRefill = rl.getMaxCapacity() - rl.getCurrentCapacity();
-                        RowLocationGoodsTemp rowLocationGoodsTemp = new RowLocationGoodsTemp(rl,
-                                new GoodsRequest(goodsRequest.getName(),
-                                        goodsRequest.getHeight(), goodsRequest.getWidth(), goodsRequest.getLength(),
-                                        goodsRequest.getUnit(), quantityRefill, goodsRequest.getCategoryCode(), goodsRequest.getVolume()));
-                        rowLocationGoodsTempList.add(rowLocationGoodsTemp);
-                        rowLocationCodeSelected.add(rl.getCode());
-                        quantityRequest = quantityRequest - quantityRefill;
-                    }
-                }
-                if (quantityRequest > 0) {
-                    System.out.println("Tìm vị trí khác để set vào");
-                    double volume1SP = goodsRequest.getVolume();
-                    int maxCapacity = (int) (volumeRowLocation / volume1SP);
-                    if (quantityRequest <= maxCapacity) {
-                        RowLocation rowLocation1 = rowLocationRepository.findTopOneByStatusEmpty(rowLocationCodeSelected);
-                        RowLocationGoodsTemp rowLocationGoodsTemp = new RowLocationGoodsTemp(rowLocation1,
-                                new GoodsRequest(goodsRequest.getName(),
-                                        goodsRequest.getHeight(), goodsRequest.getWidth(), goodsRequest.getLength(),
-                                        goodsRequest.getUnit(), quantityRequest, goodsRequest.getCategoryCode(), goodsRequest.getVolume()));
-                        rowLocationGoodsTempList.add(rowLocationGoodsTemp);
-                        rowLocationCodeSelected.add(rowLocation1.getCode());
-                    } else {
-                        double volumeGoods1= quantityRequest*volume1SP;
-                        GoodsRequest goodsRequest1 = new GoodsRequest(goodsRequest.getName(),
-                                goodsRequest.getHeight(), goodsRequest.getWidth(), goodsRequest.getLength(),
-                                goodsRequest.getUnit(), quantityRequest, goodsRequest.getCategoryCode(), goodsRequest.getVolume());
-                        process(goodsRequest1,volumeGoods1,volumeRowLocation,rowLocationGoodsTempList,rowLocationCodeSelected);
-                    }
 
-                }
-
-            }
         }
 
-
-        InventoryReceiptVoucher saveInventoryReceiptVoucher = createObjectReceiptVoucher(partner, user);
+        PurchaseReceipt purchaseReceipt = purchaseReceiptServices.findPurchaseReceiptByCode(purchaseReceiptCode);
+        User user = userRepository.findUserByEmail(receiptVoucherRequest.getEmail());
+        InventoryReceiptVoucher inventoryReceiptVoucher = new InventoryReceiptVoucher();
+        inventoryReceiptVoucher.setCode(generateReceiptVoucher());
+        inventoryReceiptVoucher.setCreateDate(new Date());
+        inventoryReceiptVoucher.setPurchaseReceipt(purchaseReceipt);
+        inventoryReceiptVoucher.setCreatedBy(user);
+        inventoryReceiptVoucher.setStatus(EStatusOfVoucher.NOT_YET_IMPORTED);
+        InventoryReceiptVoucher savedVoucher= receiptVoucherRepository.save(inventoryReceiptVoucher);
         Set<ReceiptVoucherDetail> receiptVoucherDetailSet = new HashSet<>();
-        for (RowLocationGoodsTemp item : rowLocationGoodsTempList) {
-            ReceiptVoucherDetail receiptVoucherDetail = createObjectReceiptVoucherDetail(saveInventoryReceiptVoucher, item);
-            System.out.println("==========="+receiptVoucherDetail.getGoods().toString());
+        for(GoodsAndBinLocationToCreateVoucher object: receiptVoucherRequest.getGoodsToCreateVoucher()){
+            ReceiptVoucherDetail receiptVoucherDetail = new ReceiptVoucherDetail();
+            Goods goods = goodsServices.findGoodByCode(object.getGoodsCode());
+            BinLocation binLocation = binLocationServices.findRowLocationByCode(object.getBinLocationCode());
+            PurchaseDetailPK purchaseDetailPK = new PurchaseDetailPK();
+            purchaseDetailPK.setPurchaseId(purchaseReceipt.getId());
+            purchaseDetailPK.setGoodsId(goods.getId());
+            PurchaseDetail purchaseDetail = purchaseDetailRepository.findByPurchaseDetailPK(purchaseDetailPK);
+            double volume = goods.getVolume() * object.getQuantity();
+            if(binLocation.getRemainingVolume()<volume){
+               int maxQuantity = (int) (binLocation.getRemainingVolume()/ goods.getVolume());
+                receiptVoucherDetail.setQuantity(maxQuantity);
+                purchaseDetail.setQuantityActual(maxQuantity);
+                purchaseDetail.setStatus(EStatusOfPurchasingGoods.NOT_YET_CREATED);
+            }
+            else{
+                receiptVoucherDetail.setQuantity(object.getQuantity());
+                purchaseDetail.setQuantityActual(object.getQuantity());
+                purchaseDetail.setStatus(EStatusOfPurchasingGoods.CREATED);
+            }
+            purchaseDetailRepository.save(purchaseDetail);
+            receiptVoucherDetail.setGoodsCode(goods.getCode());
+            receiptVoucherDetail.setBinLocation(binLocation);
+            receiptVoucherDetail.setInventoryReceiptVoucher(savedVoucher);
             receiptVoucherDetailSet.add(receiptVoucherDetail);
         }
-        saveInventoryReceiptVoucher.setReceiptVoucherDetails(receiptVoucherDetailSet);
-        receiptVoucherRepository.save(saveInventoryReceiptVoucher);
-        return mapperInventoryReceiptVoucher(saveInventoryReceiptVoucher);
+        savedVoucher.setReceiptVoucherDetails(receiptVoucherDetailSet);
+        receiptVoucherRepository.save(savedVoucher);
+
+        return mapperInventoryReceiptVoucher(savedVoucher);
+
     }
 
     @Override
-    public List<RowLocationResponse> putTheGoodsOnShelf(String receiptVoucherCode) {
-        List<RowLocation> rowLocationList = new ArrayList<>();
+    public List<BinLocationResponse> putTheGoodsOnShelf(String receiptVoucherCode) {
+        List<BinLocation> binList = new ArrayList<>();
         InventoryReceiptVoucher inventoryReceiptVoucher = receiptVoucherRepository.findByCode(receiptVoucherCode);
         if(inventoryReceiptVoucher.getStatus().equals(EStatusOfVoucher.IMPORTED))
             throw new ErrorException("Phiếu nhập "+inventoryReceiptVoucher.getCode() + "đã được nhập hàng lên kệ");
@@ -149,33 +127,34 @@ public class InventoryReceiptServicesImpl implements InventoryReceiptServices {
         if (ObjectUtils.isEmpty(inventoryReceiptVoucher))
             throw new NotFoundGlobalException("Không tìm thấy phiếu nhập " + receiptVoucherCode);
         for (ReceiptVoucherDetail detail : inventoryReceiptVoucher.getReceiptVoucherDetails()) {
-            Goods goods = detail.getGoods();
-            RowLocation rowLocation = detail.getRowLocation();
+//            Goods goods = detail.getGoods();
+            Goods goods = null;
+            BinLocation bin = detail.getBinLocation();
             int quantity = detail.getQuantity();
-            int maxCapacity = (int) (rowLocation.getVolume() / goods.getVolume());
-            int currentCapacity = rowLocation.getCurrentCapacity() + quantity;
-            double remainingVolume = rowLocation.getRemainingVolume() - (goods.getVolume() * quantity);
-            rowLocation.setGoods(goods);
-            rowLocation.setMaxCapacity(maxCapacity);
-            rowLocation.setCurrentCapacity(currentCapacity);
-            rowLocation.setRemainingVolume(remainingVolume);
+            int maxCapacity = (int) (bin.getVolume() / goods.getVolume());
+            int currentCapacity = bin.getCurrentCapacity() + quantity;
+            double remainingVolume = bin.getRemainingVolume() - (goods.getVolume() * quantity);
+            bin.setGoods(goods);
+            bin.setMaxCapacity(maxCapacity);
+            bin.setCurrentCapacity(currentCapacity);
+            bin.setRemainingVolume(remainingVolume);
             if (remainingVolume <= 0)
-                rowLocation.setStatus(EStatusStorage.FULL);
+                bin.setStatus(EStatusStorage.FULL);
             else {
-                rowLocation.setStatus(EStatusStorage.AVAILABLE);
+                bin.setStatus(EStatusStorage.AVAILABLE);
             }
-            RowLocation saveRowLocation = rowLocationRepository.save(rowLocation);
-            rowLocationList.add(saveRowLocation);
+            BinLocation saveBin = binLocationRepository.save(bin);
+            binList.add(saveBin);
         }
-        List<RowLocationResponse> rowLocationResponses = rowLocationList.stream().map(item ->
-                rowLocationServices.mapperRowLocation(item)
+        List<BinLocationResponse> binLocationRespons = binList.stream().map(item ->
+                binLocationServices.mapperRowLocation(item)
         ).collect(Collectors.toList());
         receiptVoucherRepository.save(inventoryReceiptVoucher);
-        return rowLocationResponses;
+        return binLocationRespons;
     }
 
     @Override
-    public Page<InventoryReceiptVoucherResponse> getAllSortedByDate(Integer page, Integer size) {
+    public Page<InventoryReceiptVoucherResponse> getPageSortedByDate(Integer page, Integer size) {
         Pageable pageable = PageRequest.of(page,size);
         Page<InventoryReceiptVoucher> vouchers = receiptVoucherRepository.findAllBySortedCreateDate(pageable);
         Page<InventoryReceiptVoucherResponse> pages = new PageImpl<InventoryReceiptVoucherResponse>(vouchers.getContent()
@@ -183,6 +162,13 @@ public class InventoryReceiptServicesImpl implements InventoryReceiptServices {
                 vouchers.getTotalElements());
         return pages;
 
+    }
+
+    @Override
+    public List<InventoryReceiptVoucherResponse> findAll() {
+        List<InventoryReceiptVoucherResponse> responseList = getAll().stream()
+                .map(item->mapperInventoryReceiptVoucher(item)).collect(Collectors.toList());
+        return responseList;
     }
 
     @Override
@@ -212,7 +198,7 @@ public class InventoryReceiptServicesImpl implements InventoryReceiptServices {
         InventoryReceiptVoucherResponse response = modelMapper.map(inventoryReceiptVoucher, InventoryReceiptVoucherResponse.class);
         response.setCreatedBy(inventoryReceiptVoucher.getCreatedBy().getFullName());
         response.setStatus(status);
-        response.setPartner(modelMapper.map(inventoryReceiptVoucher.getPartner(), PartnerResponse.class));
+        response.setPartner(modelMapper.map(inventoryReceiptVoucher.getPurchaseReceipt().getPartner(), PartnerResponse.class));
         Set<ReceiptVoucherDetailResponse> detailResponseSet = inventoryReceiptVoucher
                 .getReceiptVoucherDetails().stream().map(item -> mapperReceiptVoucherDetailResponse(item))
                 .collect(Collectors.toSet());
@@ -248,7 +234,7 @@ public class InventoryReceiptServicesImpl implements InventoryReceiptServices {
 
     private InventoryReceiptVoucher createObjectReceiptVoucher(Partner partner, User user) {
         InventoryReceiptVoucher inventoryReceiptVoucher = new InventoryReceiptVoucher();
-        inventoryReceiptVoucher.setPartner(partner);
+       // inventoryReceiptVoucher.setPartner(partner);
         inventoryReceiptVoucher.setCreatedBy(user);
         inventoryReceiptVoucher.setCreateDate(new Date());
         inventoryReceiptVoucher.setCode(generateReceiptVoucher());
@@ -260,9 +246,9 @@ public class InventoryReceiptServicesImpl implements InventoryReceiptServices {
     private ReceiptVoucherDetail createObjectReceiptVoucherDetail(InventoryReceiptVoucher saveInventoryReceiptVoucher, RowLocationGoodsTemp rowLocationGoodsTemp) {
         ReceiptVoucherDetail receiptVoucherDetail = new ReceiptVoucherDetail();
         receiptVoucherDetail.setInventoryReceiptVoucher(saveInventoryReceiptVoucher);
-        receiptVoucherDetail.setGoods(goodsServices.createGoods(rowLocationGoodsTemp.getGoodsRequest()));
+//        receiptVoucherDetail.setGoods(goodsServices.createGoods(rowLocationGoodsTemp.getGoodsRequest()));
         receiptVoucherDetail.setQuantity(rowLocationGoodsTemp.getGoodsRequest().getQuantity());
-        receiptVoucherDetail.setRowLocation(rowLocationGoodsTemp.getRowLocation());
+        receiptVoucherDetail.setBinLocation(rowLocationGoodsTemp.getBinLocation());
         receiptVoucherDetailRepository.save(receiptVoucherDetail);
 
         return receiptVoucherDetail;
@@ -270,30 +256,30 @@ public class InventoryReceiptServicesImpl implements InventoryReceiptServices {
     private ReceiptVoucherDetailResponse mapperReceiptVoucherDetailResponse(ReceiptVoucherDetail receiptVoucherDetail){
 
         ReceiptVoucherDetailResponse detailResponse = new ReceiptVoucherDetailResponse(goodsServices.mapperGoods(
-                receiptVoucherDetail.getGoods()), UtillServies.mapperLocationInWarehouse(receiptVoucherDetail.getRowLocation()),receiptVoucherDetail.getQuantity());
+                goodsServices.findGoodByCode(receiptVoucherDetail.getGoodsCode())), UtillServies.mapperLocationInWarehouse(receiptVoucherDetail.getBinLocation()),receiptVoucherDetail.getQuantity());
         return detailResponse;
     }
 
     private void process(GoodsRequest goodsRequest, double volumeGoods, double volumeRowLocation, List<RowLocationGoodsTemp> rowLocationGoodsTempList, List<String> rowLocationCodeSelected) {
         double numberRowLocation = volumeGoods / volumeRowLocation;
         if (numberRowLocation <= 1) {
-            RowLocation rowLocationSelected = rowLocationRepository.findTopOneByStatusEmptyAndRemainingVolumeGreaterThanEqual(volumeGoods, rowLocationCodeSelected);
-            RowLocationGoodsTemp rowLocationGoodsTemp = new RowLocationGoodsTemp(rowLocationSelected, goodsRequest);
+            BinLocation binSelected = binLocationRepository.findTopOneByStatusEmptyAndRemainingVolumeGreaterThanEqual(volumeGoods, rowLocationCodeSelected);
+            RowLocationGoodsTemp rowLocationGoodsTemp = new RowLocationGoodsTemp(binSelected, goodsRequest);
             rowLocationGoodsTempList.add(rowLocationGoodsTemp);
             //selected
-            rowLocationCodeSelected.add(rowLocationSelected.getCode());
+            rowLocationCodeSelected.add(binSelected.getCode());
         }
             // Trường hợp cần nhiều vị trí
         else {
             if (volumeGoods % volumeRowLocation > 0) {
                 numberRowLocation = (int) numberRowLocation + 1;
             }
-            List<RowLocation> rowLocationSelectedList = rowLocationRepository.findTopNByStatusAndRemainingVolume(goodsRequest.getVolume(), (int) numberRowLocation, rowLocationCodeSelected);
+            List<BinLocation> binSelectedList = binLocationRepository.findTopNByStatusAndRemainingVolume(goodsRequest.getVolume(), (int) numberRowLocation, rowLocationCodeSelected);
                 int maxGoodsShelfContain = (int) (volumeRowLocation / goodsRequest.getVolume());
                 int quantity = goodsRequest.getQuantity();
-                for (RowLocation rl : rowLocationSelectedList) {
+                for (BinLocation rl : binSelectedList) {
                     RowLocationGoodsTemp rowLocationGoodsTemp = new RowLocationGoodsTemp();
-                    rowLocationGoodsTemp.setRowLocation(rl);
+                    rowLocationGoodsTemp.setBinLocation(rl);
                     if (quantity <= maxGoodsShelfContain) {
                         goodsRequest.setQuantity(quantity);
                     } else {

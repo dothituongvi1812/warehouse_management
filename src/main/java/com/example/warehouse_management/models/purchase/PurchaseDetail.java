@@ -2,10 +2,6 @@ package com.example.warehouse_management.models.purchase;
 
 import com.example.warehouse_management.models.goods.Goods;
 import com.example.warehouse_management.models.type.EStatusOfPurchasingGoods;
-import com.example.warehouse_management.models.type.EStatusOfVoucher;
-import com.example.warehouse_management.models.voucher.InventoryReceiptVoucher;
-import com.example.warehouse_management.models.voucher.ReceiptVoucherDetailPK;
-import com.example.warehouse_management.models.warehouse.RowLocation;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,9 +24,10 @@ public class PurchaseDetail {
     private Goods goods;
     @ManyToOne
     @MapsId("purchaseId")
-    @JoinColumn(name = "purchaseId")
-    private PurchaseInvoice purchaseInvoice;
-    private int quantity;
+    @JoinColumn(name = "purchase_id")
+    private PurchaseReceipt purchaseReceipt;
+    private int quantityPurchased;
+    private int quantityActual;
     @Enumerated(EnumType.STRING)
     @Column(length = 20)
     private EStatusOfPurchasingGoods status;

@@ -1,6 +1,8 @@
 package com.example.warehouse_management.models.voucher;
 
 import com.example.warehouse_management.models.partner.Partner;
+import com.example.warehouse_management.models.purchase.PurchaseReceipt;
+import com.example.warehouse_management.models.selling.SaleReceipt;
 import com.example.warehouse_management.models.user.User;
 import com.example.warehouse_management.models.type.EStatusOfVoucher;
 import lombok.AllArgsConstructor;
@@ -23,12 +25,16 @@ public class InventoryDeliveryVoucher {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(unique = true)
+    @Column(unique = true,nullable = false)
     private String code;
     private String reason;
 
     @OneToMany(mappedBy ="inventoryDeliveryVoucher",cascade = CascadeType.ALL)
     private Set<DeliveryVoucherDetail> deliveryVoucherDetails;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "sale_receipt_id")
+    private SaleReceipt saleReceipt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by")
@@ -38,8 +44,5 @@ public class InventoryDeliveryVoucher {
     @Column(length = 20)
     private EStatusOfVoucher status;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "partnerId")
-    private Partner partner;
     private Date createDate;
 }

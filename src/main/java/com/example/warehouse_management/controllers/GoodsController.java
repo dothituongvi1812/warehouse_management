@@ -26,10 +26,10 @@ public class GoodsController {
         logger.info("/add");
         return new ResponseEntity(goodsServices.addGoods(goodsRequest), HttpStatus.OK);
     }
-    @GetMapping("/get-all")
-    public ResponseEntity<Page<GoodsResponse>> getAll(@RequestParam Integer page, @RequestParam Integer size){
-        logger.info("/get-all");
-        return new ResponseEntity(goodsServices.getAll(page,size),HttpStatus.OK);
+    @GetMapping("/get-page")
+    public ResponseEntity<Page<GoodsResponse>> getPage(@RequestParam Integer page, @RequestParam Integer size){
+        logger.info("/get-page");
+        return new ResponseEntity(goodsServices.getPage(page,size),HttpStatus.OK);
     }
     @GetMapping("/get-by/{code}")
     public ResponseEntity<GoodsResponse> getByCode(@PathVariable String code){
@@ -46,4 +46,15 @@ public class GoodsController {
         logger.info("/get-all-by/"+categoryCode);
         return new ResponseEntity(goodsServices.getAllByCategoryCode(categoryCode),HttpStatus.OK);
     }
+    @GetMapping("/get-all")
+    public ResponseEntity<List<GoodsResponse>> getAll(){
+        logger.info("/get-all");
+        return new ResponseEntity(goodsServices.getAll(),HttpStatus.OK);
+    }
+    @GetMapping("/get-current-quantity-by/{goodsCode}")
+    public ResponseEntity<Integer> getCurrentQuantityOfGoodsInWarehouse(@PathVariable String goodsCode){
+        logger.info("/get-current-quantity-by"+goodsCode);
+        return new ResponseEntity<>(goodsServices.getCurrentQuantityOfGoodsInWarehouse(goodsCode),HttpStatus.OK);
+    }
+
 }

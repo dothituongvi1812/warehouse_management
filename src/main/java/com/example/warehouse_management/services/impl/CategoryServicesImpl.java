@@ -1,5 +1,6 @@
 package com.example.warehouse_management.services.impl;
 
+import com.example.warehouse_management.exception.ErrorException;
 import com.example.warehouse_management.exception.NotFoundGlobalException;
 import com.example.warehouse_management.models.goods.Category;
 import com.example.warehouse_management.payload.request.CategoryRequest;
@@ -9,6 +10,7 @@ import com.example.warehouse_management.services.CategoryServices;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 
 import java.util.List;
 import java.util.Random;
@@ -22,14 +24,19 @@ public class CategoryServicesImpl implements CategoryServices {
 
     @Override
     public CategoryResponse addCategory(CategoryRequest request) {
-        Category category= new Category();
-        String code = generateCategoryCode();
-        category.setCode(code);
-        category.setName(request.getName());
-        category.setDescription(request.getDescription());
-        CategoryResponse response =mapperCategoryResponse(categoryRepository.save(category));
-
-        return response;
+        Category category  = categoryRepository.findByName(request.getName());
+        if(ObjectUtils.isEmpty(category)){
+            Category category1= new Category();
+            String code = generateCategoryCode();
+            category1.setCode(code);
+            category1.setName(request.getName());
+            category1.setDescription(request.getDescription());
+            CategoryResponse response =mapperCategoryResponse(categoryRepository.save(category1));
+            return response;
+        }
+        else{
+            throw new ErrorException("Đã tồn tại loại sản phẩm "+ request.getName());
+        }
     }
 
     @Override

@@ -20,4 +20,6 @@ public interface UserServices {
     public List<UserResponse> getAll();
     public UserResponse findUserByCode(String code);
     public User findByCode(String code);
+    public User findUserByEmail(String email);
+    public String deactivateByUserCode(String userCode);
 }

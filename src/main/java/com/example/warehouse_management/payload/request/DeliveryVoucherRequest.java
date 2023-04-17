@@ -15,12 +15,7 @@ import java.util.Set;
 @NoArgsConstructor
 public class DeliveryVoucherRequest {
 
-    @NotBlank(message = "Số điện thoại không thể trống")
-    @Pattern(regexp = "(84|0[3|5|7|8|9])+([0-9]{8})\\b")
-    private String partnerPhone;
     @Valid
-    private Set<GoodDeliveryRequest> goodsRequests;
+    private List<GoodDeliveryRequest> goodsRequests;
     private String email;
-    @NotBlank(message = "Lý do không thể trống")
-    private String reason;
 }

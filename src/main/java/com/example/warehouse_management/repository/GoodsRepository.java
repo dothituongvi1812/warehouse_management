@@ -23,5 +23,12 @@ public interface GoodsRepository extends CrudRepository<Goods,Long> {
             "join category c on g.category_id = c.id \n" +
             "where c.code =:categoryCode")
     List<Goods> findAllByCategory(String categoryCode);
+    List<Goods> findAll();
+
+    @Query(nativeQuery = true,value = "select sum(bl.current_capacity) from bin_locations bl \n" +
+            "join goods g on bl.goods_id = g.id \n" +
+            "where g.code =:goodsCode\n" +
+            "group by bl.goods_id ")
+    Integer getCurrentQuantityOfGoodsInWarehouse(String goodsCode);
 
 }

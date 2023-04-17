@@ -1,6 +1,7 @@
 package com.example.warehouse_management.controllers;
 
 import com.example.warehouse_management.payload.request.DeliveryVoucherRequest;
+import com.example.warehouse_management.payload.response.InventoryDeliveryVoucherResponse;
 import com.example.warehouse_management.payload.response.InventoryReceiptVoucherResponse;
 import com.example.warehouse_management.services.InventoryDeliveryVoucherServices;
 import org.slf4j.Logger;
@@ -22,11 +23,11 @@ public class InventoryDeliveryVoucherController {
     @Autowired
     InventoryDeliveryVoucherServices inventoryDeliveryVoucherServices;
 
-    @PostMapping("/create")
-    public ResponseEntity<?> createDeliveryVoucher(@Valid @RequestBody DeliveryVoucherRequest deliveryVoucherRequest, Principal principal) {
+    @PostMapping("/create/{saleReceiptCode}")
+    public ResponseEntity<?> createDeliveryVoucher(@PathVariable String saleReceiptCode,@Valid @RequestBody DeliveryVoucherRequest deliveryVoucherRequest, Principal principal) {
         logger.info("/api/delivery-voucher/create");
         deliveryVoucherRequest.setEmail(principal.getName());
-        return new ResponseEntity(inventoryDeliveryVoucherServices.createInventoryDeliveryVoucher(deliveryVoucherRequest), HttpStatus.OK);
+        return new ResponseEntity(inventoryDeliveryVoucherServices.createInventoryDeliveryVoucher(saleReceiptCode,deliveryVoucherRequest), HttpStatus.OK);
     }
 
     @PostMapping("/export-goods/{deliveryVoucherCode}")
@@ -40,10 +41,16 @@ public class InventoryDeliveryVoucherController {
         logger.info("/api/delivery-voucher/get-delivery-by/" + deliveryVoucherCode);
         return new ResponseEntity(inventoryDeliveryVoucherServices.getDeliveryVoucherByCode(deliveryVoucherCode), HttpStatus.OK);
     }
-    @GetMapping("/get-all")
-    public ResponseEntity<Page<InventoryReceiptVoucherResponse>> getAllSortByDate(@RequestParam Integer page, @RequestParam Integer size){
-        logger.info("/api/delivery-voucher/get-all");
-        return new ResponseEntity(inventoryDeliveryVoucherServices.getAllSortedByDate(page,size),HttpStatus.OK);
+    @GetMapping("/get-page")
+    public ResponseEntity<Page<InventoryDeliveryVoucherResponse>> getPageSortByDate(@RequestParam Integer page, @RequestParam Integer size){
+        logger.info("/api/delivery-voucher/get-page");
+        return new ResponseEntity(inventoryDeliveryVoucherServices.getPageSortedByDate(page,size),HttpStatus.OK);
     }
+    @GetMapping("/get-all")
+    public ResponseEntity<List<InventoryDeliveryVoucherResponse>> getAll(){
+        logger.info("/api/delivery-voucher/get-all");
+        return new ResponseEntity(inventoryDeliveryVoucherServices.getAll(),HttpStatus.OK);
+    }
+
 }
 

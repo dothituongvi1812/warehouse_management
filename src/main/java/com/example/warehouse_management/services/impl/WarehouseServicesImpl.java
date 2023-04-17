@@ -1,13 +1,11 @@
 package com.example.warehouse_management.services.impl;
 
 import com.example.warehouse_management.exception.NotFoundGlobalException;
-import com.example.warehouse_management.models.goods.Goods;
-import com.example.warehouse_management.models.type.EStatusStorage;
 import com.example.warehouse_management.models.warehouse.ColumnLocation;
-import com.example.warehouse_management.models.warehouse.ShelveStorage;
+import com.example.warehouse_management.models.warehouse.ShelfStorage;
 import com.example.warehouse_management.models.warehouse.Warehouse;
 import com.example.warehouse_management.payload.request.ColumnLocationRequest;
-import com.example.warehouse_management.payload.request.RowLocationRequest;
+import com.example.warehouse_management.payload.request.BinLocationRequest;
 import com.example.warehouse_management.payload.request.ShelveStorageRequest;
 import com.example.warehouse_management.payload.request.WarehouseRequest;
 import com.example.warehouse_management.payload.response.WarehouseResponse;
@@ -15,7 +13,7 @@ import com.example.warehouse_management.repository.ColumnLocationRepository;
 import com.example.warehouse_management.repository.ShelveStorageRepository;
 import com.example.warehouse_management.repository.WarehouseRepository;
 import com.example.warehouse_management.services.ColumnLocationServices;
-import com.example.warehouse_management.services.RowLocationServices;
+import com.example.warehouse_management.services.BinLocationServices;
 import com.example.warehouse_management.services.ShelveStorageServices;
 import com.example.warehouse_management.services.WarehouseServices;
 import org.modelmapper.ModelMapper;
@@ -23,7 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Random;
 import java.util.stream.Collectors;
 
 @Service
@@ -43,7 +40,7 @@ public class WarehouseServicesImpl implements WarehouseServices {
     @Autowired
     ColumnLocationRepository columnLocationRepository;
     @Autowired
-    RowLocationServices rowLocationServices;
+    BinLocationServices binLocationServices;
     private ModelMapper modelMapper =new ModelMapper();
     public WarehouseResponse addWarehouse(WarehouseRequest request){
         //validate
@@ -80,7 +77,7 @@ public class WarehouseServicesImpl implements WarehouseServices {
         int numberShelveInWarehouse = shelveStorageServices.findAll().size();
         createShelveOfWarehouse(request,warehouse,numberShelveInWarehouse,numberOfShelve,request.getNumberOfFloor());
         //xử lý cột
-        List<ShelveStorage> shelveInWarehouse=shelveStorageRepository.findAll();
+        List<ShelfStorage> shelveInWarehouse=shelveStorageRepository.findAll();
         createColumnLocationOfShelve(request.getLengthOfColumn(), shelveInWarehouse);
         //xử lý vị trí
         List<ColumnLocation> columnLocationInShelves=columnLocationRepository.findAll();
@@ -128,14 +125,14 @@ public class WarehouseServicesImpl implements WarehouseServices {
             shelveStorageServices.addShelfStorage(shelveStorageRequest);
         }
     }
-    private void createColumnLocationOfShelve(double lengthOfColumn,List<ShelveStorage> shelveStorages){
-        for (ShelveStorage shelveStorage:shelveStorages) {
-            columnLocationServices.addColumns(new ColumnLocationRequest(lengthOfColumn,shelveStorage.getCode()));
+    private void createColumnLocationOfShelve(double lengthOfColumn,List<ShelfStorage> shelfStorages){
+        for (ShelfStorage shelfStorage : shelfStorages) {
+            columnLocationServices.addColumns(new ColumnLocationRequest(lengthOfColumn, shelfStorage.getCode()));
         }
     }
     private void createRowLocationOfColumn(List<ColumnLocation> columnLocations){
         for (ColumnLocation columnLocation:columnLocations) {
-            rowLocationServices.addRowLocations(new RowLocationRequest(columnLocation.getCode()));
+            binLocationServices.addRowLocations(new BinLocationRequest(columnLocation.getCode()));
         }
     }
 }

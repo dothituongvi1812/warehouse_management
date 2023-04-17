@@ -1,7 +1,7 @@
 package com.example.warehouse_management.models.voucher;
 
 import com.example.warehouse_management.models.goods.Goods;
-import com.example.warehouse_management.models.warehouse.RowLocation;
+import com.example.warehouse_management.models.warehouse.BinLocation;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,18 +17,15 @@ import javax.persistence.*;
 public class DeliveryVoucherDetail {
     @EmbeddedId
     private DeliveryVoucherDetailPK deliveryVoucherDetailPK =new DeliveryVoucherDetailPK();
-    @ManyToOne
-    @MapsId("goodsId")
-    @JoinColumn(name = "goods_id")
-    private Goods goods;
+    private String goodsCode;
     @ManyToOne
     @MapsId("deliveryVoucherId")
     @JoinColumn(name = "delivery_voucher_id")
     private InventoryDeliveryVoucher inventoryDeliveryVoucher;
 
     @ManyToOne
-    @MapsId("rowLocationId")
-    @JoinColumn(name = "row_location_id")
-    private RowLocation rowLocation;
+    @MapsId("binLocationId")
+    @JoinColumn(name = "bin_location_id")
+    private BinLocation binLocation;
     private int quantity;
 }

@@ -27,6 +27,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.mail.MessagingException;
@@ -198,6 +199,7 @@ public class UserServicesImpl implements UserServices {
     public List<UserResponse> getAll() {
         List<User> users=userRepository.findAll();
         List<UserResponse> userResponse = users.stream()
+                .sorted(Comparator.comparing(User::getCode))
                 .map(user -> modelMapper.map(user,UserResponse.class))
                 .collect(Collectors.toList());
         return userResponse;
@@ -212,7 +214,25 @@ public class UserServicesImpl implements UserServices {
     @Override
     public User findByCode(String code) {
         User user=userRepository.findUserByCode(code);
+        if(ObjectUtils.isEmpty(user))
+            throw new NotFoundGlobalException("Không tìm thấy user"+ code);
         return user;
+    }
+
+    @Override
+    public User findUserByEmail(String email) {
+        User user = userRepository.findUserByEmail(email);
+        if(ObjectUtils.isEmpty(user))
+            throw new NotFoundGlobalException("Không tìm thấy user"+ email);
+        return user;
+    }
+
+    @Override
+    public String deactivateByUserCode(String userCode) {
+        User user = findByCode(userCode);
+        user.setEnabled(false);
+        userRepository.save(user);
+        return "Đã vô hiệu hoá user "+ user.getFullName();
     }
 
     private String generateUserCode(){

@@ -1,8 +1,6 @@
 package com.example.warehouse_management.repository;
 
 import com.example.warehouse_management.models.warehouse.ColumnLocation;
-import com.example.warehouse_management.models.warehouse.RowLocation;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 

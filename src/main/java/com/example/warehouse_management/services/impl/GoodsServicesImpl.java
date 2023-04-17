@@ -4,11 +4,9 @@ import com.example.warehouse_management.exception.NotFoundGlobalException;
 import com.example.warehouse_management.models.goods.Category;
 import com.example.warehouse_management.models.goods.Goods;
 import com.example.warehouse_management.models.type.EUnit;
-import com.example.warehouse_management.models.warehouse.RowLocation;
 import com.example.warehouse_management.payload.request.GoodsAddRequest;
 import com.example.warehouse_management.payload.request.GoodsRequest;
 import com.example.warehouse_management.payload.response.GoodsResponse;
-import com.example.warehouse_management.payload.response.RowLocationResponse;
 import com.example.warehouse_management.repository.CategoryRepository;
 import com.example.warehouse_management.repository.GoodsRepository;
 import com.example.warehouse_management.services.GoodsServices;
@@ -44,7 +42,6 @@ public class GoodsServicesImpl implements GoodsServices {
         if(category==null){
             throw new NotFoundGlobalException("Không tìm thấy loại hàng hoá");
         }
-        System.out.println("--------------category.getGoods()" +category.getGoods());
         Goods goodSearch = goodsRepository.findByName(goodsRequest.getName());
         if(ObjectUtils.isEmpty(goodSearch)){
             Goods goods =new Goods();
@@ -59,11 +56,13 @@ public class GoodsServicesImpl implements GoodsServices {
             Goods goodSave=goodsRepository.save(goods);
             return goodSave;
         }
-       return goodSearch;
+        else{
+            return goodSearch;
+        }
     }
 
     @Override
-    public Page<GoodsResponse> getAll(Integer page,Integer size) {
+    public Page<GoodsResponse> getPage(Integer page,Integer size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Goods> goodsPage= goodsRepository.findAll(pageable);
         Page<GoodsResponse> pages = new PageImpl<GoodsResponse>(goodsPage.getContent()
@@ -114,6 +113,20 @@ public class GoodsServicesImpl implements GoodsServices {
         List<GoodsResponse> responseList = goodsRepository.findAllByCategory(categoryCode).stream()
                 .map(item->mapperGoodResponse(item)).collect(Collectors.toList());
         return responseList;
+    }
+
+    @Override
+    public List<GoodsResponse> getAll() {
+        List<GoodsResponse> goodsResponse = goodsRepository.findAll().stream()
+                .map(goods -> mapperGoodResponse(goods))
+                .collect(Collectors.toList());
+
+        return goodsResponse;
+    }
+
+    @Override
+    public Integer getCurrentQuantityOfGoodsInWarehouse(String goodsCode) {
+        return Integer.valueOf(goodsRepository.getCurrentQuantityOfGoodsInWarehouse(goodsCode));
     }
 
     public GoodsResponse mapperGoodResponse(Goods goods){

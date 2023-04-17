@@ -1,6 +1,6 @@
 package com.example.warehouse_management.services.domain;
 
-import com.example.warehouse_management.models.warehouse.RowLocation;
+import com.example.warehouse_management.models.warehouse.BinLocation;
 import com.example.warehouse_management.payload.response.LocationInWarehouse;
 
 import java.util.Random;
@@ -11,16 +11,16 @@ public class UtillServies {
         String code = String.format("L-"+String.format("%04d",rnd.nextInt(999999)));
         return code;
     }
-    public static LocationInWarehouse mapperLocationInWarehouse(RowLocation rowLocation) {
+    public static LocationInWarehouse mapperLocationInWarehouse(BinLocation bin) {
         LocationInWarehouse locationInWarehouse = new LocationInWarehouse();
-        locationInWarehouse.setNameRow(rowLocation.getName());
-        locationInWarehouse.setCodeRow(rowLocation.getCode());
-        locationInWarehouse.setNameColumn(rowLocation.getColumnLocation().getName());
-        locationInWarehouse.setCodeColumn(rowLocation.getColumnLocation().getCode());
-        locationInWarehouse.setNameShelf(rowLocation.getColumnLocation().getShelveStorage().getName());
-        locationInWarehouse.setCodeShelf(rowLocation.getColumnLocation().getShelveStorage().getCode());
-        locationInWarehouse.setNameWarehouse(rowLocation.getColumnLocation().getShelveStorage().getWarehouse().getName());
-        locationInWarehouse.setCodeWarehouse(rowLocation.getColumnLocation().getShelveStorage().getWarehouse().getCode());
+        locationInWarehouse.setNameRow(bin.getName());
+        locationInWarehouse.setCodeRow(bin.getCode());
+        locationInWarehouse.setNameColumn(bin.getColumnLocation().getName());
+        locationInWarehouse.setCodeColumn(bin.getColumnLocation().getCode());
+        locationInWarehouse.setNameShelf(bin.getColumnLocation().getShelfStorage().getName());
+        locationInWarehouse.setCodeShelf(bin.getColumnLocation().getShelfStorage().getCode());
+        locationInWarehouse.setNameWarehouse(bin.getColumnLocation().getShelfStorage().getWarehouse().getName());
+        locationInWarehouse.setCodeWarehouse(bin.getColumnLocation().getShelfStorage().getWarehouse().getCode());
         return locationInWarehouse;
     }
 

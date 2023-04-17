@@ -7,7 +7,6 @@ import lombok.Setter;
 @Setter
 public class PartnerResponse {
 
-    private Long id;
     private String code;
     private String name;
     private String address;

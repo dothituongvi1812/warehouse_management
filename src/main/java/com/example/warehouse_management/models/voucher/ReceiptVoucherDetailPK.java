@@ -12,20 +12,19 @@ import java.util.Objects;
 @Setter
 @Embeddable
 public class ReceiptVoucherDetailPK implements Serializable {
-    private Long goodsId;
     private Long receiptVoucherId;
-    private Long rowLocationId;
+    private Long binLocationId;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ReceiptVoucherDetailPK that = (ReceiptVoucherDetailPK) o;
-        return Objects.equals(goodsId, that.goodsId) && Objects.equals(receiptVoucherId, that.receiptVoucherId) && Objects.equals(rowLocationId, that.rowLocationId);
+        return  Objects.equals(receiptVoucherId, that.receiptVoucherId) && Objects.equals(binLocationId, that.binLocationId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(goodsId, receiptVoucherId, rowLocationId);
+        return Objects.hash( receiptVoucherId, binLocationId);
     }
 }

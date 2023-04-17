@@ -1,8 +1,11 @@
 package com.example.warehouse_management.models.user;
 
+import com.example.warehouse_management.models.purchase.PurchaseReceipt;
 import com.example.warehouse_management.models.voucher.InventoryDeliveryVoucher;
 import com.example.warehouse_management.models.voucher.InventoryReceiptVoucher;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Date;
@@ -22,12 +25,14 @@ import javax.validation.constraints.Size;
                 @UniqueConstraint(columnNames = "code"),
                 @UniqueConstraint(columnNames = "email")
         })
+@NoArgsConstructor
+@AllArgsConstructor
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(columnDefinition = "varchar",length = 5,unique = true)
+    @Column(unique = true,nullable = false)
     private String code;
     @Column(columnDefinition = "text",length = 255)
     private String fullName;
@@ -40,9 +45,7 @@ public class User {
     @NotBlank
     @Size(max = 120)
     private String password;
-
     private boolean enabled;
-
     private String sex;
     private Date createDate;
     @ManyToMany(fetch = FetchType.LAZY)
@@ -51,14 +54,6 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
 
-    @OneToMany(mappedBy ="createdBy",cascade = CascadeType.ALL)
-    private Set<InventoryDeliveryVoucher> inventoryDeliveryVouchers;
-
-    @OneToMany(mappedBy ="createdBy",cascade = CascadeType.ALL)
-    private Set<InventoryReceiptVoucher> inventoryReceiptVouchers;
-
-    public User() {
-    }
 
     public User(String code, String email, String password,String fullName,String sex, boolean enabled) {
         this.code=code;

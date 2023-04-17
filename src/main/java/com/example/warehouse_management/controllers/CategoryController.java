@@ -18,7 +18,6 @@ public class CategoryController {
     @PostMapping("/add")
     public ResponseEntity addCategory(@RequestBody CategoryRequest request){
         logger.info("/add");
-//        Test change git username
         return new ResponseEntity(categoryServices.addCategory(request), HttpStatus.OK);
     }
     @GetMapping("/get-all")

@@ -3,7 +3,7 @@ package com.example.warehouse_management.services.impl;
 import com.example.warehouse_management.exception.ErrorException;
 import com.example.warehouse_management.exception.NotFoundGlobalException;
 import com.example.warehouse_management.models.warehouse.ColumnLocation;
-import com.example.warehouse_management.models.warehouse.ShelveStorage;
+import com.example.warehouse_management.models.warehouse.ShelfStorage;
 import com.example.warehouse_management.payload.request.ColumnLocationRequest;
 import com.example.warehouse_management.payload.response.ColumnLocationResponse;
 import com.example.warehouse_management.repository.ColumnLocationRepository;
@@ -31,15 +31,15 @@ public class ColumnLocationServicesImpl implements ColumnLocationServices {
     @Override
     public List<ColumnLocationResponse> addColumns(ColumnLocationRequest columnLocationRequest) {
         List<ColumnLocationResponse> responses =new ArrayList<>();
-        ShelveStorage shelveStorage =shelveStorageRepository.findByCode(columnLocationRequest.getShelfStorageCode());
-        if (shelveStorage==null){
+        ShelfStorage shelfStorage =shelveStorageRepository.findByCode(columnLocationRequest.getShelfStorageCode());
+        if (shelfStorage ==null){
             throw new NotFoundGlobalException("Không tìm thấy kệ "+columnLocationRequest.getShelfStorageCode());
         }
         //validation chiều dài cột
         //nhỏ hơn chiều dài kệ
         // khi chia phải là số nguyên
         double lengthColumn=columnLocationRequest.getLength();
-        double lengthShelf=shelveStorage.getLength();
+        double lengthShelf= shelfStorage.getLength();
         if(!(lengthColumn <= lengthShelf)){
             throw new ErrorException("Chiều dài của cột phải nhỏ hơn hoặc bằng chiều dài của kệ là: "+lengthShelf);
         }
@@ -47,12 +47,12 @@ public class ColumnLocationServicesImpl implements ColumnLocationServices {
             throw new ErrorException("Chiều dài của cột không phù hợp. Chiều dài của kệ là: "+lengthShelf);
         }
 
-        int numberColumn= (int) (shelveStorage.getLength()/columnLocationRequest.getLength());
+        int numberColumn= (int) (shelfStorage.getLength()/columnLocationRequest.getLength());
         int numberColumnCurrent=columnLocationRepository.findAll().size();
         String code ="CL000";
         for (int i = 0; i < numberColumn; i++) {
             ColumnLocation columnLocation =new ColumnLocation();
-            columnLocation.setShelveStorage(shelveStorage);
+            columnLocation.setShelfStorage(shelfStorage);
             columnLocation.setLength(columnLocationRequest.getLength());
             columnLocation.setName(generateColumnLocationName(i+1));
             columnLocation.setCode(code+(numberColumnCurrent+i+1));
@@ -113,8 +113,8 @@ public class ColumnLocationServicesImpl implements ColumnLocationServices {
     }
     private ColumnLocationResponse mapperColumnLocationResponse(ColumnLocation columnLocation){
         ColumnLocationResponse columnLocationResponse =modelMapper.map(columnLocation,ColumnLocationResponse.class);
-        columnLocationResponse.setShelfStorageCode(columnLocation.getShelveStorage().getCode());
-        columnLocationResponse.setShelfStorageName(columnLocation.getShelveStorage().getName());
+        columnLocationResponse.setShelfStorageCode(columnLocation.getShelfStorage().getCode());
+        columnLocationResponse.setShelfStorageName(columnLocation.getShelfStorage().getName());
 
         return columnLocationResponse;
     }

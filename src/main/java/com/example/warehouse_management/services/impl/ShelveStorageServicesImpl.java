@@ -1,8 +1,7 @@
 package com.example.warehouse_management.services.impl;
 
 import com.example.warehouse_management.exception.NotFoundGlobalException;
-import com.example.warehouse_management.models.type.EStatusStorage;
-import com.example.warehouse_management.models.warehouse.ShelveStorage;
+import com.example.warehouse_management.models.warehouse.ShelfStorage;
 import com.example.warehouse_management.models.warehouse.Warehouse;
 import com.example.warehouse_management.payload.request.ShelveStorageRequest;
 import com.example.warehouse_management.payload.response.ShelveStorageResponse;
@@ -34,16 +33,16 @@ public class ShelveStorageServicesImpl implements ShelveStorageServices {
             if(warehouse==null){
                 throw new NotFoundGlobalException("Không tìm thấy kho "+ request.getWarehouseCode());
             }
-            ShelveStorage shelveStorage =new ShelveStorage();
-            shelveStorage.setCode(request.getCode());
-            shelveStorage.setName(request.getName());
-            shelveStorage.setHeight(request.getHeight());
-            shelveStorage.setLength(request.getLength());
-            shelveStorage.setWidth(request.getWidth());
-            shelveStorage.setNumberOfFloors(request.getNumberOfFloor());
-            shelveStorage.setWarehouse(warehouse);
+            ShelfStorage shelfStorage =new ShelfStorage();
+            shelfStorage.setCode(request.getCode());
+            shelfStorage.setName(request.getName());
+            shelfStorage.setHeight(request.getHeight());
+            shelfStorage.setLength(request.getLength());
+            shelfStorage.setWidth(request.getWidth());
+            shelfStorage.setNumberOfFloors(request.getNumberOfFloor());
+            shelfStorage.setWarehouse(warehouse);
 
-            ShelveStorageResponse response = mapperShelveStorageResponse(shelveStorage);
+            ShelveStorageResponse response = mapperShelveStorageResponse(shelfStorage);
             return response;
         }
 
@@ -55,11 +54,11 @@ public class ShelveStorageServicesImpl implements ShelveStorageServices {
     }
 
     @Override
-    public ShelveStorage findShelveStorageByCode(String code) {
-        ShelveStorage shelveStorage=shelfStorageRepository.findByCode(code);
-        if(shelveStorage==null)
+    public ShelfStorage findShelveStorageByCode(String code) {
+        ShelfStorage shelfStorage =shelfStorageRepository.findByCode(code);
+        if(shelfStorage ==null)
             throw new NotFoundGlobalException("Không tìm thấy kệ "+code);
-        return shelveStorage;
+        return shelfStorage;
     }
 
     @Override
@@ -73,10 +72,10 @@ public class ShelveStorageServicesImpl implements ShelveStorageServices {
         String shelfName = String.format("SS-"+code);
         return shelfName;
     }
-    private ShelveStorageResponse mapperShelveStorageResponse(ShelveStorage shelveStorage){
-        ShelveStorageResponse response = modelMapper.map(shelfStorageRepository.save(shelveStorage),ShelveStorageResponse.class);
-        response.setWarehouseCode(shelveStorage.getWarehouse().getCode());
-        response.setWarehouseName(shelveStorage.getWarehouse().getName());
+    private ShelveStorageResponse mapperShelveStorageResponse(ShelfStorage shelfStorage){
+        ShelveStorageResponse response = modelMapper.map(shelfStorageRepository.save(shelfStorage),ShelveStorageResponse.class);
+        response.setWarehouseCode(shelfStorage.getWarehouse().getCode());
+        response.setWarehouseName(shelfStorage.getWarehouse().getName());
 
         return response;
     }

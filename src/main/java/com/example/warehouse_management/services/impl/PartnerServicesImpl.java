@@ -8,6 +8,10 @@ import com.example.warehouse_management.repository.PartnerRepository;
 import com.example.warehouse_management.services.PartnerServices;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
@@ -55,6 +59,17 @@ public class PartnerServicesImpl implements PartnerServices {
     }
 
     @Override
+    public Page<PartnerResponse> getPage(Integer page, Integer size) {
+        Pageable pageable = PageRequest.of(page,size);
+        Page<Partner> page1 = partnerRepository.findAll(pageable);
+        Page<PartnerResponse> responsePage = new PageImpl<>(page1.getContent().stream()
+                .map(item->modelMapper.map(item,PartnerResponse.class))
+                .collect(Collectors.toList())
+                ,pageable,page1.getTotalElements());
+        return responsePage;
+    }
+
+    @Override
     public PartnerResponse getPartnerByCode(String code) {
         PartnerResponse partnerResponse=modelMapper.map(partnerRepository.findByCode(code),PartnerResponse.class);
         return partnerResponse;
@@ -71,6 +86,14 @@ public class PartnerServicesImpl implements PartnerServices {
         Partner partner = partnerRepository.findByPhone(phone);
         if(partner==null)
             throw new NotFoundGlobalException("Không tìm thấy đối tác có số điện thoại"+ phone);
+        return partner;
+    }
+
+    @Override
+    public Partner findPartnerByCode(String partnerCode) {
+        Partner partner = partnerRepository.findByCode(partnerCode);
+        if(partner==null)
+            throw new NotFoundGlobalException("Không tìm thấy đối tác có mã"+ partnerCode);
         return partner;
     }
 

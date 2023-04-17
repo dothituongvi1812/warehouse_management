@@ -1,11 +1,8 @@
 package com.example.warehouse_management.models.warehouse;
 
-import com.example.warehouse_management.models.type.EStatusStorage;
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.*;
 
 import javax.persistence.*;
-import java.util.Date;
 import java.util.Set;
 
 @Table
@@ -14,11 +11,11 @@ import java.util.Set;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ShelveStorage {
+public class ShelfStorage {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(unique = true)
+    @Column(unique = true,nullable = false)
     private String code;
     private String name;
     private int numberOfFloors;
@@ -30,7 +27,7 @@ public class ShelveStorage {
     @JoinColumn(name = "warehouseId")
     private Warehouse warehouse;
 
-    @OneToMany(mappedBy = "shelveStorage")
+    @OneToMany(mappedBy = "shelfStorage")
     private Set<ColumnLocation> columnLocations;
 
 

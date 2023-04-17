@@ -1,6 +1,8 @@
 package com.example.warehouse_management.repository;
 
 import com.example.warehouse_management.models.partner.Partner;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
@@ -13,5 +15,6 @@ public interface PartnerRepository extends CrudRepository<Partner,Long> {
     Partner findByCode(String code);
     Partner findByName(String name);
     Partner findByPhone(String phone);
+    Page<Partner> findAll(Pageable pageable);
 
 }

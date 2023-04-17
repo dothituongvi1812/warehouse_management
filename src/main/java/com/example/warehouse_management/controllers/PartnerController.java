@@ -6,6 +6,7 @@ import com.example.warehouse_management.services.PartnerServices;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -39,5 +40,10 @@ public class PartnerController {
     public ResponseEntity<PartnerResponse> getPartnerByPhone(@PathVariable String phonePartner){
         logger.info("/get-by-phone"+phonePartner);
         return new ResponseEntity(partnerServices.getPartnerByPhone(phonePartner),HttpStatus.OK);
+    }
+    @GetMapping("/get-page")
+    public ResponseEntity<Page<PartnerResponse>> getPage(@RequestParam Integer page, @RequestParam Integer size){
+        logger.info("/get-page");
+        return new ResponseEntity(partnerServices.getPage(page-1, size),HttpStatus.OK);
     }
 }

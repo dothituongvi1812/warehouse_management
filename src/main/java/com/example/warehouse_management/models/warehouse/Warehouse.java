@@ -1,17 +1,14 @@
 package com.example.warehouse_management.models.warehouse;
 
-import com.example.warehouse_management.models.type.EStatusStorage;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.Nationalized;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
-import java.util.Date;
 import java.util.Set;
 
 @Entity
@@ -25,7 +22,7 @@ public class Warehouse {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true)
+    @Column(unique = true,nullable = false)
     private String code;
     @Column(columnDefinition = "text",length = 255)
     private String name;
@@ -39,7 +36,7 @@ public class Warehouse {
     private double acreage;
     @OneToMany(mappedBy = "warehouse")
     @JsonManagedReference
-    private Set<ShelveStorage> shelveStorages;
+    private Set<ShelfStorage> shelfStorages;
 
 
 }
