@@ -4,7 +4,7 @@ import com.example.warehouse_management.exception.ErrorException;
 import com.example.warehouse_management.exception.NotFoundGlobalException;
 import com.example.warehouse_management.models.warehouse.ColumnLocation;
 import com.example.warehouse_management.models.warehouse.ShelfStorage;
-import com.example.warehouse_management.payload.request.ColumnLocationRequest;
+import com.example.warehouse_management.payload.request.column.ColumnLocationRequest;
 import com.example.warehouse_management.payload.response.ColumnLocationResponse;
 import com.example.warehouse_management.repository.ColumnLocationRepository;
 import com.example.warehouse_management.repository.ShelveStorageRepository;

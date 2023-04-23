@@ -1,17 +1,17 @@
 package com.example.warehouse_management.services.impl;
 
 
+import com.example.warehouse_management.exception.ErrorException;
 import com.example.warehouse_management.exception.NotFoundGlobalException;
 import com.example.warehouse_management.models.goods.Goods;
 import com.example.warehouse_management.models.type.EStatusStorage;
-import com.example.warehouse_management.models.user.User;
-import com.example.warehouse_management.models.voucher.ReceiptVoucherDetail;
 import com.example.warehouse_management.models.warehouse.BinLocation;
 import com.example.warehouse_management.models.warehouse.ColumnLocation;
 import com.example.warehouse_management.models.warehouse.ShelfStorage;
-import com.example.warehouse_management.payload.request.BinLocationRequest;
-import com.example.warehouse_management.payload.request.GoodsCreatedReceiptVoucherRequest;
-import com.example.warehouse_management.payload.request.StatusRequest;
+import com.example.warehouse_management.payload.request.bin.BinLocationMoveToRequest;
+import com.example.warehouse_management.payload.request.bin.BinLocationRequest;
+import com.example.warehouse_management.payload.request.goods.GoodsCreatedReceiptVoucherRequest;
+import com.example.warehouse_management.payload.request.bin.StatusRequest;
 import com.example.warehouse_management.payload.response.BinLocationResponse;
 import com.example.warehouse_management.repository.ColumnLocationRepository;
 import com.example.warehouse_management.repository.BinLocationRepository;
@@ -181,6 +181,9 @@ public class BinLocationServicesImpl implements BinLocationServices {
 
     @Override
     public List<BinLocationResponse> getAllUsablePositionForGoods(String warehouseCode, GoodsCreatedReceiptVoucherRequest request) {
+        List<BinLocation> binLocationCheck = binLocationRepository.getAllBinStatusEmptyAndAvailable();
+        if(CollectionUtils.isEmpty(binLocationCheck))
+            throw new ErrorException("Kho đã đầy");
         List<Long> usingBinLocation = binLocationRepository.getAllUsingBinLocation();
         if(CollectionUtils.isEmpty(usingBinLocation))
             usingBinLocation.add(0L);
@@ -201,8 +204,33 @@ public class BinLocationServicesImpl implements BinLocationServices {
                 .sorted(Comparator.comparing(BinLocationResponse::getCodeColumn))
                 .sorted(Comparator.comparing(BinLocationResponse::getCodeBin))
                 .collect(Collectors.toList());
+
         return responseList;
     }
+
+    @Override
+    public String moveBin(String fromBinLocationCode, BinLocationMoveToRequest binLocationMoveToRequest) {
+        BinLocation fromBinLocation = findRowLocationByCode(fromBinLocationCode);
+        BinLocation toBinLocation = findRowLocationByCode(binLocationMoveToRequest.getToBinLocationCode());
+        if (!ObjectUtils.isEmpty(toBinLocation.getGoods())){
+            if(fromBinLocation.getGoods().equals(toBinLocation.getGoods())){
+                throw new ErrorException("Vị trí có mã "+ fromBinLocation.getCode()+ " đang chứa sản phẩm"+ fromBinLocation.getGoods().getCode());
+            }
+        }
+        else {
+            toBinLocation.setGoods(fromBinLocation.getGoods());
+        }
+        int quantity=binLocationMoveToRequest.getQuantity();
+        double volumeGoods = quantity* toBinLocation.getGoods().getVolume();
+        toBinLocation.setCurrentCapacity(toBinLocation.getCurrentCapacity()+ quantity);
+        toBinLocation.setRemainingVolume(toBinLocation.getRemainingVolume()-volumeGoods);
+        fromBinLocation.setCurrentCapacity(fromBinLocation.getCurrentCapacity()-quantity);
+        fromBinLocation.setRemainingVolume(fromBinLocation.getRemainingVolume()+volumeGoods);
+        List<BinLocation> binLocationList = Arrays.asList(toBinLocation,fromBinLocation);
+        binLocationRepository.saveAll(binLocationList);
+        return "Dời thành công từ vị trí" + fromBinLocationCode +" sang vị trí " + toBinLocation.getCode();
+    }
+
     private String generateRowLocationName(int numberRow){
         String name ="";
         switch (numberRow){

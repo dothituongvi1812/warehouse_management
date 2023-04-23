@@ -1,6 +1,7 @@
 package com.example.warehouse_management.controllers;
 
-import com.example.warehouse_management.payload.request.PartnerRequest;
+import com.example.warehouse_management.payload.request.partner.PartnerRequest;
+import com.example.warehouse_management.payload.request.partner.UpdatePartnerRequest;
 import com.example.warehouse_management.payload.response.PartnerResponse;
 import com.example.warehouse_management.services.PartnerServices;
 import org.slf4j.Logger;
@@ -45,5 +46,10 @@ public class PartnerController {
     public ResponseEntity<Page<PartnerResponse>> getPage(@RequestParam Integer page, @RequestParam Integer size){
         logger.info("/get-page");
         return new ResponseEntity(partnerServices.getPage(page-1, size),HttpStatus.OK);
+    }
+    @PostMapping("/update/{partnerCode}")
+    public ResponseEntity<PartnerResponse> updatePartner(@PathVariable String partnerCode, @RequestBody UpdatePartnerRequest updatePartnerRequest){
+        logger.info("/update"+partnerCode);
+        return new ResponseEntity(null,HttpStatus.OK);
     }
 }

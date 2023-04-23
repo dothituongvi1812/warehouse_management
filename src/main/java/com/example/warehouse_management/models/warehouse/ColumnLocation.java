@@ -20,7 +20,9 @@ public class ColumnLocation {
     private Long id;
     @Column(unique = true,nullable = false)
     private String code;
+    @Column(name = "name")
     private String name;
+    //@Column(name = "length", columnDefinition = "FLOAT(8) CHECK (length > 0)")
     private double length;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name ="shelfStorageId" )

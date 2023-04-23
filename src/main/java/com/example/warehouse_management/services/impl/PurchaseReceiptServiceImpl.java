@@ -1,5 +1,6 @@
 package com.example.warehouse_management.services.impl;
 
+import com.example.warehouse_management.exception.ErrorException;
 import com.example.warehouse_management.exception.NotFoundGlobalException;
 import com.example.warehouse_management.models.goods.Goods;
 import com.example.warehouse_management.models.partner.Partner;
@@ -9,10 +10,10 @@ import com.example.warehouse_management.models.purchase.PurchaseReceipt;
 import com.example.warehouse_management.models.type.EStatusOfPurchasingGoods;
 import com.example.warehouse_management.models.type.EStatusPurchaseReceipt;
 import com.example.warehouse_management.models.user.User;
-import com.example.warehouse_management.models.voucher.InventoryReceiptVoucher;
-import com.example.warehouse_management.payload.request.GoodsRequest;
-import com.example.warehouse_management.payload.request.PurchaseReceiptRequest;
+import com.example.warehouse_management.payload.request.goods.GoodsRequest;
+import com.example.warehouse_management.payload.request.purchase.PurchaseReceiptRequest;
 import com.example.warehouse_management.payload.response.*;
+import com.example.warehouse_management.repository.BinLocationRepository;
 import com.example.warehouse_management.repository.PurchaseDetailRepository;
 import com.example.warehouse_management.repository.PurchaseReceiptRepository;
 import com.example.warehouse_management.services.GoodsServices;
@@ -25,10 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -43,6 +41,8 @@ public class PurchaseReceiptServiceImpl implements PurchaseReceiptServices {
     GoodsServices goodsServices;
     @Autowired
     PurchaseDetailRepository purchaseDetailRepository;
+    @Autowired
+    BinLocationRepository binLocationRepository;
     private ModelMapper modelMapper = new ModelMapper();
     @Override
     public PurchaseReceiptResponse createPurchaseReceipt(PurchaseReceiptRequest purchaseReceiptRequest) {
@@ -63,7 +63,7 @@ public class PurchaseReceiptServiceImpl implements PurchaseReceiptServices {
             purchaseDetail.setGoods(goods);
             purchaseDetail.setPurchaseDetailPK(new PurchaseDetailPK(savePurchase.getId(),goods.getId()));
             purchaseDetail.setQuantityPurchased(goodsRequest.getQuantity());
-            purchaseDetail.setQuantityActual(0);
+            purchaseDetail.setQuantityRemaining(goodsRequest.getQuantity());
             purchaseDetail.setStatus(EStatusOfPurchasingGoods.NOT_YET_CREATED);
             purchaseDetailRepository.save(purchaseDetail);
             purchaseDetails.add(purchaseDetail);
@@ -128,11 +128,24 @@ public class PurchaseReceiptServiceImpl implements PurchaseReceiptServices {
             PurchaseDetailResponse purchaseDetailResponse = new PurchaseDetailResponse();
             purchaseDetailResponse.setGoods(goodsServices.mapperGoods(detail.getGoods()));
             purchaseDetailResponse.setQuantityPurchased(detail.getQuantityPurchased());
-            purchaseDetailResponse.setQuantityActual(detail.getQuantityActual());
+            purchaseDetailResponse.setQuantityRemaining(detail.getQuantityRemaining());
             purchaseDetailResponse.setStatus(detail.getStatus());
             purchaseDetailResponseSet.add(purchaseDetailResponse);
         }
         response.setPurchaseDetails(purchaseDetailResponseSet);
         return response;
+    }
+    private double[] createArraySize(double width, double height, double length) {
+        double[] size = {width, height, length};
+        Arrays.sort(size);
+        return size;
+
+    }
+
+    private boolean compareSizeShelfAndGoods(double[] sizeShelf, double[] sizeGoods, String goodsName) {
+        if (sizeShelf[0] >= sizeGoods[0] && sizeShelf[1] >= sizeGoods[1] && sizeShelf[2] >= sizeGoods[2])
+            return true;
+        else
+            throw new ErrorException(goodsName + "có kích thước quá lớn,kho không thể chứa");
     }
 }

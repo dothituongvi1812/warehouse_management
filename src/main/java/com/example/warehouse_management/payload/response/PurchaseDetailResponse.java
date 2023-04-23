@@ -14,7 +14,7 @@ public class PurchaseDetailResponse {
 
     private GoodsResponse goods;
     private int quantityPurchased;
-    private int quantityActual;
+    private int quantityRemaining;
 
     private EStatusOfPurchasingGoods status;
 }

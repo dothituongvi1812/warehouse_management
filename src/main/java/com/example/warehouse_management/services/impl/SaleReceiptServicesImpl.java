@@ -2,14 +2,12 @@ package com.example.warehouse_management.services.impl;
 
 import com.example.warehouse_management.exception.ErrorException;
 import com.example.warehouse_management.exception.NotFoundGlobalException;
-import com.example.warehouse_management.models.purchase.PurchaseReceipt;
 import com.example.warehouse_management.models.selling.SaleDetail;
 import com.example.warehouse_management.models.selling.SaleReceipt;
 import com.example.warehouse_management.models.type.EStatusOfPurchasingGoods;
 import com.example.warehouse_management.models.warehouse.BinLocation;
-import com.example.warehouse_management.payload.request.GoodDeliveryRequest;
-import com.example.warehouse_management.payload.request.GoodsToSaleRequest;
-import com.example.warehouse_management.payload.request.SaleReceiptRequest;
+import com.example.warehouse_management.payload.request.goods.GoodsToSaleRequest;
+import com.example.warehouse_management.payload.request.sale.SaleReceiptRequest;
 import com.example.warehouse_management.payload.response.*;
 import com.example.warehouse_management.repository.SaleReceiptRepository;
 import com.example.warehouse_management.services.*;

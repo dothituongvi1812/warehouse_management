@@ -1,9 +1,10 @@
 package com.example.warehouse_management.services;
 
 import com.example.warehouse_management.models.warehouse.BinLocation;
-import com.example.warehouse_management.payload.request.BinLocationRequest;
-import com.example.warehouse_management.payload.request.GoodsCreatedReceiptVoucherRequest;
-import com.example.warehouse_management.payload.request.StatusRequest;
+import com.example.warehouse_management.payload.request.bin.BinLocationMoveToRequest;
+import com.example.warehouse_management.payload.request.bin.BinLocationRequest;
+import com.example.warehouse_management.payload.request.goods.GoodsCreatedReceiptVoucherRequest;
+import com.example.warehouse_management.payload.request.bin.StatusRequest;
 import com.example.warehouse_management.payload.response.BinLocationResponse;
 import org.springframework.data.domain.Page;
 
@@ -26,4 +27,5 @@ public interface BinLocationServices {
     public List<BinLocationResponse> getAll();
     public List<BinLocationResponse> getAllRowLocationByWarehouseCode(String codeWarehouse);
     List<BinLocationResponse> getAllUsablePositionForGoods(String warehouseCode, GoodsCreatedReceiptVoucherRequest request);
+    String moveBin(String fromBinLocationCode, BinLocationMoveToRequest binLocationMoveToRequest);
 }

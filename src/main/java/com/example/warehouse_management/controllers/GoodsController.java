@@ -1,7 +1,7 @@
 package com.example.warehouse_management.controllers;
 
-import com.example.warehouse_management.payload.request.GoodsAddRequest;
-import com.example.warehouse_management.payload.request.GoodsRequest;
+import com.example.warehouse_management.payload.request.goods.GoodsAddRequest;
+import com.example.warehouse_management.payload.request.goods.UpdateGoodsRequest;
 import com.example.warehouse_management.payload.response.GoodsResponse;
 import com.example.warehouse_management.services.GoodsServices;
 import org.slf4j.Logger;
@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/goods")
@@ -56,5 +57,15 @@ public class GoodsController {
         logger.info("/get-current-quantity-by"+goodsCode);
         return new ResponseEntity<>(goodsServices.getCurrentQuantityOfGoodsInWarehouse(goodsCode),HttpStatus.OK);
     }
+    @GetMapping("/count-quantity")
+    public ResponseEntity<Map<String,Integer>> countCurrentQuantityOfGoodsInWarehouse(){
+        logger.info("/count-quantity");
+        return new ResponseEntity<>(goodsServices.countCurrentQuantityOfGoodsInWarehouse(),HttpStatus.OK);
+    }
+    @PostMapping("/update/{goodsCode}")
+    public ResponseEntity<GoodsResponse> updateGoods(@PathVariable String goodsCode,@RequestBody UpdateGoodsRequest updateGoodsRequest){
+        return new ResponseEntity<>(goodsServices.updateGoods(goodsCode,updateGoodsRequest),HttpStatus.OK);
+    }
+
 
 }

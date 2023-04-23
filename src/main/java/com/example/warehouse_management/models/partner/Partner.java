@@ -5,6 +5,7 @@ import com.example.warehouse_management.models.selling.SaleReceipt;
 import com.example.warehouse_management.models.voucher.InventoryDeliveryVoucher;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.util.Set;
@@ -21,7 +22,9 @@ public class Partner {
     private String code;
     @Column(columnDefinition = "text",length = 255)
     private String name;
-    private String address;
+    @Type(type = "jsonb")
+    @Column(name = "address", columnDefinition = "jsonb")
+    private Address address;
     @Column(unique = true)
     private String phone;
 }

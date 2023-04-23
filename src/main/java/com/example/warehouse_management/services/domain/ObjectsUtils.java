@@ -35,5 +35,10 @@ public class ObjectsUtils {
             return obj1 != obj2;
         return obj2 != null && obj1 != null ? obj1.equals(obj2) : true;
     }
+    public static boolean equalObject(Object obj1,Object obj2){
+        if (obj1 == null || obj2 == null)
+            return obj1 != obj2;
+        return obj2 != null && obj1 != null ? obj1.equals(obj2) : true;
+    }
 }
 

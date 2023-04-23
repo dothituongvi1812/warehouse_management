@@ -1,6 +1,6 @@
 package com.example.warehouse_management.controllers;
 
-import com.example.warehouse_management.payload.request.ColumnLocationRequest;
+import com.example.warehouse_management.payload.request.column.ColumnLocationRequest;
 import com.example.warehouse_management.payload.response.ColumnLocationResponse;
 import com.example.warehouse_management.services.ColumnLocationServices;
 import org.slf4j.Logger;

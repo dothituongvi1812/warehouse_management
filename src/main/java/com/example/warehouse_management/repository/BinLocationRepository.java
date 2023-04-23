@@ -19,6 +19,10 @@ public interface BinLocationRepository extends CrudRepository<BinLocation,Long> 
     List<BinLocation> findByGoodsName(String goodsName, List<String> codeRowLocations);
     BinLocation findByCode(String code);
     BinLocation findTopByOrderByIdDesc();
+    @Query(nativeQuery = true,value = "select * from bin_locations bl \n" +
+            "order by bl.volume asc\n" +
+            "limit 1")
+    BinLocation findBinLocationMinVolume();
     @Query(nativeQuery = true,
             value = "select * from bin_locations rl \n" +
                     "where rl.remaining_volume >=:volumeGoods and rl.status ='EMPTY' and rl.code not in :codeRowLocations\n" +
@@ -50,7 +54,7 @@ public interface BinLocationRepository extends CrudRepository<BinLocation,Long> 
     @Query(nativeQuery = true,
             value = "select rl.* from bin_locations rl \n" +
                     "join column_locations cl on rl.column_location_id = cl.id \n" +
-                    "join shelve_storages ss on ss.id = cl.shelve_storage_id \n" +
+                    "join shelve_storages ss on ss.id = cl.shelf_storage_id \n" +
                     "join warehouse w on w.id =ss.warehouse_id \n" +
                     "where rl.status =:status and w.code =:code")
     List<BinLocation> filterStatusByWarehouseCode(String code, String status);
@@ -63,7 +67,7 @@ public interface BinLocationRepository extends CrudRepository<BinLocation,Long> 
     @Query(nativeQuery = true,
             value = "select rl.* from bin_locations rl \n" +
                     "join column_locations cl on rl.column_location_id = cl.id \n" +
-                    "join shelve_storages ss on ss.id = cl.shelve_storage_id \n" +
+                    "join shelve_storages ss on ss.id = cl.shelf_storage_id \n" +
                     "join warehouse w on w.id =ss.warehouse_id \n" +
                     "where w.code =:code")
     Page<BinLocation> getPageRowLocationByWarehouseCode(String code, Pageable pageable);
@@ -93,7 +97,7 @@ public interface BinLocationRepository extends CrudRepository<BinLocation,Long> 
     @Query(nativeQuery = true,
             value = "select rl.* from bin_locations rl \n" +
                     "join column_locations cl on rl.column_location_id = cl.id \n" +
-                    "join shelve_storages ss on ss.id = cl.shelve_storage_id \n" +
+                    "join shelve_storages ss on ss.id = cl.shelf_storage_id \n" +
                     "join warehouse w on w.id =ss.warehouse_id \n" +
                     "where w.code =:code")
     List<BinLocation> getAllRowLocationByWarehouseCode(String code);
@@ -119,6 +123,10 @@ public interface BinLocationRepository extends CrudRepository<BinLocation,Long> 
             "join receipt_voucher_details rvd  on irv.id = rvd.receipt_voucher_id \n" +
             "where status ='NOT_YET_IMPORTED' ")
     List<Long> getAllUsingBinLocation();
+
+    @Query(nativeQuery = true,value = "select * from bin_locations bl \n" +
+            "where bl.status = 'EMPTY' or bl.status = 'AVAILABLE'")
+    List<BinLocation> getAllBinStatusEmptyAndAvailable();
 
 
 }

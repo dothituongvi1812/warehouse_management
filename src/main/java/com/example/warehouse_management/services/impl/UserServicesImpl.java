@@ -3,17 +3,19 @@ package com.example.warehouse_management.services.impl;
 import com.example.warehouse_management.exception.ExistedException;
 import com.example.warehouse_management.exception.NotFoundGlobalException;
 import com.example.warehouse_management.models.type.ERole;
+import com.example.warehouse_management.models.user.RefreshToken;
 import com.example.warehouse_management.models.user.Role;
 import com.example.warehouse_management.models.user.User;
-import com.example.warehouse_management.payload.request.LoginRequest;
-import com.example.warehouse_management.payload.request.RegisterUserRequest;
-import com.example.warehouse_management.payload.request.ResetPasswordRequest;
-import com.example.warehouse_management.payload.request.UserUpdateRequest;
+import com.example.warehouse_management.payload.request.auth.LoginRequest;
+import com.example.warehouse_management.payload.request.auth.RegisterUserRequest;
+import com.example.warehouse_management.payload.request.auth.ResetPasswordRequest;
+import com.example.warehouse_management.payload.request.user.UserUpdateRequest;
 import com.example.warehouse_management.payload.response.JwtResponse;
 import com.example.warehouse_management.payload.response.UserResponse;
 import com.example.warehouse_management.repository.RoleRepository;
 import com.example.warehouse_management.repository.UserRepository;
 import com.example.warehouse_management.security.jwt.JwtUtils;
+import com.example.warehouse_management.security.services.RefreshTokenService;
 import com.example.warehouse_management.security.services.UserDetailsImpl;
 import com.example.warehouse_management.services.UserServices;
 import com.example.warehouse_management.services.domain.ObjectsUtils;
@@ -55,6 +57,8 @@ public class UserServicesImpl implements UserServices {
 
     @Autowired
     JavaMailSender mailSender;
+    @Autowired
+    RefreshTokenService refreshTokenService;
 
     private ModelMapper modelMapper=new ModelMapper();
 
@@ -67,10 +71,10 @@ public class UserServicesImpl implements UserServices {
         List<String> roles = userDetails.getAuthorities().stream()
                 .map(item -> item.getAuthority())
                 .collect(Collectors.toList());
-
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getId());
 
         return new JwtResponse(jwt,userDetails.getId(),userDetails.getCode(),
-                userDetails.getFullName(),userDetails.getEmail(),roles);
+                userDetails.getFullName(),userDetails.getEmail(),roles,refreshToken.getToken());
     }
 
     public UserResponse registerUser(RegisterUserRequest registerRequest) {

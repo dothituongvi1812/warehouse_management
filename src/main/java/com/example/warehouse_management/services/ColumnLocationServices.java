@@ -1,10 +1,8 @@
 package com.example.warehouse_management.services;
 
 
-import com.example.warehouse_management.payload.request.ColumnLocationRequest;
-import com.example.warehouse_management.payload.request.ShelveStorageRequest;
+import com.example.warehouse_management.payload.request.column.ColumnLocationRequest;
 import com.example.warehouse_management.payload.response.ColumnLocationResponse;
-import com.example.warehouse_management.payload.response.ShelveStorageResponse;
 
 import java.util.List;
 

@@ -1,7 +1,7 @@
 package com.example.warehouse_management.services;
 
 import com.example.warehouse_management.models.voucher.InventoryReceiptVoucher;
-import com.example.warehouse_management.payload.request.ReceiptVoucherRequest;
+import com.example.warehouse_management.payload.request.receive.ReceiptVoucherRequest;
 import com.example.warehouse_management.payload.response.InventoryReceiptVoucherResponse;
 import com.example.warehouse_management.payload.response.BinLocationResponse;
 import org.springframework.data.domain.Page;

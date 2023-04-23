@@ -27,5 +27,6 @@ public class DeliveryVoucherDetail {
     @MapsId("binLocationId")
     @JoinColumn(name = "bin_location_id")
     private BinLocation binLocation;
+//    @Column(name = "quantity", columnDefinition = "INT(4) CHECK (quantity > 0)")
     private int quantity;
 }

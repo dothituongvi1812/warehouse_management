@@ -1,13 +1,14 @@
 package com.example.warehouse_management.services.impl;
 
+import com.example.warehouse_management.exception.ErrorException;
 import com.example.warehouse_management.exception.NotFoundGlobalException;
 import com.example.warehouse_management.models.warehouse.ColumnLocation;
 import com.example.warehouse_management.models.warehouse.ShelfStorage;
 import com.example.warehouse_management.models.warehouse.Warehouse;
-import com.example.warehouse_management.payload.request.ColumnLocationRequest;
-import com.example.warehouse_management.payload.request.BinLocationRequest;
-import com.example.warehouse_management.payload.request.ShelveStorageRequest;
-import com.example.warehouse_management.payload.request.WarehouseRequest;
+import com.example.warehouse_management.payload.request.column.ColumnLocationRequest;
+import com.example.warehouse_management.payload.request.bin.BinLocationRequest;
+import com.example.warehouse_management.payload.request.shelf.ShelveStorageRequest;
+import com.example.warehouse_management.payload.request.warehouse.WarehouseRequest;
 import com.example.warehouse_management.payload.response.WarehouseResponse;
 import com.example.warehouse_management.repository.ColumnLocationRepository;
 import com.example.warehouse_management.repository.ShelveStorageRepository;
@@ -19,6 +20,7 @@ import com.example.warehouse_management.services.WarehouseServices;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -43,6 +45,12 @@ public class WarehouseServicesImpl implements WarehouseServices {
     BinLocationServices binLocationServices;
     private ModelMapper modelMapper =new ModelMapper();
     public WarehouseResponse addWarehouse(WarehouseRequest request){
+        Warehouse warehouse1 = warehouseRepository.findByName(request.getName());
+        if(!ObjectUtils.isEmpty(warehouse1))
+            throw new ErrorException("Tên nhà kho đã tồn tại");
+        Warehouse warehouse2 = warehouseRepository.findByLocation(request.getLocation());
+        if(!ObjectUtils.isEmpty(warehouse2))
+            throw new ErrorException("Vị trí này đã tồn tại");
         //validate
         if(request.getLengthShelf()>request.getLength()-DISTANCE_CORRIDOR){
             throw new RuntimeException(String.format("Chiều dài tối đa của kệ là %f "
@@ -77,7 +85,7 @@ public class WarehouseServicesImpl implements WarehouseServices {
         int numberShelveInWarehouse = shelveStorageServices.findAll().size();
         createShelveOfWarehouse(request,warehouse,numberShelveInWarehouse,numberOfShelve,request.getNumberOfFloor());
         //xử lý cột
-        List<ShelfStorage> shelveInWarehouse=shelveStorageRepository.findAll();
+        List<ShelfStorage> shelveInWarehouse=shelveStorageRepository.findAllByWarehouse(warehouse.getCode());
         createColumnLocationOfShelve(request.getLengthOfColumn(), shelveInWarehouse);
         //xử lý vị trí
         List<ColumnLocation> columnLocationInShelves=columnLocationRepository.findAll();

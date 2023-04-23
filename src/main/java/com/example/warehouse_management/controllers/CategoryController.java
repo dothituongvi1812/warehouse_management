@@ -1,6 +1,6 @@
 package com.example.warehouse_management.controllers;
 
-import com.example.warehouse_management.payload.request.CategoryRequest;
+import com.example.warehouse_management.payload.request.category.CategoryRequest;
 import com.example.warehouse_management.services.CategoryServices;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

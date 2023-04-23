@@ -1,7 +1,7 @@
 package com.example.warehouse_management.models.voucher;
 
 import com.example.warehouse_management.models.warehouse.BinLocation;
-import com.example.warehouse_management.payload.request.GoodsRequest;
+import com.example.warehouse_management.payload.request.goods.GoodsRequest;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

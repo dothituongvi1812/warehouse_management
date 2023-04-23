@@ -4,12 +4,17 @@ import com.example.warehouse_management.exception.NotFoundGlobalException;
 import com.example.warehouse_management.models.goods.Category;
 import com.example.warehouse_management.models.goods.Goods;
 import com.example.warehouse_management.models.type.EUnit;
-import com.example.warehouse_management.payload.request.GoodsAddRequest;
-import com.example.warehouse_management.payload.request.GoodsRequest;
+import com.example.warehouse_management.models.warehouse.BinLocation;
+import com.example.warehouse_management.payload.request.goods.GoodsAddRequest;
+import com.example.warehouse_management.payload.request.goods.GoodsRequest;
+import com.example.warehouse_management.payload.request.goods.UpdateGoodsRequest;
 import com.example.warehouse_management.payload.response.GoodsResponse;
+import com.example.warehouse_management.repository.BinLocationRepository;
 import com.example.warehouse_management.repository.CategoryRepository;
 import com.example.warehouse_management.repository.GoodsRepository;
 import com.example.warehouse_management.services.GoodsServices;
+import com.example.warehouse_management.services.domain.ObjectsUtils;
+import com.example.warehouse_management.services.domain.UtillServies;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -19,7 +24,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
+import java.math.BigInteger;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,6 +36,8 @@ public class GoodsServicesImpl implements GoodsServices {
     GoodsRepository goodsRepository;
     @Autowired
     CategoryRepository categoryRepository;
+    @Autowired
+    BinLocationRepository binLocationRepository;
 
     private ModelMapper modelMapper=new ModelMapper();
     @Override
@@ -38,6 +48,8 @@ public class GoodsServicesImpl implements GoodsServices {
     }
     @Override
     public Goods createGoods(GoodsRequest goodsRequest) {
+        BinLocation binLocation = binLocationRepository.findBinLocationMinVolume();
+        UtillServies.validateGoods(goodsRequest,binLocation);
         Category category=categoryRepository.findByCode(goodsRequest.getCategoryCode());
         if(category==null){
             throw new NotFoundGlobalException("Không tìm thấy loại hàng hoá");
@@ -52,6 +64,7 @@ public class GoodsServicesImpl implements GoodsServices {
             goods.setWidth(goodsRequest.getWidth());
             goods.setLength(goodsRequest.getLength());
             goods.setUnit(EUnit.THUNG);
+            goods.setImage(goodsRequest.getImages());
             goods.setVolume(goodsRequest.getHeight()*goodsRequest.getWidth()*goodsRequest.getLength());
             Goods goodSave=goodsRepository.save(goods);
             return goodSave;
@@ -127,6 +140,43 @@ public class GoodsServicesImpl implements GoodsServices {
     @Override
     public Integer getCurrentQuantityOfGoodsInWarehouse(String goodsCode) {
         return Integer.valueOf(goodsRepository.getCurrentQuantityOfGoodsInWarehouse(goodsCode));
+    }
+
+    @Override
+    public Map<String, Integer> countCurrentQuantityOfGoodsInWarehouse() {
+        List<Object[]> objects = goodsRepository.countCurrentQuantityOfGoodsInWarehouse();
+        Map<String,Integer> map = new HashMap<>();
+        for (Object[] ob : objects){
+            String key = (String)ob[0];
+            Integer value = ((BigInteger) ob[1]).intValue();
+            map.put(key,value);
+        }
+        return map;
+    }
+
+    @Override
+    public GoodsResponse updateGoods(String goodsCode, UpdateGoodsRequest updateGoodsRequest) {
+        Goods goods = findGoodByCode(goodsCode);
+        if(!ObjectsUtils.equal(goods.getName(),updateGoodsRequest.getName())){
+            goods.setName(updateGoodsRequest.getName());
+        }
+        if(!ObjectsUtils.equalDouble(goods.getHeight(),updateGoodsRequest.getHeight())){
+            goods.setHeight(updateGoodsRequest.getHeight());
+        }
+        if(!ObjectsUtils.equalDouble(goods.getLength(),updateGoodsRequest.getLength())){
+            goods.setHeight(updateGoodsRequest.getLength());
+        }
+        if(!ObjectsUtils.equalDouble(goods.getWidth(),updateGoodsRequest.getWidth())){
+            goods.setHeight(updateGoodsRequest.getWidth());
+        }
+        if(!ObjectsUtils.equal(goods.getCategory().getCode(),updateGoodsRequest.getCategoryCode())){
+            goods.setCategory(categoryRepository.findByCode(updateGoodsRequest.getCategoryCode()));
+        }
+        if(!ObjectsUtils.equal(goods.getImage(),updateGoodsRequest.getImage())){
+            goods.setImage(updateGoodsRequest.getImage());
+        }
+        Goods goodsUpdate = goodsRepository.save(goods);
+        return mapperGoods(goodsUpdate);
     }
 
     public GoodsResponse mapperGoodResponse(Goods goods){

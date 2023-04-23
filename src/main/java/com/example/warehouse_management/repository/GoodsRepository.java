@@ -30,5 +30,9 @@ public interface GoodsRepository extends CrudRepository<Goods,Long> {
             "where g.code =:goodsCode\n" +
             "group by bl.goods_id ")
     Integer getCurrentQuantityOfGoodsInWarehouse(String goodsCode);
+    @Query(nativeQuery = true,value = "select g.\"name\" ,sum(bl.current_capacity) as quantity  from bin_locations bl\n" +
+            "join goods g ON bl.goods_id = g.id \n" +
+            "group by g.\"name\" ")
+    List<Object[]> countCurrentQuantityOfGoodsInWarehouse();
 
 }

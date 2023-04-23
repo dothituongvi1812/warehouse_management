@@ -1,10 +1,10 @@
 package com.example.warehouse_management.services;
 
 import com.example.warehouse_management.models.user.User;
-import com.example.warehouse_management.payload.request.LoginRequest;
-import com.example.warehouse_management.payload.request.RegisterUserRequest;
-import com.example.warehouse_management.payload.request.ResetPasswordRequest;
-import com.example.warehouse_management.payload.request.UserUpdateRequest;
+import com.example.warehouse_management.payload.request.auth.LoginRequest;
+import com.example.warehouse_management.payload.request.auth.RegisterUserRequest;
+import com.example.warehouse_management.payload.request.auth.ResetPasswordRequest;
+import com.example.warehouse_management.payload.request.user.UserUpdateRequest;
 import com.example.warehouse_management.payload.response.JwtResponse;
 import com.example.warehouse_management.payload.response.UserResponse;
 import org.springframework.web.bind.annotation.RequestBody;

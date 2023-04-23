@@ -1,16 +1,14 @@
 package com.example.warehouse_management.services.domain;
 
+import com.example.warehouse_management.exception.ErrorException;
 import com.example.warehouse_management.models.warehouse.BinLocation;
+import com.example.warehouse_management.payload.request.goods.GoodsRequest;
 import com.example.warehouse_management.payload.response.LocationInWarehouse;
 
-import java.util.Random;
+import java.util.Arrays;
 
 public class UtillServies {
-    private String generateGoodCode(){
-        Random rnd = new Random();
-        String code = String.format("L-"+String.format("%04d",rnd.nextInt(999999)));
-        return code;
-    }
+
     public static LocationInWarehouse mapperLocationInWarehouse(BinLocation bin) {
         LocationInWarehouse locationInWarehouse = new LocationInWarehouse();
         locationInWarehouse.setNameRow(bin.getName());
@@ -23,5 +21,25 @@ public class UtillServies {
         locationInWarehouse.setCodeWarehouse(bin.getColumnLocation().getShelfStorage().getWarehouse().getCode());
         return locationInWarehouse;
     }
+    public static boolean validateGoods(GoodsRequest goodsRequest,BinLocation binLocation){
 
+      boolean check= compareSizeShelfAndGoods(
+                        createArraySize(binLocation.getWidth(), binLocation.getHeight(), binLocation.getLength()),
+                        createArraySize(goodsRequest.getWidth(), goodsRequest.getHeight(), goodsRequest.getLength()),
+                        goodsRequest.getName());
+      return check;
+
+    }
+    private static boolean compareSizeShelfAndGoods(double[] sizeShelf, double[] sizeGoods, String goodsName) {
+        if (sizeShelf[0] >= sizeGoods[0] && sizeShelf[1] >= sizeGoods[1] && sizeShelf[2] >= sizeGoods[2])
+            return true;
+        else
+            throw new ErrorException(goodsName + " có kích thước quá lớn,kho không thể chứa");
+    }
+    private static double[] createArraySize(double width, double height, double length) {
+        double[] size = {width, height, length};
+        Arrays.sort(size);
+        return size;
+
+    }
 }

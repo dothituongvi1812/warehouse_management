@@ -1,6 +1,6 @@
 package com.example.warehouse_management.controllers;
 
-import com.example.warehouse_management.payload.request.ReceiptVoucherRequest;
+import com.example.warehouse_management.payload.request.receive.ReceiptVoucherRequest;
 import com.example.warehouse_management.payload.response.InventoryReceiptVoucherResponse;
 import com.example.warehouse_management.payload.response.BinLocationResponse;
 import com.example.warehouse_management.services.InventoryReceiptServices;

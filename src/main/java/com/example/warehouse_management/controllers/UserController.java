@@ -1,6 +1,6 @@
 package com.example.warehouse_management.controllers;
 
-import com.example.warehouse_management.payload.request.UserUpdateRequest;
+import com.example.warehouse_management.payload.request.user.UserUpdateRequest;
 import com.example.warehouse_management.payload.response.UserResponse;
 import com.example.warehouse_management.services.UserServices;
 import org.slf4j.Logger;

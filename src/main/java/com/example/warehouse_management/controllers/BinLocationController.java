@@ -1,8 +1,9 @@
 package com.example.warehouse_management.controllers;
 
-import com.example.warehouse_management.payload.request.BinLocationRequest;
-import com.example.warehouse_management.payload.request.GoodsCreatedReceiptVoucherRequest;
-import com.example.warehouse_management.payload.request.StatusRequest;
+import com.example.warehouse_management.payload.request.bin.BinLocationMoveToRequest;
+import com.example.warehouse_management.payload.request.bin.BinLocationRequest;
+import com.example.warehouse_management.payload.request.goods.GoodsCreatedReceiptVoucherRequest;
+import com.example.warehouse_management.payload.request.bin.StatusRequest;
 import com.example.warehouse_management.payload.response.BinLocationResponse;
 import com.example.warehouse_management.services.BinLocationServices;
 import org.slf4j.Logger;
@@ -65,6 +66,10 @@ public class BinLocationController {
     @GetMapping("/usable-position-by-goods/{codeWarehouse}")
     public ResponseEntity<List<BinLocationResponse>> getAllUsablePositionForGoods(@PathVariable String codeWarehouse,@Valid  @RequestBody GoodsCreatedReceiptVoucherRequest request){
         return new ResponseEntity<>(binLocationServices.getAllUsablePositionForGoods(codeWarehouse,request),HttpStatus.OK);
+    }
+    @PostMapping("/move/{fromBinLocationCode}")
+    public ResponseEntity<String> moveBin(@PathVariable String fromBinLocationCode,@RequestBody BinLocationMoveToRequest binLocationMoveToRequest){
+        return new ResponseEntity<>(binLocationServices.moveBin(fromBinLocationCode,binLocationMoveToRequest),HttpStatus.OK);
     }
 
 }

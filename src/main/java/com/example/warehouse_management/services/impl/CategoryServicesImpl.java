@@ -3,7 +3,7 @@ package com.example.warehouse_management.services.impl;
 import com.example.warehouse_management.exception.ErrorException;
 import com.example.warehouse_management.exception.NotFoundGlobalException;
 import com.example.warehouse_management.models.goods.Category;
-import com.example.warehouse_management.payload.request.CategoryRequest;
+import com.example.warehouse_management.payload.request.category.CategoryRequest;
 import com.example.warehouse_management.payload.response.CategoryResponse;
 import com.example.warehouse_management.repository.CategoryRepository;
 import com.example.warehouse_management.services.CategoryServices;

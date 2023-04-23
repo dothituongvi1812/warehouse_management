@@ -1,14 +1,15 @@
 package com.example.warehouse_management.controllers;
 
-import com.example.warehouse_management.payload.request.ForgetPasswordRequest;
-import com.example.warehouse_management.payload.request.LoginRequest;
-import com.example.warehouse_management.payload.request.RegisterUserRequest;
-import com.example.warehouse_management.payload.request.ResetPasswordRequest;
+import com.example.warehouse_management.exception.TokenRefreshException;
+import com.example.warehouse_management.models.user.RefreshToken;
+import com.example.warehouse_management.payload.request.auth.*;
 import com.example.warehouse_management.payload.response.JwtResponse;
+import com.example.warehouse_management.payload.response.TokenRefreshResponse;
 import com.example.warehouse_management.payload.response.UserResponse;
 import com.example.warehouse_management.repository.RoleRepository;
 import com.example.warehouse_management.repository.UserRepository;
 import com.example.warehouse_management.security.jwt.JwtUtils;
+import com.example.warehouse_management.security.services.RefreshTokenService;
 import com.example.warehouse_management.services.UserServices;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,6 +45,8 @@ public class AuthController {
 
     @Autowired
     JwtUtils jwtUtils;
+    @Autowired
+    RefreshTokenService refreshTokenService;
     @PostMapping("/register")
     public ResponseEntity<UserResponse> registerUser(@Valid @RequestBody RegisterUserRequest registerRequest) throws MessagingException, UnsupportedEncodingException {
         logger.info("/register");
@@ -68,7 +71,19 @@ public class AuthController {
         logger.info("/auth/forget");
         return new ResponseEntity(userServices.forgetPassword(request.getEmail()),HttpStatus.NO_CONTENT);
     }
-
+    @PostMapping("/auth/refresh-token")
+    public ResponseEntity<?> refreshToken(@Valid @RequestBody TokenRefreshRequest request) {
+        String requestRefreshToken = request.getRefreshToken();
+        return refreshTokenService.findByToken(requestRefreshToken)
+                .map(refreshTokenService::verifyExpiration)
+                .map(RefreshToken::getUser)
+                .map(user -> {
+                    String token = jwtUtils.generateJwtToken(user);
+                    return ResponseEntity.ok(new TokenRefreshResponse(token, requestRefreshToken));
+                })
+                .orElseThrow(() -> new TokenRefreshException(requestRefreshToken,
+                        "Refresh token is not in database!"));
+    }
 
 
 }

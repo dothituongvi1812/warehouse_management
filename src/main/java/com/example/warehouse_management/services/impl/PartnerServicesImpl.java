@@ -2,10 +2,12 @@ package com.example.warehouse_management.services.impl;
 
 import com.example.warehouse_management.exception.NotFoundGlobalException;
 import com.example.warehouse_management.models.partner.Partner;
-import com.example.warehouse_management.payload.request.PartnerRequest;
+import com.example.warehouse_management.payload.request.partner.PartnerRequest;
+import com.example.warehouse_management.payload.request.partner.UpdatePartnerRequest;
 import com.example.warehouse_management.payload.response.PartnerResponse;
 import com.example.warehouse_management.repository.PartnerRepository;
 import com.example.warehouse_management.services.PartnerServices;
+import com.example.warehouse_management.services.domain.ObjectsUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -95,6 +97,22 @@ public class PartnerServicesImpl implements PartnerServices {
         if(partner==null)
             throw new NotFoundGlobalException("Không tìm thấy đối tác có mã"+ partnerCode);
         return partner;
+    }
+
+    @Override
+    public PartnerResponse updatePartner(String partnerCode, UpdatePartnerRequest request) {
+        Partner partner = findPartnerByCode(partnerCode);
+        if(!ObjectsUtils.equalObject(partner.getAddress(),request.getAddress())){
+            partner.setAddress(request.getAddress());
+        }
+        if(!ObjectsUtils.equal(partner.getName(),request.getName())){
+            partner.setName(request.getName());
+        }
+        if(!ObjectsUtils.equal(partner.getPhone(),request.getPhone())){
+            partner.setName(request.getPhone());
+        }
+        Partner partnerSave = partnerRepository.save(partner);
+        return modelMapper.map(partnerSave,PartnerResponse.class);
     }
 
     private String generatePartnerCode(){

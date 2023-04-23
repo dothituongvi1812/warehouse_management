@@ -1,8 +1,7 @@
 package com.example.warehouse_management.controllers;
 
-import com.example.warehouse_management.payload.request.DeliveryVoucherRequest;
+import com.example.warehouse_management.payload.request.delivery.DeliveryVoucherRequest;
 import com.example.warehouse_management.payload.response.InventoryDeliveryVoucherResponse;
-import com.example.warehouse_management.payload.response.InventoryReceiptVoucherResponse;
 import com.example.warehouse_management.services.InventoryDeliveryVoucherServices;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

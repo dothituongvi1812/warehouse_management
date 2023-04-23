@@ -1,7 +1,7 @@
 package com.example.warehouse_management.services;
 
 import com.example.warehouse_management.models.selling.SaleReceipt;
-import com.example.warehouse_management.payload.request.SaleReceiptRequest;
+import com.example.warehouse_management.payload.request.sale.SaleReceiptRequest;
 import com.example.warehouse_management.payload.response.SaleReceiptResponse;
 
 import java.util.List;

@@ -39,6 +39,7 @@ public class InventoryReceiptVoucher {
     @Enumerated(EnumType.STRING)
     @Column(length = 20)
     private EStatusOfVoucher status;
+    @Column(name = "create_date")
     private Date createDate;
 
 }

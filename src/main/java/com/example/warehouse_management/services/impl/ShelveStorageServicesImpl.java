@@ -3,7 +3,7 @@ package com.example.warehouse_management.services.impl;
 import com.example.warehouse_management.exception.NotFoundGlobalException;
 import com.example.warehouse_management.models.warehouse.ShelfStorage;
 import com.example.warehouse_management.models.warehouse.Warehouse;
-import com.example.warehouse_management.payload.request.ShelveStorageRequest;
+import com.example.warehouse_management.payload.request.shelf.ShelveStorageRequest;
 import com.example.warehouse_management.payload.response.ShelveStorageResponse;
 import com.example.warehouse_management.repository.ShelveStorageRepository;
 import com.example.warehouse_management.repository.WarehouseRepository;
