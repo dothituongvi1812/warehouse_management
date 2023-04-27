@@ -23,9 +23,9 @@ public class GoodsController {
     @Autowired
     GoodsServices goodsServices;
     @PostMapping("/add")
-    public ResponseEntity<GoodsResponse> addGoods(@RequestBody @Valid GoodsAddRequest goodsRequest){
+    public ResponseEntity<GoodsResponse> addGoods(@Valid @RequestBody GoodsAddRequest goodsAddRequest){
         logger.info("/add");
-        return new ResponseEntity(goodsServices.addGoods(goodsRequest), HttpStatus.OK);
+        return new ResponseEntity(goodsServices.addGoods(goodsAddRequest), HttpStatus.OK);
     }
     @GetMapping("/get-page")
     public ResponseEntity<Page<GoodsResponse>> getPage(@RequestParam Integer page, @RequestParam Integer size){
@@ -66,6 +66,5 @@ public class GoodsController {
     public ResponseEntity<GoodsResponse> updateGoods(@PathVariable String goodsCode,@RequestBody UpdateGoodsRequest updateGoodsRequest){
         return new ResponseEntity<>(goodsServices.updateGoods(goodsCode,updateGoodsRequest),HttpStatus.OK);
     }
-
 
 }

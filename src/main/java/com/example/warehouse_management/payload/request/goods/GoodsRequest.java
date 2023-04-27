@@ -30,7 +30,7 @@ public class GoodsRequest {
     @NotBlank(message = "Loại hàng hoá là không thể trống")
     private String categoryCode;
     private double volume;
-    private String images;
+    private String image;
 
     public void setVolume(double width, double height, double length) {
         this.volume = width * height * length;

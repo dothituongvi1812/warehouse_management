@@ -24,6 +24,7 @@ public class GoodsResponse {
     private double height;
     private String categoryCode;
     private String categoryName;
+    private String image;
 
 
 }

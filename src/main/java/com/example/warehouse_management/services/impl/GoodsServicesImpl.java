@@ -64,7 +64,7 @@ public class GoodsServicesImpl implements GoodsServices {
             goods.setWidth(goodsRequest.getWidth());
             goods.setLength(goodsRequest.getLength());
             goods.setUnit(EUnit.THUNG);
-            goods.setImage(goodsRequest.getImages());
+            goods.setImage(goodsRequest.getImage());
             goods.setVolume(goodsRequest.getHeight()*goodsRequest.getWidth()*goodsRequest.getLength());
             Goods goodSave=goodsRepository.save(goods);
             return goodSave;
