@@ -1,6 +1,8 @@
 package com.example.warehouse_management.models.selling;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.Embeddable;
@@ -11,6 +13,8 @@ import java.util.Objects;
 @Getter
 @Setter
 @Embeddable
+@AllArgsConstructor
+@NoArgsConstructor
 public class SaleDetailPK implements Serializable {
     private Long goodsId;
     private Long saleId;

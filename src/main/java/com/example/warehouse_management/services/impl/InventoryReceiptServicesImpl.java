@@ -125,8 +125,7 @@ public class InventoryReceiptServicesImpl implements InventoryReceiptServices {
         if (ObjectUtils.isEmpty(inventoryReceiptVoucher))
             throw new NotFoundGlobalException("Không tìm thấy phiếu nhập " + receiptVoucherCode);
         for (ReceiptVoucherDetail detail : inventoryReceiptVoucher.getReceiptVoucherDetails()) {
-//            Goods goods = detail.getGoods();
-            Goods goods = null;
+            Goods goods = goodsServices.findGoodByCode(detail.getGoodsCode());
             BinLocation bin = detail.getBinLocation();
             int quantity = detail.getQuantity();
             int maxCapacity = (int) (bin.getVolume() / goods.getVolume());

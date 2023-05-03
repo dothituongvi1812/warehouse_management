@@ -139,6 +139,8 @@ public class GoodsServicesImpl implements GoodsServices {
 
     @Override
     public Integer getCurrentQuantityOfGoodsInWarehouse(String goodsCode) {
+        // kiểm tra hàng hóa đó đã có trên kệ chưa, nếu chưa thì trả về 0 còn có đi query
+        int quantity = goodsRepository.getCurrentQuantityOfGoodsInWarehouse(goodsCode);
         return Integer.valueOf(goodsRepository.getCurrentQuantityOfGoodsInWarehouse(goodsCode));
     }
 

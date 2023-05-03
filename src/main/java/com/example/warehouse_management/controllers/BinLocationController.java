@@ -38,7 +38,7 @@ public class BinLocationController {
         logger.info("/get-by"+code);
         return new ResponseEntity(binLocationServices.getByCode(code), HttpStatus.OK);
     }
-    @GetMapping("/filter-status-by/{codeWarehouse}")
+    @PostMapping("/filter-status-by/{codeWarehouse}")
     public ResponseEntity<BinLocationResponse>filterByStatus(@PathVariable String codeWarehouse, @RequestBody StatusRequest statusRequest){
         logger.info("/filter-status-by/"+codeWarehouse);
         return new ResponseEntity(binLocationServices.filterStatusByCodeWarehouse(codeWarehouse,statusRequest),HttpStatus.OK);
@@ -63,7 +63,7 @@ public class BinLocationController {
         logger.info("/get-all-by/"+codeWarehouse);
         return new ResponseEntity(binLocationServices.getAllRowLocationByWarehouseCode(codeWarehouse),HttpStatus.OK);
     }
-    @GetMapping("/usable-position-by-goods/{codeWarehouse}")
+    @PostMapping("/usable-position-by-goods/{codeWarehouse}")
     public ResponseEntity<List<BinLocationResponse>> getAllUsablePositionForGoods(@PathVariable String codeWarehouse,@Valid  @RequestBody GoodsCreatedReceiptVoucherRequest request){
         return new ResponseEntity<>(binLocationServices.getAllUsablePositionForGoods(codeWarehouse,request),HttpStatus.OK);
     }

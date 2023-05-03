@@ -34,9 +34,11 @@ public class BinLocation {
     private double volume;
     @Column(name = "remaining_volume", columnDefinition = "FLOAT(8) CHECK (remaining_volume > 0 AND remaining_volume <= volume)")
     private double remainingVolume;
-  //  @Column(name = "max_capacity", columnDefinition = "INT(4) CHECK (max_capacity >= 0)")
+    @Column(name = "max_capacity", columnDefinition = "INT CHECK (max_capacity >= 0)")
+//    @Column(name = "max_capacity")
     private int maxCapacity;
-   // @Column(name = "current_capacity", columnDefinition = "INT(4) CHECK (current_capacity >= 0 AND current_capacity <= max_capacity)")
+    @Column(name = "current_capacity", columnDefinition = "INT CHECK (current_capacity >= 0 AND current_capacity <= max_capacity)")
+//    @Column(name = "current_capacity")
     private int currentCapacity;
     @Enumerated(EnumType.STRING)
     @Column(name = "status", columnDefinition = "VARCHAR(60) CHECK (status IN ('FULL', 'AVAILABLE', 'EMPTY'))")

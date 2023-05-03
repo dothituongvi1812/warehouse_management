@@ -2,13 +2,16 @@ package com.example.warehouse_management.services.impl;
 
 import com.example.warehouse_management.exception.ErrorException;
 import com.example.warehouse_management.exception.NotFoundGlobalException;
+import com.example.warehouse_management.models.goods.Goods;
 import com.example.warehouse_management.models.selling.SaleDetail;
+import com.example.warehouse_management.models.selling.SaleDetailPK;
 import com.example.warehouse_management.models.selling.SaleReceipt;
 import com.example.warehouse_management.models.type.EStatusOfPurchasingGoods;
 import com.example.warehouse_management.models.warehouse.BinLocation;
 import com.example.warehouse_management.payload.request.goods.GoodsToSaleRequest;
 import com.example.warehouse_management.payload.request.sale.SaleReceiptRequest;
 import com.example.warehouse_management.payload.response.*;
+import com.example.warehouse_management.repository.SaleDetailRepository;
 import com.example.warehouse_management.repository.SaleReceiptRepository;
 import com.example.warehouse_management.services.*;
 import org.modelmapper.ModelMapper;
@@ -37,6 +40,8 @@ public class SaleReceiptServicesImpl implements SaleReceiptServices {
     GoodsServices goodsServices;
     @Autowired
     BinLocationServices binLocationServices;
+    @Autowired
+    SaleDetailRepository saleDetailRepository;
     private ModelMapper modelMapper = new ModelMapper();
     @Override
     public SaleReceiptResponse createSaleReceipt(SaleReceiptRequest saleReceiptRequest) {
@@ -51,21 +56,25 @@ public class SaleReceiptServicesImpl implements SaleReceiptServices {
         saleReceipt.setPartner(partnerServices.findPartnerByCode(saleReceiptRequest.getPartnerCode()));
         saleReceipt.setCode(generateSaleReceipt());
         saleReceipt.setCreatedDate(new Date());
+        SaleReceipt saveSaleReceipt= saleReceiptRepository.save(saleReceipt);
         Set<SaleDetail> saleDetails = new HashSet<>();
         for (GoodsToSaleRequest goodsRequest: saleReceiptRequest.getGoodsToSaleRequests()) {
             int currentQuantity= goodsServices.getCurrentQuantityOfGoodsInWarehouse(goodsRequest.getGoodsCode());
             if(goodsRequest.getQuantity()>currentQuantity)
                 throw new ErrorException("Hiện tại số lượng của sản phẩm "+ goodsRequest.getGoodsCode()+"trong kho không đủ");
             SaleDetail saleDetail = new SaleDetail();
-            saleDetail.setGoods(goodsServices.findGoodByCode(goodsRequest.getGoodsCode()));
+            Goods goods = goodsServices.findGoodByCode(goodsRequest.getGoodsCode());
+            saleDetail.setSaleDetailPK(new SaleDetailPK(goods.getId(),saveSaleReceipt.getId()));
+            saleDetail.setGoods(goods);
+            saleDetail.setSaleReceipt(saveSaleReceipt);
             saleDetail.setQuantity(goodsRequest.getQuantity());
             saleDetail.setStatus(EStatusOfPurchasingGoods.NOT_YET_CREATED);
+            saleDetailRepository.save(saleDetail);
             saleDetails.add(saleDetail);
 
         }
-        saleReceipt.setSaleDetails(saleDetails);
-        SaleReceipt saveSaleReceipt= saleReceiptRepository.save(saleReceipt);
-        return mapperPurchaseReceiptResponse(saveSaleReceipt);
+        saveSaleReceipt.setSaleDetails(saleDetails);
+        return mapperPurchaseReceiptResponse(saleReceiptRepository.save(saveSaleReceipt));
     }
 
     @Override
