@@ -32,7 +32,7 @@ public class SaleReceiptController {
         return new ResponseEntity<>(saleReceiptServices.getAll(),HttpStatus.OK);
     }
     @GetMapping("/get-by/{saleReceiptCode}")
-    public ResponseEntity<SaleReceiptResponse>getSaleReceiptByCode(String saleReceiptCode){
+    public ResponseEntity<SaleReceiptResponse>getSaleReceiptByCode(@PathVariable String saleReceiptCode){
         logger.info("/get-by/"+saleReceiptCode);
         return new ResponseEntity<>(saleReceiptServices.getSaleReceiptByCode(saleReceiptCode),HttpStatus.OK);
     }

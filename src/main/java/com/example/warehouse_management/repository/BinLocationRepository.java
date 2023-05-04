@@ -110,13 +110,13 @@ public interface BinLocationRepository extends CrudRepository<BinLocation,Long> 
             "and bl.id not in :usingBinLocation")
     List<BinLocation> getAllUsablePositionForGoodsNotExisted(String warehouseCode,List<Long> usingBinLocation);
 
-    @Query(nativeQuery = true,value = "select bl.* from bin_locations bl \n" +
+    @Query(nativeQuery = true,value = "select bl.* from bin_locations bl\n" +
             "join column_locations cl ON bl.column_location_id = cl.id \n" +
             "join shelve_storages ss on cl.shelf_storage_id = ss.id \n" +
             "join warehouse w on ss.warehouse_id = w.id \n" +
             "join goods g ON bl.goods_id = g.id \n" +
-            "where w.code =:warehouseCode and bl.remaining_volume >=:volume and g.code=:codeGoods" +
-            "and and bl.id not in :usingBinLocation")
+            "where w.code =:warehouseCode and bl.remaining_volume >=:volume and g.code=:codeGoods\n" +
+            "and bl.id not in :usingBinLocation")
     List<BinLocation> getAllUsablePositionForGoodsExisted(String warehouseCode,double volume,String codeGoods,List<Long> usingBinLocation);
 
     @Query(nativeQuery = true,value = "select distinct  rvd.bin_location_id  from inventory_receipt_vouchers irv \n" +

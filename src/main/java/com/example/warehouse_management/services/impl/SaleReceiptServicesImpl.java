@@ -88,7 +88,7 @@ public class SaleReceiptServicesImpl implements SaleReceiptServices {
     public SaleReceipt findSaleReceiptByCode(String saleReceiptCode) {
         SaleReceipt saleReceipt = saleReceiptRepository.findByCode(saleReceiptCode);
         if(ObjectUtils.isEmpty(saleReceipt))
-            throw new NotFoundGlobalException("Không tìm thấy phiếu mua "+saleReceiptCode);
+            throw new NotFoundGlobalException("Không tìm thấy phiếu bán "+saleReceiptCode);
         return saleReceipt;
     }
 
