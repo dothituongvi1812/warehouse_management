@@ -1,6 +1,8 @@
 package com.example.warehouse_management.models.voucher;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.Embeddable;
@@ -9,6 +11,8 @@ import java.util.Objects;
 
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @Embeddable
 public class DeliveryVoucherDetailPK implements Serializable {
     private Long goodsId;

@@ -82,9 +82,11 @@ public class PurchaseReceiptServiceImpl implements PurchaseReceiptServices {
             int temp = (int) purchase.getPurchaseDetails().stream().filter(detail -> detail.getStatus().equals(EStatusOfPurchasingGoods.CREATED)).count();
             if(flag == temp){
                 purchase.setStatus(EStatusPurchaseReceipt.DONE);
+                purchaseReceiptRepository.save(purchase);
             }
             else{
                 purchase.setStatus(EStatusPurchaseReceipt.NOT_DONE_YET);
+                purchaseReceiptRepository.save(purchase);
             }
         });
         List<PurchaseReceiptResponse> purchaseReceiptResponses = purchaseReceipts.stream()

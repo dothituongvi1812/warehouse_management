@@ -90,11 +90,14 @@ public class InventoryDeliveryVoucherServiceImpl implements InventoryDeliveryVou
         inventoryDeliveryVoucher.setStatus(EStatusOfVoucher.NOT_YET_EXPORTED);
         InventoryDeliveryVoucher deliveryVoucherSave = deliveryVoucherRepository.save(inventoryDeliveryVoucher);
         for (RowLocationGoodsDeliveryTemp item:rowLocationGoodsDeliveryTempList) {
+            String goodsCode = item.getGoodsDelivery().getGoods().getCode();
             DeliveryVoucherDetail deliveryVoucherDetail = new DeliveryVoucherDetail();
-            deliveryVoucherDetail.setGoodsCode(item.getGoodsDelivery().getGoods().getCode());
+            deliveryVoucherDetail.setGoodsCode(goodsCode);
             deliveryVoucherDetail.setQuantity(item.getGoodsDelivery().getQuantity());
             deliveryVoucherDetail.setBinLocation(item.getBinLocation());
+            deliveryVoucherDetail.setDeliveryVoucherDetailPK(new DeliveryVoucherDetailPK(item.getGoodsDelivery().getGoods().getId(),deliveryVoucherSave.getId(),item.getBinLocation().getId()));
             deliveryVoucherDetail.setInventoryDeliveryVoucher(deliveryVoucherSave);
+
             deliveryVoucherDetails.add(deliveryVoucherDetail);
         }
         deliveryVoucherSave.setDeliveryVoucherDetails(deliveryVoucherDetails);
@@ -185,7 +188,7 @@ public class InventoryDeliveryVoucherServiceImpl implements InventoryDeliveryVou
                 .collect(Collectors.toSet());
         InventoryDeliveryVoucherResponse inventoryDeliveryVoucherResponse = new InventoryDeliveryVoucherResponse();
         inventoryDeliveryVoucherResponse = modelMapper.map(deliveryVoucher,InventoryDeliveryVoucherResponse.class);
-//        inventoryDeliveryVoucherResponse.setPartner(modelMapper.map(deliveryVoucher.getPartner(), PartnerResponse.class));
+        inventoryDeliveryVoucherResponse.setPartner(modelMapper.map(deliveryVoucher.getSaleReceipt().getPartner(), PartnerResponse.class));
         inventoryDeliveryVoucherResponse.setCreatedBy(deliveryVoucher.getCreatedBy().getFullName());
         inventoryDeliveryVoucherResponse.setDetails(detailResponseSet);
         inventoryDeliveryVoucherResponse.setStatus(status);
@@ -193,7 +196,7 @@ public class InventoryDeliveryVoucherServiceImpl implements InventoryDeliveryVou
     }
     private DeliveryVoucherDetailResponse mapperDeliveryVoucherDetailResponse(DeliveryVoucherDetail deliveryVoucherDetail){
         DeliveryVoucherDetailResponse detailResponse = new DeliveryVoucherDetailResponse(goodsServices.mapperGoods(
-                null), UtillServies.mapperLocationInWarehouse(deliveryVoucherDetail.getBinLocation()),deliveryVoucherDetail.getQuantity());
+                goodsServices.findGoodByCode(deliveryVoucherDetail.getGoodsCode())), UtillServies.mapperLocationInWarehouse(deliveryVoucherDetail.getBinLocation()),deliveryVoucherDetail.getQuantity());
         return detailResponse;
     }
 

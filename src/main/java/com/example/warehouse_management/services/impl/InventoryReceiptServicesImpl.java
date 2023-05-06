@@ -110,6 +110,7 @@ public class InventoryReceiptServicesImpl implements InventoryReceiptServices {
         }
         savedVoucher.setReceiptVoucherDetails(receiptVoucherDetailSet);
         receiptVoucherRepository.save(savedVoucher);
+        //nếu phiếu mua có các item đã status created thì set phiếu mua là done.
 
         return mapperInventoryReceiptVoucher(savedVoucher);
 
