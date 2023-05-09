@@ -4,7 +4,7 @@ import com.example.warehouse_management.exception.NotFoundGlobalException;
 import com.example.warehouse_management.models.goods.Category;
 import com.example.warehouse_management.models.goods.Goods;
 import com.example.warehouse_management.models.type.EUnit;
-import com.example.warehouse_management.models.warehouse.BinLocation;
+import com.example.warehouse_management.models.warehouse.BinPosition;
 import com.example.warehouse_management.payload.request.goods.GoodsAddRequest;
 import com.example.warehouse_management.payload.request.goods.GoodsRequest;
 import com.example.warehouse_management.payload.request.goods.UpdateGoodsRequest;
@@ -25,6 +25,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
 import java.math.BigInteger;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.text.ParseException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,8 +52,8 @@ public class GoodsServicesImpl implements GoodsServices {
     }
     @Override
     public Goods createGoods(GoodsRequest goodsRequest) {
-        BinLocation binLocation = binLocationRepository.findBinLocationMinVolume();
-        UtillServies.validateGoods(goodsRequest,binLocation);
+        BinPosition binPosition = binLocationRepository.findBinLocationMinVolume();
+        UtillServies.validateGoods(goodsRequest, binPosition);
         Category category=categoryRepository.findByCode(goodsRequest.getCategoryCode());
         if(category==null){
             throw new NotFoundGlobalException("Không tìm thấy loại hàng hoá");
@@ -140,8 +144,10 @@ public class GoodsServicesImpl implements GoodsServices {
     @Override
     public Integer getCurrentQuantityOfGoodsInWarehouse(String goodsCode) {
         // kiểm tra hàng hóa đó đã có trên kệ chưa, nếu chưa thì trả về 0 còn có đi query
-        int quantity = goodsRepository.getCurrentQuantityOfGoodsInWarehouse(goodsCode);
-        return Integer.valueOf(goodsRepository.getCurrentQuantityOfGoodsInWarehouse(goodsCode));
+        if(goodsRepository.getCurrentQuantityOfGoodsInWarehouse(goodsCode) == null)
+            return 0;
+        else
+            return Integer.valueOf(goodsRepository.getCurrentQuantityOfGoodsInWarehouse(goodsCode));
     }
 
     @Override
@@ -179,6 +185,56 @@ public class GoodsServicesImpl implements GoodsServices {
         }
         Goods goodsUpdate = goodsRepository.save(goods);
         return mapperGoods(goodsUpdate);
+    }
+
+    @Override
+    public Map<String, Integer> reportImportedQuantityGoodsByDate(String date) {
+        String toDate = date+" 23:59:59";
+        String fromDate = date +" 00:00:00";
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        Map<String,Integer> map = new HashMap<>();
+        try {
+            Date parsedFromDate = dateFormat.parse(fromDate);
+            Date parsedToDate = dateFormat.parse(toDate);
+            Timestamp from = new Timestamp(parsedFromDate.getTime());
+            Timestamp to = new Timestamp(parsedToDate.getTime());
+            List<Object[]> objects = goodsRepository.reportImportedQuantityGoodsByDate(from,to);
+
+            for (Object[] ob : objects){
+                String key = (String)ob[0];
+                Integer value = ((BigInteger) ob[1]).intValue();
+                map.put(key,value);
+            }
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+        return map;
+    }
+
+    @Override
+    public Map<String, Integer> reportExportedQuantityGoodsByDate(String date) {
+        String toDate = date+" 23:59:59";
+        String fromDate = date +" 00:00:00";
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        Map<String,Integer> map = new HashMap<>();
+        try {
+            Date parsedFromDate = dateFormat.parse(fromDate);
+            Date parsedToDate = dateFormat.parse(toDate);
+            Timestamp from = new Timestamp(parsedFromDate.getTime());
+            Timestamp to = new Timestamp(parsedToDate.getTime());
+            List<Object[]> objects = goodsRepository.reportExportedQuantityGoodsByDate(from,to);
+
+            for (Object[] ob : objects){
+                String key = (String)ob[0];
+                Integer value = ((BigInteger) ob[1]).intValue();
+                map.put(key,value);
+            }
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+        return map;
     }
 
     public GoodsResponse mapperGoodResponse(Goods goods){

@@ -6,7 +6,7 @@ import javax.persistence.*;
 import java.util.Set;
 
 @Table
-@Entity(name = "shelve_storages")
+@Entity(name = "shelf_storages")
 @Getter
 @Setter
 @AllArgsConstructor
@@ -18,13 +18,13 @@ public class ShelfStorage {
     @Column(unique = true,nullable = false)
     private String code;
     private String name;
-   // @Column(name = "number_Of_floors", columnDefinition = "INT(4) CHECK (number_Of_floors >= 0)")
+    @Column(name = "number_Of_floors", columnDefinition = "INT CHECK (number_Of_floors >= 0)")
     private int numberOfFloors;
-   // @Column(name = "width", columnDefinition = "FLOAT(8) CHECK (width > 0)")
+    @Column(name = "width", columnDefinition = "FLOAT(8) CHECK (width > 0)")
     private double width;
-   // @Column(name = "height", columnDefinition = "FLOAT(8) CHECK (height > 0)")
+    @Column(name = "height", columnDefinition = "FLOAT(8) CHECK (height > 0)")
     private double height;
-   // @Column(name = "length", columnDefinition = "FLOAT(8) CHECK (length > 0)")
+    @Column(name = "length", columnDefinition = "FLOAT(8) CHECK (length > 0)")
     private double length;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -32,7 +32,7 @@ public class ShelfStorage {
     private Warehouse warehouse;
 
     @OneToMany(mappedBy = "shelfStorage")
-    private Set<ColumnLocation> columnLocations;
+    private Set<ColumnPosition> columnPositions;
 
 
 }

@@ -35,4 +35,6 @@ public class SaleReceipt {
     @JoinColumn(name = "created_by")
     private User createdBy;
     private Date createdDate;
+    @Column(columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private boolean isCanceled;
 }

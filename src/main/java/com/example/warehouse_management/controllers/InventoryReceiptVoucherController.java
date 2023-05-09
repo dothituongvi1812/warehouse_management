@@ -2,7 +2,7 @@ package com.example.warehouse_management.controllers;
 
 import com.example.warehouse_management.payload.request.receive.ReceiptVoucherRequest;
 import com.example.warehouse_management.payload.response.InventoryReceiptVoucherResponse;
-import com.example.warehouse_management.payload.response.BinLocationResponse;
+import com.example.warehouse_management.payload.response.BinPositionResponse;
 import com.example.warehouse_management.services.InventoryReceiptServices;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +34,7 @@ public class InventoryReceiptVoucherController {
         return new ResponseEntity(inventoryReceiptServices.getReceiptVoucherByCode(voucherCode), HttpStatus.OK);
     }
     @PostMapping("/put-goods-on-shelf/{receiptVoucherCode}")
-    public ResponseEntity<List<BinLocationResponse>> putTheGoodsOnShelf(@PathVariable String receiptVoucherCode){
+    public ResponseEntity<List<BinPositionResponse>> putTheGoodsOnShelf(@PathVariable String receiptVoucherCode){
         logger.info("api/receipt-voucher/put-goods-on-shelf/"+receiptVoucherCode);
         return new ResponseEntity(inventoryReceiptServices.putTheGoodsOnShelf(receiptVoucherCode),HttpStatus.OK);
     }
@@ -48,4 +48,5 @@ public class InventoryReceiptVoucherController {
         logger.info("api/receipt-voucher/get-all");
         return new ResponseEntity(inventoryReceiptServices.findAll(),HttpStatus.OK);
     }
+
 }

@@ -12,4 +12,5 @@ public interface SaleReceiptServices {
     public List<SaleReceiptResponse> getAll();
     public SaleReceipt findSaleReceiptByCode(String saleReceiptCode);
     public SaleReceiptResponse getSaleReceiptByCode(String saleReceiptCode);
+    public String cancelSaleReceipt(String saleReceiptCode );
 }

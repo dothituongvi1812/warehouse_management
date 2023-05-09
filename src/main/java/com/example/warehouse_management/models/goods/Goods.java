@@ -1,7 +1,7 @@
 package com.example.warehouse_management.models.goods;
 
 import com.example.warehouse_management.models.type.EUnit;
-import com.example.warehouse_management.models.warehouse.BinLocation;
+import com.example.warehouse_management.models.warehouse.BinPosition;
 import lombok.*;
 
 import javax.persistence.*;
@@ -36,7 +36,7 @@ public class Goods {
     private Category category;
 
     @OneToMany(mappedBy ="goods")
-    private Set<BinLocation> bins;
+    private Set<BinPosition> binPositions;
     @Column(name = "image",nullable = true)
     private String image;
 

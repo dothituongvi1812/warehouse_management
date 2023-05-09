@@ -21,7 +21,7 @@ public class SaleReceiptController {
     @Autowired
     SaleReceiptServices saleReceiptServices;
     @PostMapping("/create")
-    public ResponseEntity<SaleReceiptResponse>createPurchaseReceipt(@Valid @RequestBody SaleReceiptRequest saleReceiptRequest, Principal principal){
+    public ResponseEntity<SaleReceiptResponse>createSaleReceipt(@Valid @RequestBody SaleReceiptRequest saleReceiptRequest, Principal principal){
         logger.info("/create");
         saleReceiptRequest.setEmail(principal.getName());
         return new ResponseEntity<>(saleReceiptServices.createSaleReceipt(saleReceiptRequest), HttpStatus.OK);
@@ -35,5 +35,10 @@ public class SaleReceiptController {
     public ResponseEntity<SaleReceiptResponse>getSaleReceiptByCode(@PathVariable String saleReceiptCode){
         logger.info("/get-by/"+saleReceiptCode);
         return new ResponseEntity<>(saleReceiptServices.getSaleReceiptByCode(saleReceiptCode),HttpStatus.OK);
+    }
+    @PostMapping("/cancel/{saleReceiptCode}")
+    public ResponseEntity<String>cancel(@PathVariable String saleReceiptCode){
+        logger.info("/cancel/"+saleReceiptCode);
+        return new ResponseEntity<>(saleReceiptServices.cancelSaleReceipt(saleReceiptCode),HttpStatus.OK);
     }
 }

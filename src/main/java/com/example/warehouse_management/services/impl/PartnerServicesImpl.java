@@ -115,6 +115,14 @@ public class PartnerServicesImpl implements PartnerServices {
         return modelMapper.map(partnerSave,PartnerResponse.class);
     }
 
+    @Override
+    public List<PartnerResponse> search(String keyword) {
+        List<PartnerResponse> partnerResponseList = partnerRepository.search(keyword).stream()
+                .map(e->modelMapper.map(e, PartnerResponse.class))
+                .collect(Collectors.toList());
+        return partnerResponseList;
+    }
+
     private String generatePartnerCode(){
         Random rnd = new Random();
         Partner partner =partnerRepository.findTopByOrderByIdDesc();

@@ -11,7 +11,7 @@ import java.util.List;
 public interface ShelveStorageRepository extends CrudRepository<ShelfStorage,Long> {
     ShelfStorage findByCode(String code);
     List<ShelfStorage> findAll();
-    @Query(nativeQuery = true,value = "select * from shelve_storages ss \n" +
+    @Query(nativeQuery = true,value = "select * from shelf_storages ss \n" +
             "join warehouse w on ss.warehouse_id = w.id \n" +
             "where w.code =:warehouseCode")
     List<ShelfStorage> findAllByWarehouse(String warehouseCode);

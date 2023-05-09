@@ -1,4 +1,4 @@
-package com.example.warehouse_management.models.goods;
+package com.example.warehouse_management.utils;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

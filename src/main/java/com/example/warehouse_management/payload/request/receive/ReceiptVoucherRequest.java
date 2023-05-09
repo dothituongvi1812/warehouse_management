@@ -1,14 +1,12 @@
 package com.example.warehouse_management.payload.request.receive;
 
-import com.example.warehouse_management.models.goods.GoodsAndBinLocationToCreateVoucher;
+import com.example.warehouse_management.utils.GoodsAndBinLocationToCreateVoucher;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
 import java.util.List;
-import java.util.Set;
 
 @Getter
 @Setter

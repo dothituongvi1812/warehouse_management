@@ -1,6 +1,5 @@
 package com.example.warehouse_management.models.goods;
 
-import com.example.warehouse_management.models.goods.Goods;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,12 +22,11 @@ public class Category {
     private String code;
     @Column(columnDefinition = "text",length = 255)
     private String name;
-
     private String description;
 
     @OneToMany(mappedBy = "category",
             orphanRemoval = true,
             fetch = FetchType.EAGER,
             cascade = CascadeType.ALL)
-    private List<Goods> goods;
+    private List<Goods> goodsList;
 }

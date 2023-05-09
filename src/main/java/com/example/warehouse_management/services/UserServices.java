@@ -22,4 +22,5 @@ public interface UserServices {
     public User findByCode(String code);
     public User findUserByEmail(String email);
     public String deactivateByUserCode(String userCode);
+    public List<UserResponse> search(String keyword);
 }

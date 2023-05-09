@@ -69,6 +69,10 @@ public class PurchaseReceiptServiceImpl implements PurchaseReceiptServices {
             purchaseDetails.add(purchaseDetail);
 
         }
+        if(purchaseDetails == null){
+            purchaseReceiptRepository.delete(savePurchase);
+            throw new ErrorException("loi tao phieu mua");
+        }
         savePurchase.setPurchaseDetails(purchaseDetails);
          purchaseReceiptRepository.save(savePurchase);
         return mapperPurchaseReceiptResponse(savePurchase);
