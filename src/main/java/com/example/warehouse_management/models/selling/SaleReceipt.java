@@ -2,6 +2,7 @@ package com.example.warehouse_management.models.selling;
 
 import com.example.warehouse_management.models.partner.Partner;
 import com.example.warehouse_management.models.purchase.PurchaseDetail;
+import com.example.warehouse_management.models.type.EStatusSaleReceipt;
 import com.example.warehouse_management.models.user.User;
 import com.example.warehouse_management.models.voucher.InventoryDeliveryVoucher;
 import com.example.warehouse_management.models.voucher.InventoryReceiptVoucher;
@@ -37,4 +38,5 @@ public class SaleReceipt {
     private Date createdDate;
     @Column(columnDefinition = "BOOLEAN DEFAULT FALSE")
     private boolean isCanceled;
+    private EStatusSaleReceipt status;
 }
