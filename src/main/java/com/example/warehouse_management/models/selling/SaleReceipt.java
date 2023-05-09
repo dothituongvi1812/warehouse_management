@@ -1,10 +1,9 @@
 package com.example.warehouse_management.models.selling;
 
 import com.example.warehouse_management.models.partner.Partner;
-import com.example.warehouse_management.models.purchase.PurchaseDetail;
+import com.example.warehouse_management.models.type.EStatusOfSaleReceipt;
 import com.example.warehouse_management.models.user.User;
 import com.example.warehouse_management.models.voucher.InventoryDeliveryVoucher;
-import com.example.warehouse_management.models.voucher.InventoryReceiptVoucher;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -35,4 +34,5 @@ public class SaleReceipt {
     @JoinColumn(name = "created_by")
     private User createdBy;
     private Date createdDate;
+    private EStatusOfSaleReceipt status;
 }

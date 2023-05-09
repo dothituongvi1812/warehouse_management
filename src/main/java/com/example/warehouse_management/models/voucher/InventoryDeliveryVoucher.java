@@ -25,7 +25,6 @@ public class InventoryDeliveryVoucher {
     private Long id;
     @Column(unique = true,nullable = false)
     private String code;
-    private String reason;
 
     @OneToMany(mappedBy ="inventoryDeliveryVoucher",cascade = CascadeType.ALL)
     private Set<InventoryDeliveryVoucherDetail> inventoryDeliveryVoucherDetails;

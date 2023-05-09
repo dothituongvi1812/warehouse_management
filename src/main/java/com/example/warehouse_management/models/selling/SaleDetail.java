@@ -1,9 +1,8 @@
 package com.example.warehouse_management.models.selling;
 
 import com.example.warehouse_management.models.goods.Goods;
-import com.example.warehouse_management.models.purchase.PurchaseDetailPK;
-import com.example.warehouse_management.models.purchase.PurchaseReceipt;
 import com.example.warehouse_management.models.type.EStatusOfPurchasingGoods;
+import com.example.warehouse_management.models.type.EStatusOfSellingGoods;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -34,5 +33,5 @@ public class SaleDetail {
     private int quantityRemaining;
     @Enumerated(EnumType.STRING)
     @Column(length = 20)
-    private EStatusOfPurchasingGoods status;
+    private EStatusOfSellingGoods status;
 }
