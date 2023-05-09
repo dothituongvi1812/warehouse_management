@@ -1,6 +1,5 @@
 package com.example.warehouse_management.models.voucher;
 
-import com.example.warehouse_management.models.partner.Partner;
 import com.example.warehouse_management.models.purchase.PurchaseReceipt;
 import com.example.warehouse_management.models.type.EStatusOfVoucher;
 import com.example.warehouse_management.models.user.User;
@@ -27,7 +26,7 @@ public class InventoryReceiptVoucher {
     @Column(unique = true,nullable = false)
     private String code;
     @OneToMany(mappedBy ="inventoryReceiptVoucher",cascade = CascadeType.ALL)
-    private Set<ReceiptVoucherDetail> receiptVoucherDetails;
+    private Set<InventoryReceiptVoucherDetail> inventoryReceiptVoucherDetails;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "purchase_receipt_id")
@@ -41,5 +40,7 @@ public class InventoryReceiptVoucher {
     private EStatusOfVoucher status;
     @Column(name = "create_date")
     private Date createDate;
+    @Column(name = "imported_date")
+    private Date importedDate;
 
 }

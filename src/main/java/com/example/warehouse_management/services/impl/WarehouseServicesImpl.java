@@ -2,7 +2,7 @@ package com.example.warehouse_management.services.impl;
 
 import com.example.warehouse_management.exception.ErrorException;
 import com.example.warehouse_management.exception.NotFoundGlobalException;
-import com.example.warehouse_management.models.warehouse.ColumnLocation;
+import com.example.warehouse_management.models.warehouse.ColumnPosition;
 import com.example.warehouse_management.models.warehouse.ShelfStorage;
 import com.example.warehouse_management.models.warehouse.Warehouse;
 import com.example.warehouse_management.payload.request.column.ColumnLocationRequest;
@@ -88,8 +88,8 @@ public class WarehouseServicesImpl implements WarehouseServices {
         List<ShelfStorage> shelveInWarehouse=shelveStorageRepository.findAllByWarehouse(warehouse.getCode());
         createColumnLocationOfShelve(request.getLengthOfColumn(), shelveInWarehouse);
         //xử lý vị trí
-        List<ColumnLocation> columnLocationInShelves=columnLocationRepository.findAll();
-        createRowLocationOfColumn(columnLocationInShelves);
+        List<ColumnPosition> columnPositionInShelves =columnLocationRepository.findAll();
+        createRowLocationOfColumn(columnPositionInShelves);
         return response;
     }
 
@@ -138,9 +138,9 @@ public class WarehouseServicesImpl implements WarehouseServices {
             columnLocationServices.addColumns(new ColumnLocationRequest(lengthOfColumn, shelfStorage.getCode()));
         }
     }
-    private void createRowLocationOfColumn(List<ColumnLocation> columnLocations){
-        for (ColumnLocation columnLocation:columnLocations) {
-            binLocationServices.addRowLocations(new BinLocationRequest(columnLocation.getCode()));
+    private void createRowLocationOfColumn(List<ColumnPosition> columnPositions){
+        for (ColumnPosition columnPosition : columnPositions) {
+            binLocationServices.addRowLocations(new BinLocationRequest(columnPosition.getCode()));
         }
     }
 }

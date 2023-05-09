@@ -7,7 +7,7 @@ import com.example.warehouse_management.models.selling.SaleDetail;
 import com.example.warehouse_management.models.selling.SaleDetailPK;
 import com.example.warehouse_management.models.selling.SaleReceipt;
 import com.example.warehouse_management.models.type.EStatusOfPurchasingGoods;
-import com.example.warehouse_management.models.warehouse.BinLocation;
+import com.example.warehouse_management.models.warehouse.BinPosition;
 import com.example.warehouse_management.payload.request.goods.GoodsToSaleRequest;
 import com.example.warehouse_management.payload.request.sale.SaleReceiptRequest;
 import com.example.warehouse_management.payload.response.*;
@@ -46,7 +46,7 @@ public class SaleReceiptServicesImpl implements SaleReceiptServices {
     @Override
     public SaleReceiptResponse createSaleReceipt(SaleReceiptRequest saleReceiptRequest) {
         for (GoodsToSaleRequest request:saleReceiptRequest.getGoodsToSaleRequests()) {
-            List<BinLocation> binList = binLocationServices.findAllRowLocationByGoodsCode(request.getGoodsCode());
+            List<BinPosition> binList = binLocationServices.findAllRowLocationByGoodsCode(request.getGoodsCode());
             if(CollectionUtils.isEmpty(binList))
                 throw new ErrorException("Hàng hoá có mã "+ request.getGoodsCode() + " chưa nhập vào kho");
         }
@@ -67,7 +67,8 @@ public class SaleReceiptServicesImpl implements SaleReceiptServices {
             saleDetail.setSaleDetailPK(new SaleDetailPK(goods.getId(),saveSaleReceipt.getId()));
             saleDetail.setGoods(goods);
             saleDetail.setSaleReceipt(saveSaleReceipt);
-            saleDetail.setQuantity(goodsRequest.getQuantity());
+            saleDetail.setQuantitySale(goodsRequest.getQuantity());
+            saleDetail.setQuantityRemaining(goodsRequest.getQuantity());
             saleDetail.setStatus(EStatusOfPurchasingGoods.NOT_YET_CREATED);
             saleDetailRepository.save(saleDetail);
             saleDetails.add(saleDetail);
@@ -106,7 +107,8 @@ public class SaleReceiptServicesImpl implements SaleReceiptServices {
         for (SaleDetail detail:saleReceipt.getSaleDetails()) {
             SaleDetailResponse saleDetailResponse = new SaleDetailResponse();
             saleDetailResponse.setGoods(goodsServices.mapperGoods(detail.getGoods()));
-            saleDetailResponse.setQuantity(detail.getQuantity());
+            saleDetailResponse.setQuantitySale(detail.getQuantitySale());
+            saleDetailResponse.setQuantityRemaining(detail.getQuantitySale());
             saleDetailResponse.setStatus(detail.getStatus());
             saleDetailSet.add(saleDetailResponse);
         }

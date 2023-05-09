@@ -13,7 +13,7 @@ import lombok.Setter;
 public class SaleDetailResponse {
 
     private GoodsResponse goods;
-    private int quantity;
-
+    private int quantitySale;
+    private int quantityRemaining;
     private EStatusOfPurchasingGoods status;
 }

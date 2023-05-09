@@ -9,26 +9,27 @@ import javax.persistence.Embeddable;
 import java.io.Serializable;
 import java.util.Objects;
 
+
 @Getter
 @Setter
+@Embeddable
 @AllArgsConstructor
 @NoArgsConstructor
-@Embeddable
-public class DeliveryVoucherDetailPK implements Serializable {
+public class InventoryReceiptVoucherDetailPK implements Serializable {
+    private Long inventoryReceiptVoucherId;
+    private Long binPositionId;
     private Long goodsId;
-    private Long deliveryVoucherId;
-    private Long binLocationId;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        DeliveryVoucherDetailPK that = (DeliveryVoucherDetailPK) o;
-        return Objects.equals(goodsId, that.goodsId) && Objects.equals(deliveryVoucherId, that.deliveryVoucherId) && Objects.equals(binLocationId, that.binLocationId);
+        InventoryReceiptVoucherDetailPK that = (InventoryReceiptVoucherDetailPK) o;
+        return Objects.equals(inventoryReceiptVoucherId, that.inventoryReceiptVoucherId) && Objects.equals(binPositionId, that.binPositionId) && Objects.equals(goodsId, that.goodsId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(goodsId, deliveryVoucherId, binLocationId);
+        return Objects.hash(inventoryReceiptVoucherId, binPositionId, goodsId);
     }
 }

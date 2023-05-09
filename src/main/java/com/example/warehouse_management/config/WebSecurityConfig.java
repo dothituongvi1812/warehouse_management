@@ -1,6 +1,7 @@
 package com.example.warehouse_management.config;
 
 
+import com.example.warehouse_management.models.type.ERole;
 import com.example.warehouse_management.security.jwt.AuthEntryPointJwt;
 import com.example.warehouse_management.security.jwt.AuthTokenFilter;
 import com.example.warehouse_management.security.services.UserDetailsServiceImpl;
@@ -82,14 +83,17 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(AUTH_WHITELIST).permitAll()
 //                .antMatchers("/api/register").hasAuthority(ERole.ADMIN.name())
                 .antMatchers("/api/register").permitAll()
+                .antMatchers("/api/user/get-all").hasAuthority(ERole.ADMIN.name())
+                .antMatchers("/api/user/deactivate-by/**").hasAuthority(ERole.ADMIN.name())
                 .antMatchers("/api/user/**").authenticated()
                 .antMatchers("/api/auth/login").permitAll()
                 .antMatchers("/api/auth/forget").permitAll()
                 .antMatchers("/api/auth/reset-password").authenticated()
-                .antMatchers("/test/**").authenticated()
+                .antMatchers("/api/warehouse/**").authenticated()
                 .antMatchers("/api/category/**").authenticated()
                 .antMatchers("/api/delivery-voucher/**").authenticated()
                 .antMatchers("/api/receipt-voucher/**").authenticated()
+                .antMatchers("/api/purchase-receipt/**").authenticated()
                 .and()
                 .logout()
                 .logoutUrl("/api/auth/logout")

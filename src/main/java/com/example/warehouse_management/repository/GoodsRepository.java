@@ -8,6 +8,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 @Repository
@@ -34,5 +35,18 @@ public interface GoodsRepository extends CrudRepository<Goods,Long> {
             "join goods g ON bl.goods_id = g.id \n" +
             "group by g.\"name\" ")
     List<Object[]> countCurrentQuantityOfGoodsInWarehouse();
+
+    @Query(nativeQuery = true,value ="select g.name ,sum(irvd.quantity) from goods g\n" +
+            "join inventory_receipt_voucher_details irvd on g.id = irvd.goods_id\n" +
+            "join inventory_receipt_vouchers irv on irvd.inventory_receipt_voucher_id = irv.id\n" +
+            "where irv.status ='IMPORTED' and imported_date BETWEEN :from AND :to\n" +
+            "group by g.\"name\"" )
+    List<Object[]>reportImportedQuantityGoodsByDate(Timestamp from, Timestamp to);
+    @Query(nativeQuery = true,value ="select g.name ,sum(idvd.quantity) from goods g\n" +
+            "join inventory_delivery_voucher_details idvd  on g.id = idvd.goods_id \n" +
+            "join inventory_delivery_vouchers idv on idvd.delivery_voucher_id = idv.id \n" +
+            "where idv.status ='EXPORTED' and idv.exported_date BETWEEN :from AND :to\n" +
+            "group by g.\"name\"" )
+    List<Object[]>reportExportedQuantityGoodsByDate(Timestamp from, Timestamp to);
 
 }

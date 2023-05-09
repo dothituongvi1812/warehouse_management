@@ -3,6 +3,7 @@ package com.example.warehouse_management.controllers;
 import com.example.warehouse_management.payload.request.partner.PartnerRequest;
 import com.example.warehouse_management.payload.request.partner.UpdatePartnerRequest;
 import com.example.warehouse_management.payload.response.PartnerResponse;
+import com.example.warehouse_management.payload.response.UserResponse;
 import com.example.warehouse_management.services.PartnerServices;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,6 +51,11 @@ public class PartnerController {
     @PostMapping("/update/{partnerCode}")
     public ResponseEntity<PartnerResponse> updatePartner(@PathVariable String partnerCode, @RequestBody UpdatePartnerRequest updatePartnerRequest){
         logger.info("/update"+partnerCode);
-        return new ResponseEntity(null,HttpStatus.OK);
+        return new ResponseEntity(partnerServices.updatePartner(partnerCode,updatePartnerRequest),HttpStatus.OK);
+    }
+    @GetMapping("/search/{keyword}")
+    public ResponseEntity<List<PartnerResponse>> search(@PathVariable String keyword){
+        logger.info("/search/"+keyword);
+        return new ResponseEntity(partnerServices.search(keyword),HttpStatus.OK);
     }
 }

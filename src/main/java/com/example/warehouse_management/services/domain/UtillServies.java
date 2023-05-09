@@ -1,7 +1,7 @@
 package com.example.warehouse_management.services.domain;
 
 import com.example.warehouse_management.exception.ErrorException;
-import com.example.warehouse_management.models.warehouse.BinLocation;
+import com.example.warehouse_management.models.warehouse.BinPosition;
 import com.example.warehouse_management.payload.request.goods.GoodsRequest;
 import com.example.warehouse_management.payload.response.LocationInWarehouse;
 
@@ -9,22 +9,22 @@ import java.util.Arrays;
 
 public class UtillServies {
 
-    public static LocationInWarehouse mapperLocationInWarehouse(BinLocation bin) {
+    public static LocationInWarehouse mapperLocationInWarehouse(BinPosition bin) {
         LocationInWarehouse locationInWarehouse = new LocationInWarehouse();
         locationInWarehouse.setNameRow(bin.getName());
         locationInWarehouse.setCodeRow(bin.getCode());
-        locationInWarehouse.setNameColumn(bin.getColumnLocation().getName());
-        locationInWarehouse.setCodeColumn(bin.getColumnLocation().getCode());
-        locationInWarehouse.setNameShelf(bin.getColumnLocation().getShelfStorage().getName());
-        locationInWarehouse.setCodeShelf(bin.getColumnLocation().getShelfStorage().getCode());
-        locationInWarehouse.setNameWarehouse(bin.getColumnLocation().getShelfStorage().getWarehouse().getName());
-        locationInWarehouse.setCodeWarehouse(bin.getColumnLocation().getShelfStorage().getWarehouse().getCode());
+        locationInWarehouse.setNameColumn(bin.getColumnPosition().getName());
+        locationInWarehouse.setCodeColumn(bin.getColumnPosition().getCode());
+        locationInWarehouse.setNameShelf(bin.getColumnPosition().getShelfStorage().getName());
+        locationInWarehouse.setCodeShelf(bin.getColumnPosition().getShelfStorage().getCode());
+        locationInWarehouse.setNameWarehouse(bin.getColumnPosition().getShelfStorage().getWarehouse().getName());
+        locationInWarehouse.setCodeWarehouse(bin.getColumnPosition().getShelfStorage().getWarehouse().getCode());
         return locationInWarehouse;
     }
-    public static boolean validateGoods(GoodsRequest goodsRequest,BinLocation binLocation){
+    public static boolean validateGoods(GoodsRequest goodsRequest, BinPosition binPosition){
 
       boolean check= compareSizeShelfAndGoods(
-                        createArraySize(binLocation.getWidth(), binLocation.getHeight(), binLocation.getLength()),
+                        createArraySize(binPosition.getWidth(), binPosition.getHeight(), binPosition.getLength()),
                         createArraySize(goodsRequest.getWidth(), goodsRequest.getHeight(), goodsRequest.getLength()),
                         goodsRequest.getName());
       return check;

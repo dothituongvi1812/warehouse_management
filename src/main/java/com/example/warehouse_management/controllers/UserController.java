@@ -39,4 +39,9 @@ public class UserController {
     public ResponseEntity<String> deactivateByUserCode(@PathVariable String userCode){
         return new ResponseEntity(userServices.deactivateByUserCode(userCode),HttpStatus.OK);
     }
+    @GetMapping("/search/{keyword}")
+    public ResponseEntity<List<UserResponse>> search(@PathVariable String keyword){
+        logger.info("/search/"+keyword);
+        return new ResponseEntity(userServices.search(keyword),HttpStatus.OK);
+    }
 }

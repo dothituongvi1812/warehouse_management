@@ -239,6 +239,14 @@ public class UserServicesImpl implements UserServices {
         return "Đã vô hiệu hoá user "+ user.getFullName();
     }
 
+    @Override
+    public List<UserResponse> search(String keyword) {
+        List<User> user = userRepository.search(keyword);
+        List<UserResponse> userResponses = user.stream().map(e->modelMapper.map(e,UserResponse.class))
+                .collect(Collectors.toList());
+        return userResponses;
+    }
+
     private String generateUserCode(){
         Random rnd = new Random();
         User user =userRepository.findTopByOrderByIdDesc();

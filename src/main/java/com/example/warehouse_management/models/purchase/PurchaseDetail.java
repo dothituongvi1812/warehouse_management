@@ -26,9 +26,9 @@ public class PurchaseDetail {
     @MapsId("purchaseId")
     @JoinColumn(name = "purchase_id")
     private PurchaseReceipt purchaseReceipt;
-//    @Column(name = "quantity_purchased", columnDefinition = "INT(4) CHECK (quantity_purchased > 0)")
+    @Column(name = "quantity_purchased", columnDefinition = "INT CHECK (quantity_purchased >= 0)")
     private int quantityPurchased;
-//    @Column(name = "quantity_remaining", columnDefinition = "INT(4) CHECK (quantity_remaining > 0)")
+    @Column(name = "quantity_remaining", columnDefinition = "INT CHECK (quantity_remaining >= 0)")
     private int quantityRemaining;
     @Enumerated(EnumType.STRING)
     @Column(length = 20)

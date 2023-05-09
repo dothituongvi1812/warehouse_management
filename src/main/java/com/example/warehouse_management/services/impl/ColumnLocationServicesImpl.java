@@ -2,10 +2,10 @@ package com.example.warehouse_management.services.impl;
 
 import com.example.warehouse_management.exception.ErrorException;
 import com.example.warehouse_management.exception.NotFoundGlobalException;
-import com.example.warehouse_management.models.warehouse.ColumnLocation;
+import com.example.warehouse_management.models.warehouse.ColumnPosition;
 import com.example.warehouse_management.models.warehouse.ShelfStorage;
 import com.example.warehouse_management.payload.request.column.ColumnLocationRequest;
-import com.example.warehouse_management.payload.response.ColumnLocationResponse;
+import com.example.warehouse_management.payload.response.ColumnPositionResponse;
 import com.example.warehouse_management.repository.ColumnLocationRepository;
 import com.example.warehouse_management.repository.ShelveStorageRepository;
 import com.example.warehouse_management.services.ColumnLocationServices;
@@ -29,8 +29,8 @@ public class ColumnLocationServicesImpl implements ColumnLocationServices {
     private ModelMapper modelMapper =new ModelMapper();
 
     @Override
-    public List<ColumnLocationResponse> addColumns(ColumnLocationRequest columnLocationRequest) {
-        List<ColumnLocationResponse> responses =new ArrayList<>();
+    public List<ColumnPositionResponse> addColumns(ColumnLocationRequest columnLocationRequest) {
+        List<ColumnPositionResponse> responses =new ArrayList<>();
         ShelfStorage shelfStorage =shelveStorageRepository.findByCode(columnLocationRequest.getShelfStorageCode());
         if (shelfStorage ==null){
             throw new NotFoundGlobalException("Không tìm thấy kệ "+columnLocationRequest.getShelfStorageCode());
@@ -49,32 +49,32 @@ public class ColumnLocationServicesImpl implements ColumnLocationServices {
 
         int numberColumn= (int) (shelfStorage.getLength()/columnLocationRequest.getLength());
         int numberColumnCurrent=columnLocationRepository.findAll().size();
-        String code ="CL000";
+        String code ="CP000";
         for (int i = 0; i < numberColumn; i++) {
-            ColumnLocation columnLocation =new ColumnLocation();
-            columnLocation.setShelfStorage(shelfStorage);
-            columnLocation.setLength(columnLocationRequest.getLength());
-            columnLocation.setName(generateColumnLocationName(i+1));
-            columnLocation.setCode(code+(numberColumnCurrent+i+1));
-            ColumnLocation columnLocationSave=columnLocationRepository.save(columnLocation);
-            ColumnLocationResponse columnLocationResponse= mapperColumnLocationResponse(columnLocationSave);
-            responses.add(columnLocationResponse);
+            ColumnPosition columnPosition =new ColumnPosition();
+            columnPosition.setShelfStorage(shelfStorage);
+            columnPosition.setLength(columnLocationRequest.getLength());
+            columnPosition.setName(generateColumnLocationName(i+1));
+            columnPosition.setCode(code+(numberColumnCurrent+i+1));
+            ColumnPosition columnPositionSave =columnLocationRepository.save(columnPosition);
+            ColumnPositionResponse columnPositionResponse = mapperColumnLocationResponse(columnPositionSave);
+            responses.add(columnPositionResponse);
         }
         return responses;
     }
 
     @Override
-    public List<ColumnLocationResponse> getAll() {
-            List<ColumnLocationResponse> responseList =columnLocationRepository.findAll().stream()
+    public List<ColumnPositionResponse> getAll() {
+            List<ColumnPositionResponse> responseList =columnLocationRepository.findAll().stream()
                     .map(columnLocation ->mapperColumnLocationResponse(columnLocation) )
                     .collect(Collectors.toList());
         return responseList;
     }
 
     @Override
-    public ColumnLocationResponse getByCode(String code) {
-        ColumnLocation columnLocation=columnLocationRepository.findByCode(code);
-        ColumnLocationResponse response=mapperColumnLocationResponse(columnLocation);
+    public ColumnPositionResponse getByCode(String code) {
+        ColumnPosition columnPosition =columnLocationRepository.findByCode(code);
+        ColumnPositionResponse response=mapperColumnLocationResponse(columnPosition);
         return response;
     }
 
@@ -111,11 +111,11 @@ public class ColumnLocationServicesImpl implements ColumnLocationServices {
         return name;
 
     }
-    private ColumnLocationResponse mapperColumnLocationResponse(ColumnLocation columnLocation){
-        ColumnLocationResponse columnLocationResponse =modelMapper.map(columnLocation,ColumnLocationResponse.class);
-        columnLocationResponse.setShelfStorageCode(columnLocation.getShelfStorage().getCode());
-        columnLocationResponse.setShelfStorageName(columnLocation.getShelfStorage().getName());
+    private ColumnPositionResponse mapperColumnLocationResponse(ColumnPosition columnPosition){
+        ColumnPositionResponse columnPositionResponse =modelMapper.map(columnPosition, ColumnPositionResponse.class);
+        columnPositionResponse.setShelfStorageCode(columnPosition.getShelfStorage().getCode());
+        columnPositionResponse.setShelfStorageName(columnPosition.getShelfStorage().getName());
 
-        return columnLocationResponse;
+        return columnPositionResponse;
     }
 }

@@ -1,5 +1,6 @@
 package com.example.warehouse_management.security.jwt;
 
+import com.example.warehouse_management.exception.ErrorException;
 import com.example.warehouse_management.models.user.User;
 import com.example.warehouse_management.security.services.UserDetailsImpl;
 import org.slf4j.Logger;
@@ -57,6 +58,7 @@ public class JwtUtils {
             logger.error("Invalid JWT token: {}", e.getMessage());
         } catch (ExpiredJwtException e) {
             logger.error("JWT token is expired: {}", e.getMessage());
+            throw new ErrorException("JWT token is expired: {}"+ e.getMessage());
         } catch (UnsupportedJwtException e) {
             logger.error("JWT token is unsupported: {}", e.getMessage());
         } catch (IllegalArgumentException e) {

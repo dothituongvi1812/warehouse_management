@@ -13,8 +13,8 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name="column_locations")
-public class ColumnLocation {
+@Table(name="column_positions")
+public class ColumnPosition {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -22,11 +22,11 @@ public class ColumnLocation {
     private String code;
     @Column(name = "name")
     private String name;
-    //@Column(name = "length", columnDefinition = "FLOAT(8) CHECK (length > 0)")
+    @Column(name = "length", columnDefinition = "FLOAT(8) CHECK (length > 0)")
     private double length;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name ="shelfStorageId" )
     private ShelfStorage shelfStorage;
-    @OneToMany(mappedBy = "columnLocation")
-    private Set<BinLocation> binLocations;
+    @OneToMany(mappedBy = "columnPosition")
+    private Set<BinPosition> binPositions;
 }

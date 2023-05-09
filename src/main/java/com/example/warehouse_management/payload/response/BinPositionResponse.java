@@ -10,7 +10,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class BinLocationResponse {
+public class BinPositionResponse {
     private Long id;
     private String codeBin;
     private String nameBin;

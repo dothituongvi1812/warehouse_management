@@ -7,6 +7,7 @@ import com.example.warehouse_management.payload.request.goods.UpdateGoodsRequest
 import com.example.warehouse_management.payload.response.GoodsResponse;
 import org.springframework.data.domain.Page;
 
+import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
 
@@ -24,4 +25,6 @@ public interface GoodsServices {
     public Integer getCurrentQuantityOfGoodsInWarehouse(String goodsCode);
     Map<String, Integer> countCurrentQuantityOfGoodsInWarehouse();
     public GoodsResponse updateGoods(String goodsCode, UpdateGoodsRequest updateGoodsRequest);
+    public Map<String,Integer> reportImportedQuantityGoodsByDate(String date);
+    public Map<String,Integer> reportExportedQuantityGoodsByDate(String date);
 }

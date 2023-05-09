@@ -9,11 +9,12 @@ import com.example.warehouse_management.models.type.EStatusOfVoucher;
 import com.example.warehouse_management.models.type.EStatusStorage;
 import com.example.warehouse_management.models.user.User;
 import com.example.warehouse_management.models.voucher.*;
-import com.example.warehouse_management.models.warehouse.BinLocation;
+import com.example.warehouse_management.models.warehouse.BinPosition;
 import com.example.warehouse_management.payload.request.delivery.DeliveryVoucherRequest;
 import com.example.warehouse_management.payload.response.*;
 import com.example.warehouse_management.repository.InventoryDeliveryVoucherRepository;
 import com.example.warehouse_management.repository.BinLocationRepository;
+import com.example.warehouse_management.repository.SaleDetailRepository;
 import com.example.warehouse_management.repository.UserRepository;
 import com.example.warehouse_management.services.*;
 import com.example.warehouse_management.services.domain.UtillServies;
@@ -36,16 +37,15 @@ public class InventoryDeliveryVoucherServiceImpl implements InventoryDeliveryVou
     @Autowired
     GoodsServices goodsServices;
     @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private PartnerServices partnerServices;
+    UserRepository userRepository;
     @Autowired
     BinLocationServices binLocationServices;
     @Autowired
     BinLocationRepository binLocationRepository;
-
     @Autowired
     SaleReceiptServices saleReceiptServices;
+    @Autowired
+    SaleDetailRepository saleDetailRepository;
 
     private ModelMapper modelMapper = new ModelMapper();
     @Override
@@ -54,7 +54,7 @@ public class InventoryDeliveryVoucherServiceImpl implements InventoryDeliveryVou
         InventoryDeliveryVoucher inventoryDeliveryVoucher = new InventoryDeliveryVoucher();
         inventoryDeliveryVoucher.setSaleReceipt(saleReceipt);
         User user = userRepository.findUserByEmail(deliveryVoucherRequest.getEmail());
-        Set<DeliveryVoucherDetail> deliveryVoucherDetails = new HashSet<>();
+        Set<InventoryDeliveryVoucherDetail> inventoryDeliveryVoucherDetails = new HashSet<>();
         List<RowLocationGoodsDeliveryTemp> rowLocationGoodsDeliveryTempList = new ArrayList<>();
         List<GoodsDelivery> goodsDeliveryList = deliveryVoucherRequest.getGoodsRequests().stream()
                 .map(item->new GoodsDelivery(goodsServices.findGoodByCode(item.getGoodCode()), item.getQuantity())).collect(Collectors.toList());
@@ -64,8 +64,9 @@ public class InventoryDeliveryVoucherServiceImpl implements InventoryDeliveryVou
             if(goodDelivery.getQuantity()>sumQuantityOfGoods){
                 throw new ErrorException("Không đủ số lượng để xuất");
             }
-            List<BinLocation> binList = binLocationServices.findAllByGoodsNameEnoughToExport(goodDelivery.getGoods().getName(),goodDelivery.getQuantity());
-            for (BinLocation rl: binList) {
+
+            List<BinPosition> binList = binLocationServices.findAllByGoodsNameEnoughToExport(goodDelivery.getGoods().getName(),goodDelivery.getQuantity());
+            for (BinPosition rl: binList) {
                 int currentQuantity=rl.getCurrentCapacity();
                 if(currentQuantity>=goodDelivery.getQuantity()){
                     System.out.println("Tao phieu xuat");
@@ -83,6 +84,12 @@ public class InventoryDeliveryVoucherServiceImpl implements InventoryDeliveryVou
                 }
 
             }
+            saleReceipt.getSaleDetails().stream().forEach(e->{
+                if(e.getGoods().equals(goodDelivery.getGoods())){
+                    e.setQuantityRemaining(e.getQuantityRemaining()-goodDelivery.getQuantity());
+                    saleDetailRepository.save(e);
+                }
+            });
         }
         inventoryDeliveryVoucher.setCreateDate(new Date());
         inventoryDeliveryVoucher.setCreatedBy(user);
@@ -90,32 +97,32 @@ public class InventoryDeliveryVoucherServiceImpl implements InventoryDeliveryVou
         inventoryDeliveryVoucher.setStatus(EStatusOfVoucher.NOT_YET_EXPORTED);
         InventoryDeliveryVoucher deliveryVoucherSave = deliveryVoucherRepository.save(inventoryDeliveryVoucher);
         for (RowLocationGoodsDeliveryTemp item:rowLocationGoodsDeliveryTempList) {
-            String goodsCode = item.getGoodsDelivery().getGoods().getCode();
-            DeliveryVoucherDetail deliveryVoucherDetail = new DeliveryVoucherDetail();
-            deliveryVoucherDetail.setGoodsCode(goodsCode);
-            deliveryVoucherDetail.setQuantity(item.getGoodsDelivery().getQuantity());
-            deliveryVoucherDetail.setBinLocation(item.getBinLocation());
-            deliveryVoucherDetail.setDeliveryVoucherDetailPK(new DeliveryVoucherDetailPK(item.getGoodsDelivery().getGoods().getId(),deliveryVoucherSave.getId(),item.getBinLocation().getId()));
-            deliveryVoucherDetail.setInventoryDeliveryVoucher(deliveryVoucherSave);
+            InventoryDeliveryVoucherDetail inventoryDeliveryVoucherDetail = new InventoryDeliveryVoucherDetail();
+            inventoryDeliveryVoucherDetail.setGoods(item.getGoodsDelivery().getGoods());
+            inventoryDeliveryVoucherDetail.setQuantity(item.getGoodsDelivery().getQuantity());
+            inventoryDeliveryVoucherDetail.setBinPosition(item.getBinPosition());
+            inventoryDeliveryVoucherDetail.setInventoryDeliveryVoucherDetailPK(new InventoryDeliveryVoucherDetailPK(item.getGoodsDelivery().getGoods().getId(),deliveryVoucherSave.getId(),item.getBinPosition().getId()));
+            inventoryDeliveryVoucherDetail.setInventoryDeliveryVoucher(deliveryVoucherSave);
 
-            deliveryVoucherDetails.add(deliveryVoucherDetail);
+            inventoryDeliveryVoucherDetails.add(inventoryDeliveryVoucherDetail);
         }
-        deliveryVoucherSave.setDeliveryVoucherDetails(deliveryVoucherDetails);
+        deliveryVoucherSave.setInventoryDeliveryVoucherDetails(inventoryDeliveryVoucherDetails);
         return mapperInventoryDeliveryVoucher(deliveryVoucherRepository.save(deliveryVoucherSave));
     }
 
     @Override
-    public List<BinLocationResponse> exportGoods(String deliveryVoucherCode) {
+    public List<BinPositionResponse> exportGoods(String deliveryVoucherCode) {
         InventoryDeliveryVoucher inventoryDeliveryVoucher = deliveryVoucherRepository.findByCode(deliveryVoucherCode);
         if(inventoryDeliveryVoucher.getStatus().equals(EStatusOfVoucher.EXPORTED))
             throw new ErrorException("Phiếu xuất" + deliveryVoucherCode + "đã được xuất");
-        List<BinLocation> binList = new ArrayList<>();
+        List<BinPosition> binList = new ArrayList<>();
         if (ObjectUtils.isEmpty(inventoryDeliveryVoucher))
             throw new NotFoundGlobalException("Không tìm thấy phiếu xuất "+ deliveryVoucherCode);
+        inventoryDeliveryVoucher.setExportedDate(new Date());
         inventoryDeliveryVoucher.setStatus(EStatusOfVoucher.EXPORTED);
-        for (DeliveryVoucherDetail detail:inventoryDeliveryVoucher.getDeliveryVoucherDetails()) {
-            Goods goods =goodsServices.findGoodByCode(detail.getGoodsCode());
-            BinLocation bin = detail.getBinLocation();
+        for (InventoryDeliveryVoucherDetail detail:inventoryDeliveryVoucher.getInventoryDeliveryVoucherDetails()) {
+            Goods goods =goodsServices.findGoodByCode(detail.getGoods().getCode());
+            BinPosition bin = detail.getBinPosition();
             int currentCapacity= bin.getCurrentCapacity();
             double remainingVolume= bin.getRemainingVolume();
             bin.setCurrentCapacity(currentCapacity-detail.getQuantity());
@@ -127,14 +134,14 @@ public class InventoryDeliveryVoucherServiceImpl implements InventoryDeliveryVou
             else{
                 bin.setRemainingVolume(remainingVolume+ goods.getVolume()*detail.getQuantity());
             }
-            BinLocation bin1 = binLocationRepository.save(bin);
+            BinPosition bin1 = binLocationRepository.save(bin);
             binList.add(bin1);
 
         }
-        List<BinLocationResponse> binLocationResponses = binList.stream().map(item ->
+        List<BinPositionResponse> binPositionRespons = binList.stream().map(item ->
                 binLocationServices.mapperRowLocation(item)).collect(Collectors.toList());
         deliveryVoucherRepository.save(inventoryDeliveryVoucher);
-        return binLocationResponses;
+        return binPositionRespons;
     }
 
     @Override
@@ -184,7 +191,7 @@ public class InventoryDeliveryVoucherServiceImpl implements InventoryDeliveryVou
                 break;
 
         }
-        Set<DeliveryVoucherDetailResponse>  detailResponseSet = deliveryVoucher.getDeliveryVoucherDetails().stream().map(item ->mapperDeliveryVoucherDetailResponse(item))
+        Set<DeliveryVoucherDetailResponse>  detailResponseSet = deliveryVoucher.getInventoryDeliveryVoucherDetails().stream().map(item ->mapperDeliveryVoucherDetailResponse(item))
                 .collect(Collectors.toSet());
         InventoryDeliveryVoucherResponse inventoryDeliveryVoucherResponse = new InventoryDeliveryVoucherResponse();
         inventoryDeliveryVoucherResponse = modelMapper.map(deliveryVoucher,InventoryDeliveryVoucherResponse.class);
@@ -194,9 +201,9 @@ public class InventoryDeliveryVoucherServiceImpl implements InventoryDeliveryVou
         inventoryDeliveryVoucherResponse.setStatus(status);
         return inventoryDeliveryVoucherResponse;
     }
-    private DeliveryVoucherDetailResponse mapperDeliveryVoucherDetailResponse(DeliveryVoucherDetail deliveryVoucherDetail){
+    private DeliveryVoucherDetailResponse mapperDeliveryVoucherDetailResponse(InventoryDeliveryVoucherDetail inventoryDeliveryVoucherDetail){
         DeliveryVoucherDetailResponse detailResponse = new DeliveryVoucherDetailResponse(goodsServices.mapperGoods(
-                goodsServices.findGoodByCode(deliveryVoucherDetail.getGoodsCode())), UtillServies.mapperLocationInWarehouse(deliveryVoucherDetail.getBinLocation()),deliveryVoucherDetail.getQuantity());
+                goodsServices.findGoodByCode(inventoryDeliveryVoucherDetail.getGoods().getCode())), UtillServies.mapperLocationInWarehouse(inventoryDeliveryVoucherDetail.getBinPosition()), inventoryDeliveryVoucherDetail.getQuantity());
         return detailResponse;
     }
 

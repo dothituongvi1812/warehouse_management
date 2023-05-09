@@ -66,5 +66,13 @@ public class GoodsController {
     public ResponseEntity<GoodsResponse> updateGoods(@PathVariable String goodsCode,@RequestBody UpdateGoodsRequest updateGoodsRequest){
         return new ResponseEntity<>(goodsServices.updateGoods(goodsCode,updateGoodsRequest),HttpStatus.OK);
     }
+    @GetMapping("/report-imported-quantity-by/{date}")
+    public ResponseEntity<Map<String,Integer>> reportImportedQuantityGoodsBy(@PathVariable String date){
+        return new ResponseEntity<>(goodsServices.reportImportedQuantityGoodsByDate(date),HttpStatus.OK);
+    }
+    @GetMapping("/report-exported-quantity-by/{date}")
+    public ResponseEntity<Map<String,Integer>> reportExportedQuantityGoodsBy(@PathVariable String date){
+        return new ResponseEntity<>(goodsServices.reportImportedQuantityGoodsByDate(date),HttpStatus.OK);
+    }
 
 }

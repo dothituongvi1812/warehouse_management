@@ -36,4 +36,5 @@ public class PurchaseReceiptController {
         return new ResponseEntity<>(purchaseReceiptServices.getPurchaseReceiptByCode(purchaseReceiptCode),HttpStatus.OK);
     }
 
+
 }
