@@ -42,5 +42,7 @@ public class InventoryReceiptVoucher {
     private Date createDate;
     @Column(name = "imported_date")
     private Date importedDate;
+    @Column(columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private boolean isCanceled;
 
 }

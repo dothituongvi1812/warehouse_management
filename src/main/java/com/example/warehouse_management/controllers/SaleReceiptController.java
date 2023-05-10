@@ -1,6 +1,7 @@
 package com.example.warehouse_management.controllers;
 
 import com.example.warehouse_management.payload.request.sale.SaleReceiptRequest;
+import com.example.warehouse_management.payload.response.PurchaseReceiptResponse;
 import com.example.warehouse_management.payload.response.SaleReceiptResponse;
 import com.example.warehouse_management.services.SaleReceiptServices;
 import org.slf4j.Logger;
@@ -36,9 +37,8 @@ public class SaleReceiptController {
         logger.info("/get-by/"+saleReceiptCode);
         return new ResponseEntity<>(saleReceiptServices.getSaleReceiptByCode(saleReceiptCode),HttpStatus.OK);
     }
-    @PostMapping("/cancel/{saleReceiptCode}")
-    public ResponseEntity<String>cancel(@PathVariable String saleReceiptCode){
-        logger.info("/cancel/"+saleReceiptCode);
-        return new ResponseEntity<>(saleReceiptServices.cancelSaleReceipt(saleReceiptCode),HttpStatus.OK);
+    @GetMapping("/search-by/{date}")
+    public ResponseEntity<List<SaleReceiptResponse>> searchByDate(@PathVariable String date){
+        return new ResponseEntity<>(saleReceiptServices.searchByDate(date),HttpStatus.OK);
     }
 }

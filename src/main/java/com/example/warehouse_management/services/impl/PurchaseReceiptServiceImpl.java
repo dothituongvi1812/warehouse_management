@@ -25,6 +25,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
+import java.sql.Timestamp;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -112,6 +114,24 @@ public class PurchaseReceiptServiceImpl implements PurchaseReceiptServices {
         return mapperPurchaseReceiptResponse(findPurchaseReceiptByCode(purchaseReceiptCode));
     }
 
+    @Override
+    public List<PurchaseReceiptResponse> searchByDate(String date) {
+        String toDate = date+" 23:59:59";
+        String fromDate = date +" 00:00:00";
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        try {
+            Date parsedFromDate = dateFormat.parse(fromDate);
+            Date parsedToDate = dateFormat.parse(toDate);
+            Timestamp from = new Timestamp(parsedFromDate.getTime());
+            Timestamp to = new Timestamp(parsedToDate.getTime());
+            List<PurchaseReceiptResponse> responseList = purchaseReceiptRepository.searchByCreatedDate(from,to).stream()
+                    .map(item->mapperPurchaseReceiptResponse(item)).collect(Collectors.toList());
+            return responseList;
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private String generatePurchaseReceipt() {
         SimpleDateFormat sdf = new SimpleDateFormat("yyMMdd");
         String dateFormat = sdf.format(new Date());
@@ -126,6 +146,7 @@ public class PurchaseReceiptServiceImpl implements PurchaseReceiptServices {
     private PurchaseReceiptResponse mapperPurchaseReceiptResponse(PurchaseReceipt purchaseReceipt){
         PurchaseReceiptResponse response = new PurchaseReceiptResponse();
         response.setCode(purchaseReceipt.getCode());
+        response.setCreatedDate(purchaseReceipt.getCreatedDate());
         response.setCreatedBy(purchaseReceipt.getCreatedBy().getFullName());
         response.setPartner(modelMapper.map(purchaseReceipt.getPartner(), PartnerResponse.class));
         response.setStatus(purchaseReceipt.getStatus());

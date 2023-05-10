@@ -198,10 +198,15 @@ public class BinLocationServicesImpl implements BinLocationServices {
         if (!CollectionUtils.isEmpty(binPositions)) {
             usablePositonList = binLocationRepository.getAllUsablePositionForGoodsExisted(warehouseCode, volume, goods.getCode(), usingBinLocation).stream()
                     .sorted(Comparator.comparing(BinPosition::getCode)).collect(Collectors.toList());
+            if(CollectionUtils.isEmpty(usablePositonList)){
+                usablePositonList = binLocationRepository.getAllUsablePositionForGoodsNotExisted(warehouseCode, usingBinLocation).stream()
+                        .sorted(Comparator.comparing(BinPosition::getCode)).collect(Collectors.toList());
+            }
         } else {
             usablePositonList = binLocationRepository.getAllUsablePositionForGoodsNotExisted(warehouseCode, usingBinLocation).stream()
                     .sorted(Comparator.comparing(BinPosition::getCode)).collect(Collectors.toList());
         }
+
         List<BinPositionResponse> responseList = usablePositonList.stream().map(this::mapperRowLocationResponse)
                 .sorted(Comparator.comparing(BinPositionResponse::getNameShelf)
                         .thenComparing(BinPositionResponse::getNameColumn))

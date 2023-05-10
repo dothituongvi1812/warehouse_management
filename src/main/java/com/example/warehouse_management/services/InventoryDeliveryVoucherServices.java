@@ -13,5 +13,6 @@ public interface InventoryDeliveryVoucherServices {
     InventoryDeliveryVoucherResponse getDeliveryVoucherByCode(String deliveryVoucherCode);
     public Page<InventoryDeliveryVoucherResponse> getPageSortedByDate(Integer page, Integer size);
     public List<InventoryDeliveryVoucherResponse> getAll();
+    public List<InventoryDeliveryVoucherResponse> searchByDate(String date);
 
 }

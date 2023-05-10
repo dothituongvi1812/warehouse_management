@@ -1,6 +1,7 @@
 package com.example.warehouse_management.controllers;
 
 import com.example.warehouse_management.payload.request.receive.ReceiptVoucherRequest;
+import com.example.warehouse_management.payload.response.InventoryDeliveryVoucherResponse;
 import com.example.warehouse_management.payload.response.InventoryReceiptVoucherResponse;
 import com.example.warehouse_management.payload.response.BinPositionResponse;
 import com.example.warehouse_management.services.InventoryReceiptServices;
@@ -47,6 +48,10 @@ public class InventoryReceiptVoucherController {
     public ResponseEntity<List<InventoryReceiptVoucherResponse>> getAll(){
         logger.info("api/receipt-voucher/get-all");
         return new ResponseEntity(inventoryReceiptServices.findAll(),HttpStatus.OK);
+    }
+    @GetMapping("/search-by/{date}")
+    public ResponseEntity<List<InventoryReceiptVoucherResponse>> searchByDate(@PathVariable String date){
+        return new ResponseEntity<>(inventoryReceiptServices.searchByDate(date),HttpStatus.OK);
     }
 
 }

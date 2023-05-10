@@ -20,11 +20,11 @@ public class ShelfStorage {
     private String name;
     @Column(name = "number_Of_floors", columnDefinition = "INT CHECK (number_Of_floors >= 0)")
     private int numberOfFloors;
-    @Column(name = "width", columnDefinition = "FLOAT(8) CHECK (width > 0)")
+    @Column(name = "width", columnDefinition = "NUMERIC(5, 2) CHECK (width > 0)")
     private double width;
-    @Column(name = "height", columnDefinition = "FLOAT(8) CHECK (height > 0)")
+    @Column(name = "height", columnDefinition = "NUMERIC(5, 2) CHECK (height > 0)")
     private double height;
-    @Column(name = "length", columnDefinition = "FLOAT(8) CHECK (length > 0)")
+    @Column(name = "length", columnDefinition = "NUMERIC(5, 2) CHECK (length > 0)")
     private double length;
 
     @ManyToOne(fetch = FetchType.LAZY)

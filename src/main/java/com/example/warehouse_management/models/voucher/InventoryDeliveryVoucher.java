@@ -44,4 +44,6 @@ public class InventoryDeliveryVoucher {
 
     private Date createDate;
     private Date exportedDate;
+    @Column(columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private boolean isCanceled;
 }

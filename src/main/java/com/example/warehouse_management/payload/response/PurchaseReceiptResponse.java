@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Date;
 import java.util.Set;
 @Getter
 @Setter
@@ -19,5 +20,6 @@ public class PurchaseReceiptResponse {
     private String createdBy;
     private EStatusPurchaseReceipt status;
     private Set<PurchaseDetailResponse> purchaseDetails;
+    private Date createdDate;
 
 }

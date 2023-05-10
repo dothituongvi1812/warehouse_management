@@ -22,7 +22,7 @@ public class ColumnPosition {
     private String code;
     @Column(name = "name")
     private String name;
-    @Column(name = "length", columnDefinition = "FLOAT(8) CHECK (length > 0)")
+    @Column(name = "length", columnDefinition = "NUMERIC(5, 2) CHECK (length > 0)")
     private double length;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name ="shelfStorageId" )

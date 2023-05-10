@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.security.Principal;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/delivery-voucher")
@@ -49,6 +50,10 @@ public class InventoryDeliveryVoucherController {
     public ResponseEntity<List<InventoryDeliveryVoucherResponse>> getAll(){
         logger.info("/api/delivery-voucher/get-all");
         return new ResponseEntity(inventoryDeliveryVoucherServices.getAll(),HttpStatus.OK);
+    }
+    @GetMapping("/search-by/{date}")
+    public ResponseEntity<List<InventoryDeliveryVoucherResponse>> searchByDate(@PathVariable String date){
+        return new ResponseEntity<>(inventoryDeliveryVoucherServices.searchByDate(date),HttpStatus.OK);
     }
 
 }

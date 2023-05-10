@@ -11,5 +11,6 @@ public interface PurchaseReceiptServices {
     public List<PurchaseReceiptResponse> getAll();
     public PurchaseReceipt findPurchaseReceiptByCode(String purchaseReceiptCode);
     public PurchaseReceiptResponse getPurchaseReceiptByCode(String purchaseReceiptCode);
+    public List<PurchaseReceiptResponse> searchByDate(String date);
 
 }

@@ -31,6 +31,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
+import java.sql.Timestamp;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -169,7 +171,9 @@ public class InventoryReceiptServicesImpl implements InventoryReceiptServices {
     @Override
     public List<InventoryReceiptVoucherResponse> findAll() {
         List<InventoryReceiptVoucherResponse> responseList = getAll().stream()
-                .map(item->mapperInventoryReceiptVoucher(item)).collect(Collectors.toList());
+                .map(item->mapperInventoryReceiptVoucher(item))
+                .sorted(Comparator.comparing(InventoryReceiptVoucherResponse::getCreateDate))
+                .collect(Collectors.toList());
         return responseList;
     }
 
@@ -184,6 +188,24 @@ public class InventoryReceiptServicesImpl implements InventoryReceiptServices {
         if(ObjectUtils.isEmpty(voucher))
             throw new NotFoundGlobalException("Không tìm thấy phiếu nhập "+voucherCode);
         return mapperInventoryReceiptVoucher(voucher) ;
+    }
+
+    @Override
+    public List<InventoryReceiptVoucherResponse> searchByDate(String date) {
+        String toDate = date+" 23:59:59";
+        String fromDate = date +" 00:00:00";
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        try {
+            Date parsedFromDate = dateFormat.parse(fromDate);
+            Date parsedToDate = dateFormat.parse(toDate);
+            Timestamp from = new Timestamp(parsedFromDate.getTime());
+            Timestamp to = new Timestamp(parsedToDate.getTime());
+            List<InventoryReceiptVoucherResponse> responseList = receiptVoucherRepository.searchByDate(from,to).stream()
+                    .map(item->mapperInventoryReceiptVoucher(item)).collect(Collectors.toList());
+            return responseList;
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public InventoryReceiptVoucherResponse mapperInventoryReceiptVoucher(InventoryReceiptVoucher inventoryReceiptVoucher) {

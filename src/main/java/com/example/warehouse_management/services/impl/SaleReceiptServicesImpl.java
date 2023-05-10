@@ -7,6 +7,7 @@ import com.example.warehouse_management.models.selling.SaleDetail;
 import com.example.warehouse_management.models.selling.SaleDetailPK;
 import com.example.warehouse_management.models.selling.SaleReceipt;
 import com.example.warehouse_management.models.type.EStatusOfPurchasingGoods;
+import com.example.warehouse_management.models.type.EStatusOfSellingGoods;
 import com.example.warehouse_management.models.warehouse.BinPosition;
 import com.example.warehouse_management.payload.request.goods.GoodsToSaleRequest;
 import com.example.warehouse_management.payload.request.sale.SaleReceiptRequest;
@@ -21,6 +22,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
+import java.sql.Timestamp;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
@@ -69,7 +72,7 @@ public class SaleReceiptServicesImpl implements SaleReceiptServices {
             saleDetail.setSaleReceipt(saveSaleReceipt);
             saleDetail.setQuantitySale(goodsRequest.getQuantity());
             saleDetail.setQuantityRemaining(goodsRequest.getQuantity());
-            saleDetail.setStatus(EStatusOfPurchasingGoods.NOT_YET_CREATED);
+            saleDetail.setStatus(EStatusOfSellingGoods.NOT_YET_CREATED);
             saleDetailRepository.save(saleDetail);
             saleDetails.add(saleDetail);
 
@@ -99,16 +102,27 @@ public class SaleReceiptServicesImpl implements SaleReceiptServices {
     }
 
     @Override
-    public String cancelSaleReceipt(String saleReceiptCode) {
-        SaleReceipt saleReceipt = findSaleReceiptByCode(saleReceiptCode);
-        saleReceipt.setCanceled(true);
-        saleReceiptRepository.save(saleReceipt);
-        return "Success!";
+    public List<SaleReceiptResponse> searchByDate(String date) {
+        String toDate = date + " 23:59:59";
+        String fromDate = date + " 00:00:00";
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        try {
+            Date parsedFromDate = dateFormat.parse(fromDate);
+            Date parsedToDate = dateFormat.parse(toDate);
+            Timestamp from = new Timestamp(parsedFromDate.getTime());
+            Timestamp to = new Timestamp(parsedToDate.getTime());
+            List<SaleReceiptResponse> responseList = saleReceiptRepository.searchByCreatedDate(from, to).stream()
+                    .map(item -> mapperPurchaseReceiptResponse(item)).collect(Collectors.toList());
+            return responseList;
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private SaleReceiptResponse mapperPurchaseReceiptResponse(SaleReceipt saleReceipt){
         SaleReceiptResponse response = new SaleReceiptResponse();
         response.setCode(saleReceipt.getCode());
+        response.setCreatedDate(saleReceipt.getCreatedDate());
         response.setCreatedBy(saleReceipt.getCreatedBy().getFullName());
         response.setPartner(modelMapper.map(saleReceipt.getPartner(), PartnerResponse.class));
         Set<SaleDetailResponse> saleDetailSet = new HashSet<>();

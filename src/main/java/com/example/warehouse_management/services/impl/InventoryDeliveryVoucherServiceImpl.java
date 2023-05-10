@@ -28,6 +28,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
+import java.sql.Timestamp;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -168,8 +170,28 @@ public class InventoryDeliveryVoucherServiceImpl implements InventoryDeliveryVou
     @Override
     public List<InventoryDeliveryVoucherResponse> getAll() {
         List<InventoryDeliveryVoucherResponse> responseList = deliveryVoucherRepository.findAll().stream()
-                .map(item->mapperInventoryDeliveryVoucher(item)).collect(Collectors.toList());
+                .map(item->mapperInventoryDeliveryVoucher(item))
+                .sorted(Comparator.comparing(InventoryDeliveryVoucherResponse::getCreateDate))
+                .collect(Collectors.toList());
         return responseList;
+    }
+
+    @Override
+    public List<InventoryDeliveryVoucherResponse> searchByDate(String date) {
+        String toDate = date+" 23:59:59";
+        String fromDate = date +" 00:00:00";
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        try {
+            Date parsedFromDate = dateFormat.parse(fromDate);
+            Date parsedToDate = dateFormat.parse(toDate);
+            Timestamp from = new Timestamp(parsedFromDate.getTime());
+            Timestamp to = new Timestamp(parsedToDate.getTime());
+            List<InventoryDeliveryVoucherResponse> responseList = deliveryVoucherRepository.searchByDate(from,to).stream()
+                    .map(item->mapperInventoryDeliveryVoucher(item)).collect(Collectors.toList());
+            return responseList;
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private String generateDeliveryVoucher() {

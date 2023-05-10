@@ -23,13 +23,13 @@ public class Goods {
     private String name;
     @Enumerated(EnumType.STRING)
     private EUnit unit;
-    @Column(name = "length", columnDefinition = "FLOAT(8) CHECK (length > 0)")
+    @Column(name = "length", columnDefinition = "NUMERIC(5, 2) CHECK (length > 0)")
     private double length;
-    @Column(name = "width", columnDefinition = "FLOAT(8) CHECK (width > 0)")
+    @Column(name = "width", columnDefinition = "NUMERIC(5, 2) CHECK (width > 0)")
     private double width;
-    @Column(name = "height", columnDefinition = "FLOAT(8) CHECK (height > 0)")
+    @Column(name = "height", columnDefinition = "NUMERIC(5, 2) CHECK (height > 0)")
     private double height;
-    @Column(name = "volume", columnDefinition = "FLOAT(8) CHECK (volume > 0)")
+    @Column(name = "volume", columnDefinition = "NUMERIC(5, 2) CHECK (volume > 0)")
     private double volume;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "categoryId")
