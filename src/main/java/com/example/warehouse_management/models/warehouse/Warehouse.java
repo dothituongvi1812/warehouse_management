@@ -35,7 +35,7 @@ public class Warehouse {
     private double width;
     @Column(name = "height", columnDefinition = "NUMERIC(5, 2) CHECK (height > 0)")
     private double height;
-    @Column(name = "volume", columnDefinition = "NUMERIC(5, 2) CHECK (volume > 0)")
+    @Column(name = "volume", columnDefinition = "FLOAT(8) CHECK (volume > 0)")
     private double volume;
     @Column(name = "acreage", columnDefinition = "NUMERIC(5, 2) CHECK (acreage > 0)")
     private double acreage;

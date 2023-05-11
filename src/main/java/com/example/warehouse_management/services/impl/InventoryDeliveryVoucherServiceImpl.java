@@ -54,8 +54,6 @@ public class InventoryDeliveryVoucherServiceImpl implements InventoryDeliveryVou
     @Override
     public InventoryDeliveryVoucherResponse createInventoryDeliveryVoucher(String saleReceiptCode,DeliveryVoucherRequest deliveryVoucherRequest) {
         SaleReceipt saleReceipt = saleReceiptServices.findSaleReceiptByCode(saleReceiptCode);
-        if(saleReceipt.isCanceled()==true)
-            throw new ErrorException(String.format("Phiếu bán %s đã bị huỷ",saleReceiptCode));
         InventoryDeliveryVoucher inventoryDeliveryVoucher = new InventoryDeliveryVoucher();
         inventoryDeliveryVoucher.setSaleReceipt(saleReceipt);
         User user = userRepository.findUserByEmail(deliveryVoucherRequest.getEmail());
@@ -118,11 +116,14 @@ public class InventoryDeliveryVoucherServiceImpl implements InventoryDeliveryVou
     @Override
     public List<BinPositionResponse> exportGoods(String deliveryVoucherCode) {
         InventoryDeliveryVoucher inventoryDeliveryVoucher = deliveryVoucherRepository.findByCode(deliveryVoucherCode);
+        if (ObjectUtils.isEmpty(inventoryDeliveryVoucher))
+            throw new NotFoundGlobalException("Không tìm thấy phiếu xuất "+ deliveryVoucherCode);
+        if(inventoryDeliveryVoucher.isCanceled()==true)
+            throw new ErrorException("Phiếu xuất" + deliveryVoucherCode + "đã bị huỷ");
         if(inventoryDeliveryVoucher.getStatus().equals(EStatusOfVoucher.EXPORTED))
             throw new ErrorException("Phiếu xuất" + deliveryVoucherCode + "đã được xuất");
         List<BinPosition> binList = new ArrayList<>();
-        if (ObjectUtils.isEmpty(inventoryDeliveryVoucher))
-            throw new NotFoundGlobalException("Không tìm thấy phiếu xuất "+ deliveryVoucherCode);
+
         inventoryDeliveryVoucher.setExportedDate(new Date());
         inventoryDeliveryVoucher.setStatus(EStatusOfVoucher.EXPORTED);
         for (InventoryDeliveryVoucherDetail detail:inventoryDeliveryVoucher.getInventoryDeliveryVoucherDetails()) {
@@ -192,6 +193,16 @@ public class InventoryDeliveryVoucherServiceImpl implements InventoryDeliveryVou
         } catch (ParseException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public boolean cancelInventoryDeliveryVoucherByCode(String code) {
+        InventoryDeliveryVoucher deliveryVoucher = deliveryVoucherRepository.findByCode(code);
+        if(ObjectUtils.isEmpty(deliveryVoucher))
+            throw new NotFoundGlobalException("Không tìm thấy phiếu xuất "+deliveryVoucher);
+        deliveryVoucher.setCanceled(true);
+        deliveryVoucherRepository.save(deliveryVoucher);
+        return true;
     }
 
     private String generateDeliveryVoucher() {

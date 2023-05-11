@@ -17,4 +17,5 @@ public interface InventoryReceiptServices {
     public List<InventoryReceiptVoucher> getAll();
     public InventoryReceiptVoucherResponse getReceiptVoucherByCode(String voucherCode);
     public List<InventoryReceiptVoucherResponse> searchByDate(String date);
+    public boolean cancelInventoryReceiptVoucherByCode(String code);
 }

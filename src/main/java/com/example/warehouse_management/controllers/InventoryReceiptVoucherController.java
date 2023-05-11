@@ -53,5 +53,9 @@ public class InventoryReceiptVoucherController {
     public ResponseEntity<List<InventoryReceiptVoucherResponse>> searchByDate(@PathVariable String date){
         return new ResponseEntity<>(inventoryReceiptServices.searchByDate(date),HttpStatus.OK);
     }
+    @PostMapping("/cancel/{receiptVoucherCode}")
+    public ResponseEntity<Boolean> cancelInventoryReceiptVoucherByCode(@PathVariable String receiptVoucherCode){
+        return new ResponseEntity<>(inventoryReceiptServices.cancelInventoryReceiptVoucherByCode(receiptVoucherCode),HttpStatus.OK);
+    }
 
 }

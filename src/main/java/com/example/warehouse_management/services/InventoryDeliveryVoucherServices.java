@@ -14,5 +14,6 @@ public interface InventoryDeliveryVoucherServices {
     public Page<InventoryDeliveryVoucherResponse> getPageSortedByDate(Integer page, Integer size);
     public List<InventoryDeliveryVoucherResponse> getAll();
     public List<InventoryDeliveryVoucherResponse> searchByDate(String date);
+    public boolean cancelInventoryDeliveryVoucherByCode(String code);
 
 }

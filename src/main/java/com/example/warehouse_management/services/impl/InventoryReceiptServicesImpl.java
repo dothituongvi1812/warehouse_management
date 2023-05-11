@@ -125,10 +125,13 @@ public class InventoryReceiptServicesImpl implements InventoryReceiptServices {
     public List<BinPositionResponse> putTheGoodsOnShelf(String receiptVoucherCode) {
         List<BinPosition> binList = new ArrayList<>();
         InventoryReceiptVoucher inventoryReceiptVoucher = receiptVoucherRepository.findByCode(receiptVoucherCode);
-        if(inventoryReceiptVoucher.getStatus().equals(EStatusOfVoucher.IMPORTED))
-            throw new ErrorException("Phiếu nhập "+inventoryReceiptVoucher.getCode() + "đã được nhập hàng lên kệ");
         if (ObjectUtils.isEmpty(inventoryReceiptVoucher))
             throw new NotFoundGlobalException("Không tìm thấy phiếu nhập " + receiptVoucherCode);
+        if(inventoryReceiptVoucher.isCanceled()==true)
+            throw new ErrorException(String.format("Phiếu nhập có mã %s đã bị huỷ",receiptVoucherCode));
+        if(inventoryReceiptVoucher.getStatus().equals(EStatusOfVoucher.IMPORTED))
+            throw new ErrorException("Phiếu nhập "+inventoryReceiptVoucher.getCode() + "đã được nhập hàng lên kệ");
+
         inventoryReceiptVoucher.setImportedDate(new Date());
         inventoryReceiptVoucher.setStatus(EStatusOfVoucher.IMPORTED);
         for (InventoryReceiptVoucherDetail detail : inventoryReceiptVoucher.getInventoryReceiptVoucherDetails()) {
@@ -206,6 +209,16 @@ public class InventoryReceiptServicesImpl implements InventoryReceiptServices {
         } catch (ParseException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public boolean cancelInventoryReceiptVoucherByCode(String code) {
+        InventoryReceiptVoucher receiptVoucher = receiptVoucherRepository.findInventoryReceiptVoucherByCode(code);
+        if(ObjectUtils.isEmpty(receiptVoucher))
+            throw new NotFoundGlobalException("Không tìm thấy phiếu nhập "+receiptVoucher);
+        receiptVoucher.setCanceled(true);
+        receiptVoucherRepository.save(receiptVoucher);
+        return true;
     }
 
     public InventoryReceiptVoucherResponse mapperInventoryReceiptVoucher(InventoryReceiptVoucher inventoryReceiptVoucher) {
