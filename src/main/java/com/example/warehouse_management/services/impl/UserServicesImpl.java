@@ -147,7 +147,7 @@ public class UserServicesImpl implements UserServices {
                 + "Cảm ơn,<br>"
                 + "KHO QUẢN LÝ HÀNG HÓA A.";
         String jwt = jwtUtils.generateJwtToken(user);
-        String url="http://localhost:3000/doi-mat-khau?token=%s";
+        String url="https://warehouse-management-git-dev-tuananh-tuananhitgr-gmailcom.vercel.app/doi-mat-khau?token=%s";
         String urlFormat=String.format(url,jwt);
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message);

@@ -170,9 +170,14 @@ public class BinLocationServicesImpl implements BinLocationServices {
 
     @Override
     public List<BinPositionResponse> getAll() {
-        List<BinPositionResponse> responseList = binLocationRepository.findAll().stream().
-                map(rowLocation -> mapperRowLocationResponse(rowLocation))
+         binLocationRepository.findAll().stream()
+                .forEach(this::updateStatusForBin);
+        List<BinPositionResponse> responseList = binLocationRepository.findAll().stream()
+                .map(rowLocation -> mapperRowLocationResponse(rowLocation))
                 .collect(Collectors.toList());
+
+
+
         return responseList;
     }
 
@@ -218,14 +223,23 @@ public class BinLocationServicesImpl implements BinLocationServices {
 
     @Override
     public String moveBin(String fromBinLocationCode, BinLocationMoveToRequest binLocationMoveToRequest) {
-        BinPosition fromBinPosition = findRowLocationByCode(fromBinLocationCode);
         BinPosition toBinPosition = findRowLocationByCode(binLocationMoveToRequest.getToBinLocationCode());
+        if(toBinPosition.getStatus().equals(EStatusStorage.FULL))
+            throw new ErrorException(String.format("Vị trí %s đã đầy",toBinPosition.getCode()));
+        BinPosition fromBinPosition = findRowLocationByCode(fromBinLocationCode);
+
         if (!ObjectUtils.isEmpty(toBinPosition.getGoods())) {
-            if (fromBinPosition.getGoods().equals(toBinPosition.getGoods())) {
-                throw new ErrorException("Vị trí có mã " + fromBinPosition.getCode() + " đang chứa sản phẩm" + fromBinPosition.getGoods().getCode());
+            if (!fromBinPosition.getGoods().getCode().equals(toBinPosition.getGoods().getCode())) {
+                throw new ErrorException("Vị trí có mã " + fromBinPosition.getCode() + " đang chứa sản phẩm " + fromBinPosition.getGoods().getCode());
             }
-        } else {
+        }
+        else {
+            fromBinPosition.setGoods(null);
             toBinPosition.setGoods(fromBinPosition.getGoods());
+            int maxCapacity= (int) (toBinPosition.getVolume()/fromBinPosition.getGoods().getVolume());
+            toBinPosition.setMaxCapacity(maxCapacity);
+            toBinPosition.setStatus(EStatusStorage.AVAILABLE);
+
         }
         int quantity = binLocationMoveToRequest.getQuantity();
         double volumeGoods = quantity * toBinPosition.getGoods().getVolume();
@@ -233,9 +247,11 @@ public class BinLocationServicesImpl implements BinLocationServices {
         toBinPosition.setRemainingVolume(toBinPosition.getRemainingVolume() - volumeGoods);
         fromBinPosition.setCurrentCapacity(fromBinPosition.getCurrentCapacity() - quantity);
         fromBinPosition.setRemainingVolume(fromBinPosition.getRemainingVolume() + volumeGoods);
+        if(fromBinPosition.getCurrentCapacity()==0)
+            fromBinPosition.setStatus(EStatusStorage.EMPTY);
         List<BinPosition> binPositionList = Arrays.asList(toBinPosition, fromBinPosition);
         binLocationRepository.saveAll(binPositionList);
-        return "Dời thành công từ vị trí" + fromBinLocationCode + " sang vị trí " + toBinPosition.getCode();
+        return "Dời thành công từ vị trí " + fromBinLocationCode + " sang vị trí " + toBinPosition.getCode();
     }
 
     @Override
@@ -317,5 +333,11 @@ public class BinLocationServicesImpl implements BinLocationServices {
         else
             binPositionResponseMapper.setGoods(goodsServices.mapperGoods(binPosition.getGoods()));
         return binPositionResponseMapper;
+    }
+    private void updateStatusForBin(BinPosition bin){
+        if (bin.getCurrentCapacity() == bin.getMaxCapacity()){
+            bin.setStatus(EStatusStorage.FULL);
+            binLocationRepository.save(bin);
+        }
     }
 }
