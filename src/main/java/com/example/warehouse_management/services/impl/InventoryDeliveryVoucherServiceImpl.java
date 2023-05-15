@@ -1,5 +1,6 @@
 package com.example.warehouse_management.services.impl;
 
+import com.amazonaws.util.CollectionUtils;
 import com.example.warehouse_management.exception.ErrorException;
 import com.example.warehouse_management.exception.NotFoundGlobalException;
 import com.example.warehouse_management.models.goods.Goods;
@@ -62,31 +63,39 @@ public class InventoryDeliveryVoucherServiceImpl implements InventoryDeliveryVou
         List<GoodsDelivery> goodsDeliveryList = deliveryVoucherRequest.getGoodsRequests().stream()
                 .map(item->new GoodsDelivery(goodsServices.findGoodByCode(item.getGoodCode()), item.getQuantity())).collect(Collectors.toList());
         for (GoodsDelivery goodDelivery:goodsDeliveryList) {
-            //tìm những vị trí sao cho số lượng current >=quantity request
-            int sumQuantityOfGoods= binLocationServices.getSumCurrentCapacityByGoodsName(goodDelivery.getGoods().getName()).intValue();
-            if(goodDelivery.getQuantity()>sumQuantityOfGoods){
-                throw new ErrorException("Không đủ số lượng để xuất");
+            //tìm 1 vị trí đủ để xuất
+            BinPosition binPosition = binLocationServices.findOnePosition(goodDelivery.getQuantity(),goodDelivery.getGoods().getCode());
+            if(!ObjectUtils.isEmpty(binPosition)){
+                rowLocationGoodsDeliveryTempList.add(new RowLocationGoodsDeliveryTemp(binPosition,goodDelivery));
             }
-
-            List<BinPosition> binList = binLocationServices.findAllByGoodsNameEnoughToExport(goodDelivery.getGoods().getName(),goodDelivery.getQuantity());
-            for (BinPosition rl: binList) {
-                int currentQuantity=rl.getCurrentCapacity();
-                if(currentQuantity>=goodDelivery.getQuantity()){
-                    System.out.println("Tao phieu xuat");
-                    rowLocationGoodsDeliveryTempList.add(new RowLocationGoodsDeliveryTemp(rl,goodDelivery));
-                }else{
-                    if(sumQuantityOfGoods<rl.getCurrentCapacity()) {
-                        GoodsDelivery goodsDelivery = new GoodsDelivery(goodDelivery.getGoods(),sumQuantityOfGoods);
-                        rowLocationGoodsDeliveryTempList.add(new RowLocationGoodsDeliveryTemp(rl,goodsDelivery));
+            else{
+                //tìm những vị trí sao cho số lượng current >=quantity request
+                int sumQuantityOfGoods= binLocationServices.getSumCurrentCapacityByGoodsName(goodDelivery.getGoods().getName()).intValue();
+                if(goodDelivery.getQuantity()>sumQuantityOfGoods){
+                    throw new ErrorException("Không đủ số lượng để xuất");
+                }
+                List<BinPosition> binList = binLocationServices.findAllByGoodsNameEnoughToExport(goodDelivery.getGoods().getName(),goodDelivery.getQuantity());
+                for (BinPosition rl: binList) {
+                    int currentQuantity=rl.getCurrentCapacity();
+                    if(currentQuantity>=goodDelivery.getQuantity()){
+                        System.out.println("Tao phieu xuat");
+                        rowLocationGoodsDeliveryTempList.add(new RowLocationGoodsDeliveryTemp(rl,goodDelivery));
                     }else{
-                        GoodsDelivery goodsDelivery = new GoodsDelivery(goodDelivery.getGoods(),currentQuantity);
-                        rowLocationGoodsDeliveryTempList.add(new RowLocationGoodsDeliveryTemp(rl,goodsDelivery));
-                        sumQuantityOfGoods = sumQuantityOfGoods -goodDelivery.getQuantity();
+                        if(sumQuantityOfGoods<rl.getCurrentCapacity()) {
+                            GoodsDelivery goodsDelivery = new GoodsDelivery(goodDelivery.getGoods(),sumQuantityOfGoods);
+                            rowLocationGoodsDeliveryTempList.add(new RowLocationGoodsDeliveryTemp(rl,goodsDelivery));
+                        }else{
+                            GoodsDelivery goodsDelivery = new GoodsDelivery(goodDelivery.getGoods(),currentQuantity);
+                            rowLocationGoodsDeliveryTempList.add(new RowLocationGoodsDeliveryTemp(rl,goodsDelivery));
+                            sumQuantityOfGoods = sumQuantityOfGoods -goodDelivery.getQuantity();
+                        }
+
                     }
 
                 }
 
             }
+
             saleReceipt.getSaleDetails().stream().forEach(e->{
                 if(e.getGoods().equals(goodDelivery.getGoods())){
                     e.setQuantityRemaining(e.getQuantityRemaining()-goodDelivery.getQuantity());
@@ -106,7 +115,6 @@ public class InventoryDeliveryVoucherServiceImpl implements InventoryDeliveryVou
             inventoryDeliveryVoucherDetail.setBinPosition(item.getBinPosition());
             inventoryDeliveryVoucherDetail.setInventoryDeliveryVoucherDetailPK(new InventoryDeliveryVoucherDetailPK(item.getGoodsDelivery().getGoods().getId(),deliveryVoucherSave.getId(),item.getBinPosition().getId()));
             inventoryDeliveryVoucherDetail.setInventoryDeliveryVoucher(deliveryVoucherSave);
-
             inventoryDeliveryVoucherDetails.add(inventoryDeliveryVoucherDetail);
         }
         deliveryVoucherSave.setInventoryDeliveryVoucherDetails(inventoryDeliveryVoucherDetails);
@@ -235,6 +243,7 @@ public class InventoryDeliveryVoucherServiceImpl implements InventoryDeliveryVou
         inventoryDeliveryVoucherResponse.setCreatedBy(deliveryVoucher.getCreatedBy().getFullName());
         inventoryDeliveryVoucherResponse.setDetails(detailResponseSet);
         inventoryDeliveryVoucherResponse.setStatus(status);
+        inventoryDeliveryVoucherResponse.setCanceled(deliveryVoucher.isCanceled());
         return inventoryDeliveryVoucherResponse;
     }
     private DeliveryVoucherDetailResponse mapperDeliveryVoucherDetailResponse(InventoryDeliveryVoucherDetail inventoryDeliveryVoucherDetail){

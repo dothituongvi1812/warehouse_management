@@ -72,7 +72,7 @@ public class GoodsController {
     }
     @GetMapping("/report-exported-quantity-by/{date}")
     public ResponseEntity<Map<String,Integer>> reportExportedQuantityGoodsBy(@PathVariable String date){
-        return new ResponseEntity<>(goodsServices.reportImportedQuantityGoodsByDate(date),HttpStatus.OK);
+        return new ResponseEntity<>(goodsServices.reportExportedQuantityGoodsByDate(date),HttpStatus.OK);
     }
 
 }

@@ -118,6 +118,11 @@ public interface BinLocationRepository extends CrudRepository<BinPosition,Long> 
             "where w.code =:codeWarehouse \n" +
             "and cl.code like  '%' || :columnCode || '%' ")
     List<BinPosition> filterByColumnCode(String columnCode, String codeWarehouse);
+    @Query(nativeQuery = true,value = "select * from bin_positions bp \n" +
+            "join goods g on bp.goods_id = g.id \n" +
+            "where bp.current_capacity >=:quantity and g.code =:goodsCode\n" +
+            "limit 1")
+    BinPosition findOne(int quantity, String goodsCode);
 
 
 }

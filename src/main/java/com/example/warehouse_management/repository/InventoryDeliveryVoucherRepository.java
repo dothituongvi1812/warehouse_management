@@ -22,4 +22,5 @@ public interface InventoryDeliveryVoucherRepository extends CrudRepository<Inven
     @Query(nativeQuery = true,value = "select * from inventory_delivery_vouchers idv \n" +
             "where idv .create_date between :from and :to")
     List<InventoryDeliveryVoucher> searchByDate(Timestamp from, Timestamp to);
+
 }

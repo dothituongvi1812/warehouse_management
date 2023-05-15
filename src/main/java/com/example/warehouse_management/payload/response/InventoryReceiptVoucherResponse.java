@@ -21,4 +21,5 @@ public class InventoryReceiptVoucherResponse {
     private PartnerResponse partner;
     private Date createDate;
     private String status;
+    private boolean isCanceled;
 }

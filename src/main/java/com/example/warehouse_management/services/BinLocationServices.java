@@ -32,4 +32,5 @@ public interface BinLocationServices {
     List<BinPositionResponse> search(String keyword, String codeWarehouse);
     List<BinPositionResponse> filterByColumnLocationCode(String columnCode, String codeWarehouse);
     boolean checkRemainingVolumeForGoodsByBinCode(String binCode,GoodsCheckedRequest goodsCheckedRequest);
+    BinPosition findOnePosition(int quanity, String goodsCode);
 }

@@ -101,10 +101,18 @@ public class UserServicesImpl implements UserServices {
                                 .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
                         roles.add(adminRole);
                         break;
-                    default:
+                    case "user":
+                    case "USER":
+                    case "User":
                         Role userRole = roleRepository.findByName(ERole.USER)
                                 .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
                         roles.add(userRole);
+                        break;
+                    default:
+                        Role systemRole = roleRepository.findByName(ERole.SYSTEM_MANAGER)
+                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+                        roles.add(systemRole);
+
                 }
 
         }
@@ -181,7 +189,7 @@ public class UserServicesImpl implements UserServices {
                         roles.add(adminRole);
                         break;
                     default:
-                        Role userRole = roleRepository.findByName(ERole.USER)
+                        Role userRole = roleRepository.findByName(ERole.ADMIN)
                                 .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
                         roles.add(userRole);
                 }

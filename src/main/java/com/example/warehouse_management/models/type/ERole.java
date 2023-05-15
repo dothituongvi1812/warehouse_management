@@ -2,5 +2,6 @@ package com.example.warehouse_management.models.type;
 
 public enum ERole {
     USER,
-    ADMIN
+    ADMIN,
+    SYSTEM_MANAGER,
 }

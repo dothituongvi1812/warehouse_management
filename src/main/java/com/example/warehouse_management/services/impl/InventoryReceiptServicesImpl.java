@@ -235,6 +235,7 @@ public class InventoryReceiptServicesImpl implements InventoryReceiptServices {
         InventoryReceiptVoucherResponse response = modelMapper.map(inventoryReceiptVoucher, InventoryReceiptVoucherResponse.class);
         response.setCreatedBy(inventoryReceiptVoucher.getCreatedBy().getFullName());
         response.setStatus(status);
+        response.setCanceled(inventoryReceiptVoucher.isCanceled());
         response.setPartner(modelMapper.map(inventoryReceiptVoucher.getPurchaseReceipt().getPartner(), PartnerResponse.class));
         Set<ReceiptVoucherDetailResponse> detailResponseSet = inventoryReceiptVoucher
                 .getInventoryReceiptVoucherDetails().stream().map(item -> mapperReceiptVoucherDetailResponse(item))

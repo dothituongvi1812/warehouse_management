@@ -287,6 +287,12 @@ public class BinLocationServicesImpl implements BinLocationServices {
         return true;
     }
 
+    @Override
+    public BinPosition findOnePosition(int quantity, String goodsCode) {
+        BinPosition binPosition = binLocationRepository.findOne(quantity,goodsCode);
+        return binPosition;
+    }
+
     private String generateRowLocationName(int numberRow) {
         String name = "";
         switch (numberRow) {
