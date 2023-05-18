@@ -38,9 +38,9 @@ public class GoodsController {
         return new ResponseEntity(goodsServices.getByCode(code),HttpStatus.OK);
     }
     @GetMapping("/search/{keyword}")
-    public ResponseEntity<List<GoodsResponse>> searchByCodeOrName(@PathVariable String keyword){
+    public ResponseEntity<Page<GoodsResponse>> searchByCodeOrName(@PathVariable String keyword,@RequestParam Integer page, @RequestParam Integer size){
         logger.info("/search/"+keyword);
-        return new ResponseEntity(goodsServices.searchByCodeOrName(keyword),HttpStatus.OK);
+        return new ResponseEntity(goodsServices.searchByCodeOrName(keyword,page,size),HttpStatus.OK);
     }
     @GetMapping("/get-all-by/{categoryCode}")
     public ResponseEntity<List<GoodsResponse>> getAllByCategoryCode(@PathVariable String categoryCode ){
@@ -67,12 +67,28 @@ public class GoodsController {
         return new ResponseEntity<>(goodsServices.updateGoods(goodsCode,updateGoodsRequest),HttpStatus.OK);
     }
     @GetMapping("/report-imported-quantity-by/{date}")
-    public ResponseEntity<Map<String,Integer>> reportImportedQuantityGoodsBy(@PathVariable String date){
+    public ResponseEntity<Map<String,Integer>> reportImportedQuantityGoodsByDate(@PathVariable String date){
         return new ResponseEntity<>(goodsServices.reportImportedQuantityGoodsByDate(date),HttpStatus.OK);
     }
     @GetMapping("/report-exported-quantity-by/{date}")
-    public ResponseEntity<Map<String,Integer>> reportExportedQuantityGoodsBy(@PathVariable String date){
+    public ResponseEntity<Map<String,Integer>> reportExportedQuantityGoodsByDate(@PathVariable String date){
         return new ResponseEntity<>(goodsServices.reportExportedQuantityGoodsByDate(date),HttpStatus.OK);
+    }
+    @GetMapping("/report-total-quantity-imported-by-period")
+    public ResponseEntity<Map<String,Integer>> reportTotalQuantityImportedByPeriod(@RequestParam(required = false) String fromDate,@RequestParam(required = false) String toDate){
+        return new ResponseEntity<>(goodsServices.reportSumQuantityImportedByPeriod(fromDate,toDate),HttpStatus.OK);
+    }
+    @GetMapping("/report-total-quantity-exported-by-period")
+    public ResponseEntity<Map<String,Integer>> reportTotalQuantityExportedByPeriod(@RequestParam(required = false) String fromDate,@RequestParam(required = false) String toDate){
+        return new ResponseEntity<>(goodsServices.reportSumQuantityExportedByPeriod(fromDate,toDate),HttpStatus.OK);
+    }
+    @GetMapping("/statistic-of-the-most-imported-products-by/{month}")
+    public ResponseEntity<Map<String,Integer>> statisticOfTheMostImportedProducts(@PathVariable int month){
+        return new ResponseEntity<>(goodsServices.statisticOfTheMostImportedProducts(month),HttpStatus.OK);
+    }
+    @GetMapping("/statistic-of-the-most-exported-products-by/{month}")
+    public ResponseEntity<Map<String,Integer>> statisticOfTheMostExportedProducts(@PathVariable int month){
+        return new ResponseEntity<>(goodsServices.statisticOfTheMostExportedProducts(month),HttpStatus.OK);
     }
 
 }

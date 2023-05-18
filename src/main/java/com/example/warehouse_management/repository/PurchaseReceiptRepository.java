@@ -17,4 +17,11 @@ public interface PurchaseReceiptRepository extends CrudRepository<PurchaseReceip
     @Query(nativeQuery = true,value = "select * from purchase_receipts pr \n" +
             "where pr.created_date between :from and :to")
     List<PurchaseReceipt> searchByCreatedDate(Timestamp from, Timestamp to);
+    @Query(nativeQuery = true,value = "select * from purchase_receipts pr \n" +
+            "where pr.code like '%' || :code || '%'")
+    List<PurchaseReceipt> searchByCode(String code);
+    @Query(nativeQuery = true,value = "select pr.* from purchase_receipts pr     \n" +
+            "join users u on pr.created_by = u.id \n" +
+            "where u.full_name like '%' || :createdBy || '%'")
+    List<PurchaseReceipt> searchByCreatedBy(String createdBy);
 }

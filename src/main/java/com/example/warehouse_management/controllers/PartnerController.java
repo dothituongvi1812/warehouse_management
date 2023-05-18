@@ -54,8 +54,8 @@ public class PartnerController {
         return new ResponseEntity(partnerServices.updatePartner(partnerCode,updatePartnerRequest),HttpStatus.OK);
     }
     @GetMapping("/search/{keyword}")
-    public ResponseEntity<List<PartnerResponse>> searchByCodeOrNameOrPhone(@PathVariable String keyword){
+    public ResponseEntity<Page<PartnerResponse>> searchByCodeOrNameOrPhone(@PathVariable String keyword,@RequestParam Integer page, @RequestParam Integer size){
         logger.info("/search/"+keyword);
-        return new ResponseEntity(partnerServices.search(keyword),HttpStatus.OK);
+        return new ResponseEntity(partnerServices.search(keyword,page, size),HttpStatus.OK);
     }
 }

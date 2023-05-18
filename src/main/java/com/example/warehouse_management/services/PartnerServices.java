@@ -18,6 +18,6 @@ public interface PartnerServices {
     Partner findPartnerByPhone(String phone);
     Partner findPartnerByCode(String partnerCode);
     PartnerResponse updatePartner(String partnerCode, UpdatePartnerRequest request);
-    List<PartnerResponse> search(String keyword);
+    Page<PartnerResponse> search(String keywor,Integer page, Integer size);
 
 }

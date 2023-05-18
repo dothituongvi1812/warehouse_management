@@ -29,7 +29,7 @@ public interface BinLocationServices {
     public List<BinPositionResponse> getAllRowLocationByWarehouseCode(String codeWarehouse);
     List<BinPositionResponse> getAllUsablePositionForGoods(String warehouseCode, GoodsCreatedReceiptVoucherRequest request);
     String moveBin(String fromBinLocationCode, BinLocationMoveToRequest binLocationMoveToRequest);
-    List<BinPositionResponse> search(String keyword, String codeWarehouse);
+    Page<BinPositionResponse> search(String keyword, String codeWarehouse,Integer page, Integer size);
     List<BinPositionResponse> filterByColumnLocationCode(String columnCode, String codeWarehouse);
     boolean checkRemainingVolumeForGoodsByBinCode(String binCode,GoodsCheckedRequest goodsCheckedRequest);
     BinPosition findOnePosition(int quanity, String goodsCode);

@@ -51,9 +51,10 @@ public class InventoryDeliveryVoucherController {
         logger.info("/api/delivery-voucher/get-all");
         return new ResponseEntity(inventoryDeliveryVoucherServices.getAll(),HttpStatus.OK);
     }
-    @GetMapping("/search-by/{date}")
-    public ResponseEntity<List<InventoryDeliveryVoucherResponse>> searchByDate(@PathVariable String date){
-        return new ResponseEntity<>(inventoryDeliveryVoucherServices.searchByDate(date),HttpStatus.OK);
+    @GetMapping("/search-by/")
+    public ResponseEntity<Page<InventoryDeliveryVoucherResponse>> searchByDateOrCodeOrCreatedBy(@RequestParam(required = false) String date,@RequestParam(required = false) String code, @RequestParam(required = false) String createdBy,
+                                                                                                @RequestParam(required = true) Integer page, @RequestParam(required = true) Integer size){
+        return new ResponseEntity<>(inventoryDeliveryVoucherServices.searchByDateOrCodeOrCreatedBy(date,code,createdBy,page,size),HttpStatus.OK);
     }
 
     @PostMapping("/cancel/{receiptVoucherCode}")

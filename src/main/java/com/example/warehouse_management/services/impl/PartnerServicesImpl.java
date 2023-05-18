@@ -4,6 +4,7 @@ import com.example.warehouse_management.exception.NotFoundGlobalException;
 import com.example.warehouse_management.models.partner.Partner;
 import com.example.warehouse_management.payload.request.partner.PartnerRequest;
 import com.example.warehouse_management.payload.request.partner.UpdatePartnerRequest;
+import com.example.warehouse_management.payload.response.GoodsResponse;
 import com.example.warehouse_management.payload.response.PartnerResponse;
 import com.example.warehouse_management.repository.PartnerRepository;
 import com.example.warehouse_management.services.PartnerServices;
@@ -116,11 +117,13 @@ public class PartnerServicesImpl implements PartnerServices {
     }
 
     @Override
-    public List<PartnerResponse> search(String keyword) {
+    public Page<PartnerResponse> search(String keyword,Integer page, Integer size) {
+        Pageable pageable = PageRequest.of(page, size);
         List<PartnerResponse> partnerResponseList = partnerRepository.search(keyword).stream()
                 .map(e->modelMapper.map(e, PartnerResponse.class))
                 .collect(Collectors.toList());
-        return partnerResponseList;
+        Page<PartnerResponse> pages = new PageImpl<>(partnerResponseList, pageable, partnerResponseList.size());
+        return pages;
     }
 
     private String generatePartnerCode(){

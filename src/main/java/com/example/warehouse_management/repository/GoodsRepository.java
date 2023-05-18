@@ -48,5 +48,32 @@ public interface GoodsRepository extends CrudRepository<Goods,Long> {
             "where idv.status ='EXPORTED' and idv.exported_date BETWEEN :from AND :to\n" +
             "group by g.\"name\"" )
     List<Object[]>reportExportedQuantityGoodsByDate(Timestamp from, Timestamp to);
-
+    @Query(nativeQuery = true,value = "select g.\"name\",sum(irvd.quantity)  from inventory_receipt_vouchers irv \n" +
+            "join inventory_receipt_voucher_details irvd on irv.id = irvd.inventory_receipt_voucher_id \n" +
+            "join goods g on g.id = irvd.goods_id \n" +
+            "where irv.status = 'IMPORTED' and irv.imported_date between :fromDate  and :toDate\n" +
+            "group by g.\"name\" ")
+    List<Object[]>reportSumQuantityImportedByPeriod(Timestamp fromDate, Timestamp toDate);
+    @Query(nativeQuery = true,value = "select g.\"name\",sum(idvd.quantity)  from inventory_delivery_vouchers idv \n" +
+            "join inventory_delivery_voucher_details idvd on idv.id = idvd.delivery_voucher_id \n" +
+            "join goods g on g.id = idvd.goods_id \n" +
+            "where idv.status = 'EXPORTED' and idv.exported_date  between :fromDate  and :toDate\n" +
+            "group by g.\"name\"")
+    List<Object[]>reportSumQuantityExportedByPeriod(Timestamp fromDate, Timestamp toDate);
+    @Query(nativeQuery = true,value = "select g.\"name\" ,sum(irvd.quantity) as total  from inventory_receipt_vouchers irv \n" +
+            "join inventory_receipt_voucher_details irvd on irv.id = irvd.inventory_receipt_voucher_id \n" +
+            "join goods g on g.id = irvd.goods_id \n" +
+            "where irv.status ='IMPORTED' and EXTRACT(MONTH FROM irv.imported_date) =:month\n" +
+            "group by g.\"name\" \n" +
+            "order by total desc \n" +
+            "limit 5")
+    List<Object[]>statisticOfTheMostImportedProducts(int month);
+    @Query(nativeQuery = true,value = "select g.\"name\" ,sum(idvd.quantity) as total  from inventory_delivery_vouchers idv \n" +
+            "join inventory_delivery_voucher_details idvd on idv.id = idvd.delivery_voucher_id \n" +
+            "join goods g on g.id = idvd.goods_id \n" +
+            "where idv.status ='EXPORTED' and EXTRACT(MONTH FROM idv.exported_date) =:month\n" +
+            "group by g.\"name\" \n" +
+            "order by total desc \n" +
+            "limit 5")
+    List<Object[]>statisticOfTheMostExportedProducts(int month);
 }

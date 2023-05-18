@@ -4,6 +4,7 @@ import com.example.warehouse_management.payload.request.delivery.DeliveryVoucher
 import com.example.warehouse_management.payload.response.InventoryDeliveryVoucherResponse;
 import com.example.warehouse_management.payload.response.BinPositionResponse;
 import org.springframework.data.domain.Page;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -13,7 +14,7 @@ public interface InventoryDeliveryVoucherServices {
     InventoryDeliveryVoucherResponse getDeliveryVoucherByCode(String deliveryVoucherCode);
     public Page<InventoryDeliveryVoucherResponse> getPageSortedByDate(Integer page, Integer size);
     public List<InventoryDeliveryVoucherResponse> getAll();
-    public List<InventoryDeliveryVoucherResponse> searchByDate(String date);
+    public Page<InventoryDeliveryVoucherResponse> searchByDateOrCodeOrCreatedBy(String date, String code, String createdBy, Integer page, Integer size);
     public boolean cancelInventoryDeliveryVoucherByCode(String code);
 
 }

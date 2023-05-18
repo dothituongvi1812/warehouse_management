@@ -14,6 +14,7 @@ import com.example.warehouse_management.payload.request.goods.GoodsCheckedReques
 import com.example.warehouse_management.payload.request.goods.GoodsCreatedReceiptVoucherRequest;
 import com.example.warehouse_management.payload.request.bin.StatusRequest;
 import com.example.warehouse_management.payload.response.BinPositionResponse;
+import com.example.warehouse_management.payload.response.PartnerResponse;
 import com.example.warehouse_management.repository.ColumnLocationRepository;
 import com.example.warehouse_management.repository.BinLocationRepository;
 import com.example.warehouse_management.repository.ReceiptVoucherDetailRepository;
@@ -232,9 +233,13 @@ public class BinLocationServicesImpl implements BinLocationServices {
             if (!fromBinPosition.getGoods().getCode().equals(toBinPosition.getGoods().getCode())) {
                 throw new ErrorException("Vị trí có mã " + fromBinPosition.getCode() + " đang chứa sản phẩm " + fromBinPosition.getGoods().getCode());
             }
+            else{
+                if(binLocationMoveToRequest.getQuantity()>fromBinPosition.getCurrentCapacity()){
+                    throw new ErrorException(String.format("Vượt số lượng vị trí đang có. Số lượng hiện tại:%d",fromBinPosition.getCurrentCapacity()));
+                }
+            }
         }
         else {
-            fromBinPosition.setGoods(null);
             toBinPosition.setGoods(fromBinPosition.getGoods());
             int maxCapacity= (int) (toBinPosition.getVolume()/fromBinPosition.getGoods().getVolume());
             toBinPosition.setMaxCapacity(maxCapacity);
@@ -247,21 +252,25 @@ public class BinLocationServicesImpl implements BinLocationServices {
         toBinPosition.setRemainingVolume(toBinPosition.getRemainingVolume() - volumeGoods);
         fromBinPosition.setCurrentCapacity(fromBinPosition.getCurrentCapacity() - quantity);
         fromBinPosition.setRemainingVolume(fromBinPosition.getRemainingVolume() + volumeGoods);
-        if(fromBinPosition.getCurrentCapacity()==0)
+        if(fromBinPosition.getCurrentCapacity()==0){
+            fromBinPosition.setGoods(null);
             fromBinPosition.setStatus(EStatusStorage.EMPTY);
+        }
+
         List<BinPosition> binPositionList = Arrays.asList(toBinPosition, fromBinPosition);
         binLocationRepository.saveAll(binPositionList);
         return "Dời thành công từ vị trí " + fromBinLocationCode + " sang vị trí " + toBinPosition.getCode();
     }
 
     @Override
-    public List<BinPositionResponse> search(String keyword, String codeWarehouse) {
+    public Page<BinPositionResponse> search(String keyword, String codeWarehouse,Integer page, Integer size) {
+        Pageable pageable = PageRequest.of(page, size);
         List<BinPositionResponse> binPositionResponseList = binLocationRepository
                 .search(keyword, codeWarehouse).stream().map(this::mapperRowLocationResponse)
                 .sorted(Comparator.comparing(BinPositionResponse::getCodeBin))
                 .collect(Collectors.toList());
-
-        return binPositionResponseList;
+        Page<BinPositionResponse> pages = new PageImpl<>(binPositionResponseList, pageable, binPositionResponseList.size());
+        return pages;
     }
 
     @Override

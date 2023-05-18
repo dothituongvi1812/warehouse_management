@@ -16,7 +16,7 @@ public interface GoodsServices {
     public Goods createGoods(GoodsRequest goodsRequest);
     public Page<GoodsResponse> getPage(Integer page, Integer size);
     public GoodsResponse getByCode(String code);
-    public List<GoodsResponse> searchByCodeOrName(String keyword);
+    public Page<GoodsResponse> searchByCodeOrName(String keyword,Integer page, Integer size);
     public Goods findGoodByCode(String code);
     public Goods findGoodByName(String name);
     public GoodsResponse mapperGoods(Goods goods);
@@ -27,4 +27,9 @@ public interface GoodsServices {
     public GoodsResponse updateGoods(String goodsCode, UpdateGoodsRequest updateGoodsRequest);
     public Map<String,Integer> reportImportedQuantityGoodsByDate(String date);
     public Map<String,Integer> reportExportedQuantityGoodsByDate(String date);
+    public Map<String,Integer> reportSumQuantityImportedByPeriod(String fromDate,String toDate);
+    public Map<String,Integer> reportSumQuantityExportedByPeriod(String fromDate,String toDate);
+    public Map<String,Integer> statisticOfTheMostImportedProducts(int month);
+    public Map<String,Integer> statisticOfTheMostExportedProducts(int month);
+
 }

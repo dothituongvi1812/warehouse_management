@@ -73,8 +73,8 @@ public class BinPositionController {
         return new ResponseEntity<>(binLocationServices.moveBin(fromBinLocationCode,binLocationMoveToRequest),HttpStatus.OK);
     }
     @GetMapping("/search/{keyword}")
-    public ResponseEntity<List<BinPositionResponse>> searchByCodeOrName(@PathVariable String keyword, @RequestParam("codeWarehouse") String codeWarehouse){
-        return new ResponseEntity<>(binLocationServices.search(keyword,codeWarehouse),HttpStatus.OK);
+    public ResponseEntity<Page<BinPositionResponse>> searchByCodeOrName(@PathVariable String keyword, @RequestParam("codeWarehouse") String codeWarehouse,@RequestParam Integer page, @RequestParam Integer size){
+        return new ResponseEntity<>(binLocationServices.search(keyword,codeWarehouse,page, size),HttpStatus.OK);
     }
     @GetMapping("filter-by/{columnLocationCode}")
     public ResponseEntity<List<BinPositionResponse>> filterByColumnCode(@PathVariable String columnLocationCode, @RequestParam("codeWarehouse") String codeWarehouse){

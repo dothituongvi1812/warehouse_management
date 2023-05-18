@@ -4,6 +4,8 @@ import com.amazonaws.util.CollectionUtils;
 import com.example.warehouse_management.exception.ErrorException;
 import com.example.warehouse_management.exception.NotFoundGlobalException;
 import com.example.warehouse_management.models.goods.Goods;
+import com.example.warehouse_management.models.type.EStatusOfSellingGoods;
+import com.example.warehouse_management.repository.*;
 import com.example.warehouse_management.utils.GoodsDelivery;
 import com.example.warehouse_management.models.selling.SaleReceipt;
 import com.example.warehouse_management.models.type.EStatusOfVoucher;
@@ -13,10 +15,6 @@ import com.example.warehouse_management.models.voucher.*;
 import com.example.warehouse_management.models.warehouse.BinPosition;
 import com.example.warehouse_management.payload.request.delivery.DeliveryVoucherRequest;
 import com.example.warehouse_management.payload.response.*;
-import com.example.warehouse_management.repository.InventoryDeliveryVoucherRepository;
-import com.example.warehouse_management.repository.BinLocationRepository;
-import com.example.warehouse_management.repository.SaleDetailRepository;
-import com.example.warehouse_management.repository.UserRepository;
 import com.example.warehouse_management.services.*;
 import com.example.warehouse_management.services.domain.UtillServies;
 import com.example.warehouse_management.utils.RowLocationGoodsDeliveryTemp;
@@ -50,6 +48,8 @@ public class InventoryDeliveryVoucherServiceImpl implements InventoryDeliveryVou
     SaleReceiptServices saleReceiptServices;
     @Autowired
     SaleDetailRepository saleDetailRepository;
+    @Autowired
+    SaleReceiptRepository saleReceiptRepository;
 
     private ModelMapper modelMapper = new ModelMapper();
     @Override
@@ -99,9 +99,16 @@ public class InventoryDeliveryVoucherServiceImpl implements InventoryDeliveryVou
             saleReceipt.getSaleDetails().stream().forEach(e->{
                 if(e.getGoods().equals(goodDelivery.getGoods())){
                     e.setQuantityRemaining(e.getQuantityRemaining()-goodDelivery.getQuantity());
+                    if(e.getQuantityRemaining()==0){
+                        e.setStatus(EStatusOfSellingGoods.CREATED);
+                    }
+                    else{
+                        e.setStatus(EStatusOfSellingGoods.NOT_YET_CREATED);
+                    }
                     saleDetailRepository.save(e);
                 }
             });
+            saleReceiptRepository.save(saleReceipt);
         }
         inventoryDeliveryVoucher.setCreateDate(new Date());
         inventoryDeliveryVoucher.setCreatedBy(user);
@@ -186,21 +193,41 @@ public class InventoryDeliveryVoucherServiceImpl implements InventoryDeliveryVou
     }
 
     @Override
-    public List<InventoryDeliveryVoucherResponse> searchByDate(String date) {
-        String toDate = date+" 23:59:59";
-        String fromDate = date +" 00:00:00";
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        try {
-            Date parsedFromDate = dateFormat.parse(fromDate);
-            Date parsedToDate = dateFormat.parse(toDate);
-            Timestamp from = new Timestamp(parsedFromDate.getTime());
-            Timestamp to = new Timestamp(parsedToDate.getTime());
-            List<InventoryDeliveryVoucherResponse> responseList = deliveryVoucherRepository.searchByDate(from,to).stream()
+    public Page<InventoryDeliveryVoucherResponse> searchByDateOrCodeOrCreatedBy(String date,String code, String createdBy,Integer page, Integer size) {
+        Pageable pageable = PageRequest.of(page,size);
+        Page<InventoryDeliveryVoucherResponse> pages =null ;
+        if(code!=null){
+            List<InventoryDeliveryVoucherResponse> responseList = deliveryVoucherRepository.searchByCode(code).stream()
                     .map(item->mapperInventoryDeliveryVoucher(item)).collect(Collectors.toList());
-            return responseList;
-        } catch (ParseException e) {
-            throw new RuntimeException(e);
+            pages = new PageImpl<>(responseList,pageable,responseList.size());
         }
+        else if(createdBy!=null){
+            List<InventoryDeliveryVoucherResponse> responseList = deliveryVoucherRepository.searchByCreatedBy(createdBy).stream()
+                    .map(item->mapperInventoryDeliveryVoucher(item)).collect(Collectors.toList());
+            pages = new PageImpl<>(responseList,pageable,responseList.size());
+        }else{
+                if(date == null){
+                SimpleDateFormat formatter= new SimpleDateFormat("yyyy-MM-dd");
+                Date currentDate = new Date(System.currentTimeMillis());
+                date = formatter.format(currentDate);
+            }
+            String toDate = date+" 23:59:59";
+            String fromDate = date +" 00:00:00";
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            try {
+                Date parsedFromDate = dateFormat.parse(fromDate);
+                Date parsedToDate = dateFormat.parse(toDate);
+                Timestamp from = new Timestamp(parsedFromDate.getTime());
+                Timestamp to = new Timestamp(parsedToDate.getTime());
+                List<InventoryDeliveryVoucherResponse> responseList = deliveryVoucherRepository.searchByDate(from,to).stream()
+                        .map(item->mapperInventoryDeliveryVoucher(item)).collect(Collectors.toList());
+                pages = new PageImpl<>(responseList,pageable,responseList.size());
+            } catch (ParseException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        return pages;
     }
 
     @Override
@@ -209,6 +236,7 @@ public class InventoryDeliveryVoucherServiceImpl implements InventoryDeliveryVou
         if(ObjectUtils.isEmpty(deliveryVoucher))
             throw new NotFoundGlobalException("Không tìm thấy phiếu xuất "+deliveryVoucher);
         deliveryVoucher.setCanceled(true);
+        deliveryVoucher.setStatus(EStatusOfVoucher.IS_CANCELED);
         deliveryVoucherRepository.save(deliveryVoucher);
         return true;
     }
@@ -232,6 +260,9 @@ public class InventoryDeliveryVoucherServiceImpl implements InventoryDeliveryVou
                 break;
             case NOT_YET_EXPORTED:
                 status="Chưa xuất";
+                break;
+            case IS_CANCELED:
+                status="Đã huỷ";
                 break;
 
         }

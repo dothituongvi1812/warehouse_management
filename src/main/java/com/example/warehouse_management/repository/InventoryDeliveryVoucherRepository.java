@@ -22,5 +22,13 @@ public interface InventoryDeliveryVoucherRepository extends CrudRepository<Inven
     @Query(nativeQuery = true,value = "select * from inventory_delivery_vouchers idv \n" +
             "where idv .create_date between :from and :to")
     List<InventoryDeliveryVoucher> searchByDate(Timestamp from, Timestamp to);
+    @Query(nativeQuery = true,value = "select * from inventory_delivery_vouchers idv  \n" +
+            "where idv.code like '%' || :code || '%'")
+    List<InventoryDeliveryVoucher> searchByCode(String code);
+
+    @Query(nativeQuery = true,value = "select idv.* from inventory_delivery_vouchers idv   \n" +
+            "join users u on idv.created_by = u.id \n" +
+            "where u.full_name like '%' || :createdBy || '%'")
+    List<InventoryDeliveryVoucher> searchByCreatedBy(String createdBy);
 
 }

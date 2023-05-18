@@ -5,5 +5,6 @@ public enum EStatusOfVoucher {
     IMPORTED,
     NOT_YET_EXPORTED,
     EXPORTED,
+    IS_CANCELED,
 
 }

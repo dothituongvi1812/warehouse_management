@@ -18,6 +18,10 @@ import com.example.warehouse_management.services.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
@@ -102,21 +106,41 @@ public class SaleReceiptServicesImpl implements SaleReceiptServices {
     }
 
     @Override
-    public List<SaleReceiptResponse> searchByDate(String date) {
-        String toDate = date + " 23:59:59";
-        String fromDate = date + " 00:00:00";
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        try {
-            Date parsedFromDate = dateFormat.parse(fromDate);
-            Date parsedToDate = dateFormat.parse(toDate);
-            Timestamp from = new Timestamp(parsedFromDate.getTime());
-            Timestamp to = new Timestamp(parsedToDate.getTime());
-            List<SaleReceiptResponse> responseList = saleReceiptRepository.searchByCreatedDate(from, to).stream()
+    public Page<SaleReceiptResponse> searchByDateOrCodeOrCreatedBy(String date, String code, String createdBy, Integer page, Integer size) {
+        Pageable pageable = PageRequest.of(page,size);
+        Page<SaleReceiptResponse> pages= null;
+        if(code!=null){
+            List<SaleReceiptResponse> responseList = saleReceiptRepository.searchByCode(code).stream()
                     .map(item -> mapperPurchaseReceiptResponse(item)).collect(Collectors.toList());
-            return responseList;
-        } catch (ParseException e) {
-            throw new RuntimeException(e);
+            pages = new PageImpl<>(responseList,pageable,responseList.size());
         }
+        else if( createdBy!=null){
+            List<SaleReceiptResponse> responseList = saleReceiptRepository.searchByCreatedBy(createdBy).stream()
+                    .map(item -> mapperPurchaseReceiptResponse(item)).collect(Collectors.toList());
+            pages = new PageImpl<>(responseList,pageable,responseList.size());
+        }
+        else{
+            if(date == null){
+                SimpleDateFormat formatter= new SimpleDateFormat("yyyy-MM-dd");
+                Date currentDate = new Date(System.currentTimeMillis());
+                date = formatter.format(currentDate);
+            }
+            String toDate = date + " 23:59:59";
+            String fromDate = date + " 00:00:00";
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            try {
+                Date parsedFromDate = dateFormat.parse(fromDate);
+                Date parsedToDate = dateFormat.parse(toDate);
+                Timestamp from = new Timestamp(parsedFromDate.getTime());
+                Timestamp to = new Timestamp(parsedToDate.getTime());
+                List<SaleReceiptResponse> responseList = saleReceiptRepository.searchByCreatedDate(from, to).stream()
+                        .map(item -> mapperPurchaseReceiptResponse(item)).collect(Collectors.toList());
+                pages = new PageImpl<>(responseList,pageable,responseList.size());
+            } catch (ParseException e) {
+                throw new RuntimeException(e);
+            }
+        }
+       return pages;
     }
 
     private SaleReceiptResponse mapperPurchaseReceiptResponse(SaleReceipt saleReceipt){

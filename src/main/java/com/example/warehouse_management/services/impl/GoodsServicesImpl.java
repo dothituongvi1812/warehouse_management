@@ -28,6 +28,8 @@ import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.text.ParseException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -97,10 +99,12 @@ public class GoodsServicesImpl implements GoodsServices {
     }
 
     @Override
-    public List<GoodsResponse> searchByCodeOrName(String keyword) {
+    public Page<GoodsResponse> searchByCodeOrName(String keyword,Integer page, Integer size) {
+        Pageable pageable = PageRequest.of(page, size);
         List<GoodsResponse> goodsResponses=goodsRepository.findByCodeAndName(keyword).stream()
                 .map(goods->mapperGoodResponse(goods)).collect(Collectors.toList());
-        return goodsResponses;
+        Page<GoodsResponse> pages = new PageImpl<>(goodsResponses, pageable, goodsResponses.size());
+        return pages;
     }
     @Override
     public Goods findGoodByCode(String code) {
@@ -233,6 +237,94 @@ public class GoodsServicesImpl implements GoodsServices {
             }
         } catch (ParseException e) {
             throw new RuntimeException(e);
+        }
+        return map;
+    }
+
+    @Override
+    public Map<String, Integer> reportSumQuantityImportedByPeriod(String fromDate, String toDate) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        if(fromDate == null || toDate ==null ){
+            LocalDateTime date = LocalDateTime.now();
+            toDate = date.format(formatter);
+            fromDate = date.withDayOfMonth(1).format(formatter);
+        }
+        else{
+            toDate =toDate+" 23:59:59";
+            fromDate = fromDate +" 00:00:00";
+        }
+
+        Map<String,Integer> map = new HashMap<>();
+        try {
+            Date parsedFromDate = dateFormat.parse(fromDate);
+            Date parsedToDate = dateFormat.parse(toDate);
+            Timestamp from = new Timestamp(parsedFromDate.getTime());
+            Timestamp to = new Timestamp(parsedToDate.getTime());
+            List<Object[]> objects = goodsRepository.reportSumQuantityImportedByPeriod(from,to);
+            for (Object[] ob : objects){
+                String key = (String)ob[0];
+                Integer value = ((BigInteger) ob[1]).intValue();
+                map.put(key,value);
+            }
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+        return map;
+    }
+
+    @Override
+    public Map<String, Integer> reportSumQuantityExportedByPeriod(String fromDate, String toDate) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        if(fromDate == null || toDate ==null ){
+            LocalDateTime date = LocalDateTime.now();
+            toDate = date.format(formatter);
+            fromDate = date.withDayOfMonth(1).format(formatter);
+        }
+        else{
+            toDate =toDate+" 23:59:59";
+            fromDate = fromDate +" 00:00:00";
+        }
+
+        Map<String,Integer> map = new HashMap<>();
+        try {
+            Date parsedFromDate = dateFormat.parse(fromDate);
+            Date parsedToDate = dateFormat.parse(toDate);
+            Timestamp from = new Timestamp(parsedFromDate.getTime());
+            Timestamp to = new Timestamp(parsedToDate.getTime());
+            List<Object[]> objects = goodsRepository.reportSumQuantityExportedByPeriod(from,to);
+            for (Object[] ob : objects){
+                String key = (String)ob[0];
+                Integer value = ((BigInteger) ob[1]).intValue();
+                map.put(key,value);
+            }
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+        return map;
+    }
+
+    @Override
+    public Map<String, Integer> statisticOfTheMostImportedProducts(int month) {
+        Map<String,Integer> map = new HashMap<>();
+        List<Object[]> objects = goodsRepository.statisticOfTheMostImportedProducts(month);
+        for (Object[] ob : objects){
+            String key = (String)ob[0];
+            Integer value = ((BigInteger) ob[1]).intValue();
+            map.put(key,value);
+        }
+        return map;
+    }
+
+    @Override
+    public Map<String, Integer> statisticOfTheMostExportedProducts(int month) {
+        Map<String,Integer> map = new HashMap<>();
+        List<Object[]> objects = goodsRepository.statisticOfTheMostExportedProducts(month);
+        for (Object[] ob : objects){
+            String key = (String)ob[0];
+            Integer value = ((BigInteger) ob[1]).intValue();
+            map.put(key,value);
         }
         return map;
     }

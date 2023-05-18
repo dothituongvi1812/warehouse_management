@@ -8,6 +8,7 @@ import com.example.warehouse_management.services.InventoryReceiptServices;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -49,9 +50,10 @@ public class InventoryReceiptVoucherController {
         logger.info("api/receipt-voucher/get-all");
         return new ResponseEntity(inventoryReceiptServices.findAll(),HttpStatus.OK);
     }
-    @GetMapping("/search-by/{date}")
-    public ResponseEntity<List<InventoryReceiptVoucherResponse>> searchByDate(@PathVariable String date){
-        return new ResponseEntity<>(inventoryReceiptServices.searchByDate(date),HttpStatus.OK);
+    @GetMapping("/search-by/")
+    public ResponseEntity<Page<InventoryReceiptVoucherResponse>> searchByDateOrCodeOrCreatedBy(@RequestParam(required = false) String date, @RequestParam(required = false) String code, @RequestParam(required = false) String createdBy
+            , @RequestParam(required = true) Integer page, @RequestParam(required = true) Integer size){
+        return new ResponseEntity<>(inventoryReceiptServices.searchByDateOrCodeOrCreatedBy(date,code,createdBy,page,size),HttpStatus.OK);
     }
     @PostMapping("/cancel/{receiptVoucherCode}")
     public ResponseEntity<Boolean> cancelInventoryReceiptVoucherByCode(@PathVariable String receiptVoucherCode){

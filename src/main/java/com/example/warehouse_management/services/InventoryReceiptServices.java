@@ -5,6 +5,7 @@ import com.example.warehouse_management.payload.request.receive.ReceiptVoucherRe
 import com.example.warehouse_management.payload.response.InventoryReceiptVoucherResponse;
 import com.example.warehouse_management.payload.response.BinPositionResponse;
 import org.springframework.data.domain.Page;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -16,6 +17,6 @@ public interface InventoryReceiptServices {
     public List<InventoryReceiptVoucherResponse> findAll();
     public List<InventoryReceiptVoucher> getAll();
     public InventoryReceiptVoucherResponse getReceiptVoucherByCode(String voucherCode);
-    public List<InventoryReceiptVoucherResponse> searchByDate(String date);
+    public Page<InventoryReceiptVoucherResponse> searchByDateOrCodeOrCreatedBy(String date, String code, String createdBy, Integer page, Integer size);
     public boolean cancelInventoryReceiptVoucherByCode(String code);
 }

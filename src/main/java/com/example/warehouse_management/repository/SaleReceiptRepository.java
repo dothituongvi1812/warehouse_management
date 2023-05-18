@@ -14,6 +14,13 @@ public interface SaleReceiptRepository extends CrudRepository<SaleReceipt,Long> 
     SaleReceipt findTopByOrderByIdDesc();
     SaleReceipt findByCode(String code);
     @Query(nativeQuery = true,value = "select * from sale_receipts sr \n" +
-            "where sr.created_date between :from anh :to")
+            "where sr.created_date between :from and :to")
     List<SaleReceipt> searchByCreatedDate(Timestamp from, Timestamp to);
+    @Query(nativeQuery = true,value = "select * from sale_receipts sr \n" +
+            "where sr.code like '%' || :code || '%'")
+    List<SaleReceipt> searchByCode(String code);
+    @Query(nativeQuery = true,value = "select sr.* from sale_receipts sr       \n" +
+            "join users u on sr.created_by = u.id \n" +
+            "where u.full_name like '%' || :createdBy || '%'")
+    List<SaleReceipt> searchByCreatedBy(String createdBy);
 }

@@ -34,6 +34,7 @@ import org.springframework.util.ObjectUtils;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -194,21 +195,44 @@ public class InventoryReceiptServicesImpl implements InventoryReceiptServices {
     }
 
     @Override
-    public List<InventoryReceiptVoucherResponse> searchByDate(String date) {
-        String toDate = date+" 23:59:59";
-        String fromDate = date +" 00:00:00";
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        try {
-            Date parsedFromDate = dateFormat.parse(fromDate);
-            Date parsedToDate = dateFormat.parse(toDate);
-            Timestamp from = new Timestamp(parsedFromDate.getTime());
-            Timestamp to = new Timestamp(parsedToDate.getTime());
-            List<InventoryReceiptVoucherResponse> responseList = receiptVoucherRepository.searchByDate(from,to).stream()
+    public Page<InventoryReceiptVoucherResponse> searchByDateOrCodeOrCreatedBy(String date,String code, String createdBy,Integer page,Integer size) {
+        Pageable pageable =PageRequest.of(page,size);
+        Page<InventoryReceiptVoucherResponse> pages = null ;
+        if (code!=null){
+            List<InventoryReceiptVoucherResponse> responseList = receiptVoucherRepository.searchByCode(code).stream()
                     .map(item->mapperInventoryReceiptVoucher(item)).collect(Collectors.toList());
-            return responseList;
-        } catch (ParseException e) {
-            throw new RuntimeException(e);
+            pages = new PageImpl<>(responseList,pageable,responseList.size());
         }
+        else if(createdBy!=null){
+            List<InventoryReceiptVoucherResponse> responseList = receiptVoucherRepository.searchByCreatedBy(createdBy).stream()
+                    .map(item->mapperInventoryReceiptVoucher(item)).collect(Collectors.toList());
+            pages = new PageImpl<>(responseList,pageable,responseList.size());
+
+        }
+        else{
+            if(date == null){
+                SimpleDateFormat formatter= new SimpleDateFormat("yyyy-MM-dd");
+                Date currentDate = new Date(System.currentTimeMillis());
+                date = formatter.format(currentDate);
+            }
+            String toDate = date+" 23:59:59";
+            String fromDate = date +" 00:00:00";
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            try {
+                Date parsedFromDate = dateFormat.parse(fromDate);
+                Date parsedToDate = dateFormat.parse(toDate);
+                Timestamp from = new Timestamp(parsedFromDate.getTime());
+                Timestamp to = new Timestamp(parsedToDate.getTime());
+                List<InventoryReceiptVoucherResponse> responseList = receiptVoucherRepository.searchByDate(from,to).stream()
+                        .map(item->mapperInventoryReceiptVoucher(item)).collect(Collectors.toList());
+                pages = new PageImpl<>(responseList,pageable,responseList.size());
+
+            } catch (ParseException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        return pages;
     }
 
     @Override
@@ -217,6 +241,7 @@ public class InventoryReceiptServicesImpl implements InventoryReceiptServices {
         if(ObjectUtils.isEmpty(receiptVoucher))
             throw new NotFoundGlobalException("Không tìm thấy phiếu nhập "+receiptVoucher);
         receiptVoucher.setCanceled(true);
+        receiptVoucher.setStatus(EStatusOfVoucher.IS_CANCELED);
         receiptVoucherRepository.save(receiptVoucher);
         return true;
     }
@@ -229,6 +254,9 @@ public class InventoryReceiptServicesImpl implements InventoryReceiptServices {
                 break;
             case NOT_YET_IMPORTED:
                 status="Chưa nhập lên kệ";
+                break;
+            case IS_CANCELED:
+                status="Đã huỷ";
                 break;
 
         }
