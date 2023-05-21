@@ -106,6 +106,9 @@ public class InventoryReceiptServicesImpl implements InventoryReceiptServices {
                 purchaseDetail.setQuantityRemaining(quantityPurchased-object.getQuantity());
                 purchaseDetail.setStatus(EStatusOfPurchasingGoods.CREATED);
             }
+            if(purchaseDetail.getQuantityPurchased()>purchaseDetail.getQuantityRemaining()){
+                purchaseDetail.setStatus(EStatusOfPurchasingGoods.NOT_DONE_CREATED);
+            }
             purchaseDetailRepository.save(purchaseDetail);
             inventoryReceiptVoucherDetail.setGoods(goods);
             inventoryReceiptVoucherDetail.setBinPosition(binPosition);
@@ -116,7 +119,6 @@ public class InventoryReceiptServicesImpl implements InventoryReceiptServices {
         }
         savedVoucher.setInventoryReceiptVoucherDetails(inventoryReceiptVoucherDetailSet);
         receiptVoucherRepository.save(savedVoucher);
-        //nếu phiếu mua có các item đã status created thì set phiếu mua là done.
 
         return mapperInventoryReceiptVoucher(savedVoucher);
 
@@ -146,7 +148,7 @@ public class InventoryReceiptServicesImpl implements InventoryReceiptServices {
             bin.setMaxCapacity(maxCapacity);
             bin.setCurrentCapacity(currentCapacity);
             bin.setRemainingVolume(remainingVolume);
-            if (remainingVolume <= 0)
+            if (bin.getCurrentCapacity()== bin.getMaxCapacity()||remainingVolume == 0 )
                 bin.setStatus(EStatusStorage.FULL);
             else {
                 bin.setStatus(EStatusStorage.AVAILABLE);
@@ -154,11 +156,11 @@ public class InventoryReceiptServicesImpl implements InventoryReceiptServices {
             BinPosition saveBin = binLocationRepository.save(bin);
             binList.add(saveBin);
         }
-        List<BinPositionResponse> binLocationRespons = binList.stream().map(item ->
+        List<BinPositionResponse> binLocationResponse = binList.stream().map(item ->
                 binLocationServices.mapperRowLocation(item)
         ).collect(Collectors.toList());
         receiptVoucherRepository.save(inventoryReceiptVoucher);
-        return binLocationRespons;
+        return binLocationResponse;
     }
 
     @Override

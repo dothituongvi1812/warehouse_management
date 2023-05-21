@@ -35,6 +35,14 @@ public interface GoodsRepository extends CrudRepository<Goods,Long> {
             "join goods g ON bl.goods_id = g.id \n" +
             "group by g.\"name\" ")
     List<Object[]> countCurrentQuantityOfGoodsInWarehouse();
+    @Query(nativeQuery = true,value = "select g.\"name\" , sum(bp.current_capacity) from goods g      \n" +
+            "join bin_positions bp on g.id = bp.goods_id \n" +
+            "join column_positions cp on bp.column_position_id  =cp.id \n" +
+            "join shelf_storages ss on cp.shelf_storage_id = ss.id \n" +
+            "join warehouse w on ss.warehouse_id = w.id \n" +
+            "where w.code =:warehouseCode \n" +
+            "group by g.\"name\"")
+    List<Object[]> countCurrentQuantityOfGoodsByWarehouseCode(String warehouseCode);
 
     @Query(nativeQuery = true,value ="select g.name ,sum(irvd.quantity) from goods g\n" +
             "join inventory_receipt_voucher_details irvd on g.id = irvd.goods_id\n" +
@@ -60,20 +68,56 @@ public interface GoodsRepository extends CrudRepository<Goods,Long> {
             "where idv.status = 'EXPORTED' and idv.exported_date  between :fromDate  and :toDate\n" +
             "group by g.\"name\"")
     List<Object[]>reportSumQuantityExportedByPeriod(Timestamp fromDate, Timestamp toDate);
-    @Query(nativeQuery = true,value = "select g.\"name\" ,sum(irvd.quantity) as total  from inventory_receipt_vouchers irv \n" +
+    @Query(nativeQuery = true,value = "select g.\"name\",g.code,c.\"name\" as categoryName ,sum(irvd.quantity) as total  from inventory_receipt_vouchers irv\n" +
             "join inventory_receipt_voucher_details irvd on irv.id = irvd.inventory_receipt_voucher_id \n" +
-            "join goods g on g.id = irvd.goods_id \n" +
+            "join goods g on g.id = irvd.goods_id\n" +
+            "join category c on c.id = g.category_id\n" +
             "where irv.status ='IMPORTED' and EXTRACT(MONTH FROM irv.imported_date) =:month\n" +
-            "group by g.\"name\" \n" +
-            "order by total desc \n" +
+            "group by  g.\"name\" ,g.code,c.\"name\"\n" +
+            "order by total desc\n" +
             "limit 5")
     List<Object[]>statisticOfTheMostImportedProducts(int month);
-    @Query(nativeQuery = true,value = "select g.\"name\" ,sum(idvd.quantity) as total  from inventory_delivery_vouchers idv \n" +
+    @Query(nativeQuery = true,value = "select g.\"name\",g.code ,c.\"name\" as categoryName ,sum(idvd.quantity) as total  from inventory_delivery_vouchers idv \n" +
             "join inventory_delivery_voucher_details idvd on idv.id = idvd.delivery_voucher_id \n" +
             "join goods g on g.id = idvd.goods_id \n" +
+            "join category c on c.id = g.category_id\n" +
             "where idv.status ='EXPORTED' and EXTRACT(MONTH FROM idv.exported_date) =:month\n" +
-            "group by g.\"name\" \n" +
-            "order by total desc \n" +
+            "group by g.\"name\" ,g.code,c.\"name\"\n" +
+            "order by total desc\n" +
             "limit 5")
     List<Object[]>statisticOfTheMostExportedProducts(int month);
+
+    @Query(nativeQuery = true,value = "select g.\"name\" ,sum(idvd.quantity) as total  from inventory_delivery_vouchers idv \n" +
+            "            join inventory_delivery_voucher_details idvd on idv.id = idvd.delivery_voucher_id \n" +
+            "            join goods g on g.id = idvd.goods_id \n" +
+            "            where idv.status ='EXPORTED' and EXTRACT(MONTH FROM idv.exported_date) =:month\n" +
+            "            group by g.\"name\" ")
+    List<Object[]>statisticExportedProducts(int month);
+
+    @Query(nativeQuery = true,value = " select g.\"name\" ,sum(irvd.quantity) as total  from inventory_receipt_vouchers irv \n" +
+            "            join inventory_receipt_voucher_details irvd on irv.id = irvd.inventory_receipt_voucher_id \n" +
+            "            join goods g on g.id = irvd.goods_id\n" +
+            "            where irv.status ='IMPORTED' and EXTRACT(MONTH FROM irv.imported_date) =:month\n" +
+            "            group by g.\"name\" ")
+    List<Object[]>statisticImportedProducts(int month);
+
+    @Query(nativeQuery = true,value = "select g.\"name\",g.code,c.\"name\" as categoryName ,sum(irvd.quantity) as total  from inventory_receipt_vouchers irv\n" +
+            "join inventory_receipt_voucher_details irvd on irv.id = irvd.inventory_receipt_voucher_id \n" +
+            "join goods g on g.id = irvd.goods_id\n" +
+            "join category c on c.id = g.category_id\n" +
+            "where irv.status ='IMPORTED' and EXTRACT(MONTH FROM irv.imported_date) =:month\n" +
+            "group by  g.\"name\" ,g.code,c.\"name\"\n" +
+            "order by total desc\n" +
+            "limit 1")
+    List<Object[]> statisticOfTheTop1ImportedProducts(int month);
+    @Query(nativeQuery = true,value = "select g.\"name\",g.code ,c.\"name\" as categoryName ,sum(idvd.quantity) as total  from inventory_delivery_vouchers idv \n" +
+            "join inventory_delivery_voucher_details idvd on idv.id = idvd.delivery_voucher_id \n" +
+            "join goods g on g.id = idvd.goods_id \n" +
+            "join category c on c.id = g.category_id\n" +
+            "where idv.status ='EXPORTED' and EXTRACT(MONTH FROM idv.exported_date) =:month\n" +
+            "group by g.\"name\" ,g.code,c.\"name\"\n" +
+            "order by total desc\n" +
+            "limit 1")
+    List<Object[]> statisticOfTheTop1ExportedProducts(int month);
+
 }

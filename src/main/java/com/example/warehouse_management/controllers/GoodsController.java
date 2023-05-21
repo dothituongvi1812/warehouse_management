@@ -3,6 +3,7 @@ package com.example.warehouse_management.controllers;
 import com.example.warehouse_management.payload.request.goods.GoodsAddRequest;
 import com.example.warehouse_management.payload.request.goods.UpdateGoodsRequest;
 import com.example.warehouse_management.payload.response.GoodsResponse;
+import com.example.warehouse_management.payload.response.GoodsStaticsResponse;
 import com.example.warehouse_management.services.GoodsServices;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,7 +62,12 @@ public class GoodsController {
     public ResponseEntity<Map<String,Integer>> countCurrentQuantityOfGoodsInWarehouse(){
         logger.info("/count-quantity");
         return new ResponseEntity<>(goodsServices.countCurrentQuantityOfGoodsInWarehouse(),HttpStatus.OK);
+    }@GetMapping("/count-quantity-by/{warehouseCode}")
+    public ResponseEntity<Map<String,Integer>> countCurrentQuantityOfGoodsByWarehouseCode(@PathVariable String warehouseCode){
+        logger.info("/count-quantity-by/{warehouseCode}");
+        return new ResponseEntity<>(goodsServices.countCurrentQuantityOfGoodsByWarehouseCode(warehouseCode),HttpStatus.OK);
     }
+
     @PostMapping("/update/{goodsCode}")
     public ResponseEntity<GoodsResponse> updateGoods(@PathVariable String goodsCode,@RequestBody UpdateGoodsRequest updateGoodsRequest){
         return new ResponseEntity<>(goodsServices.updateGoods(goodsCode,updateGoodsRequest),HttpStatus.OK);
@@ -82,13 +88,25 @@ public class GoodsController {
     public ResponseEntity<Map<String,Integer>> reportTotalQuantityExportedByPeriod(@RequestParam(required = false) String fromDate,@RequestParam(required = false) String toDate){
         return new ResponseEntity<>(goodsServices.reportSumQuantityExportedByPeriod(fromDate,toDate),HttpStatus.OK);
     }
-    @GetMapping("/statistic-of-the-most-imported-products-by/{month}")
-    public ResponseEntity<Map<String,Integer>> statisticOfTheMostImportedProducts(@PathVariable int month){
-        return new ResponseEntity<>(goodsServices.statisticOfTheMostImportedProducts(month),HttpStatus.OK);
+    @GetMapping("/statistic-of-the-top5-imported-products-by/{month}")
+    public ResponseEntity<List<GoodsStaticsResponse>>statisticOfTheTop5ImportedProducts(@PathVariable int month){
+        return new ResponseEntity<>(goodsServices.statisticOfTheTop5ImportedProducts(month),HttpStatus.OK);
     }
-    @GetMapping("/statistic-of-the-most-exported-products-by/{month}")
-    public ResponseEntity<Map<String,Integer>> statisticOfTheMostExportedProducts(@PathVariable int month){
-        return new ResponseEntity<>(goodsServices.statisticOfTheMostExportedProducts(month),HttpStatus.OK);
+    @GetMapping("/statistic-of-the-top5-exported-products-by/{month}")
+    public ResponseEntity<List<GoodsStaticsResponse>> statisticOfTheTop5ExportedProducts(@PathVariable int month){
+        return new ResponseEntity<>(goodsServices.statisticOfTheTop5ExportedProducts(month),HttpStatus.OK);
+    }
+    @GetMapping("/statistic-of-the-top1-imported-products-by/{month}")
+    public ResponseEntity<List<GoodsStaticsResponse>>statisticOfTheTop1ImportedProducts(@PathVariable int month){
+        return new ResponseEntity<>(goodsServices.statisticOfTheTop1ImportedProducts(month),HttpStatus.OK);
+    }
+    @GetMapping("/statistic-of-the-top1-exported-products-by/{month}")
+    public ResponseEntity<List<GoodsStaticsResponse>> statisticOfTheTop1ExportedProducts(@PathVariable int month){
+        return new ResponseEntity<>(goodsServices.statisticOfTheTop1ExportedProducts(month),HttpStatus.OK);
+    }
+    @GetMapping("/statistic-of-the-total-imported_exported-products-by-current-month")
+    public ResponseEntity<Map<String,Integer>> statisticOfTheTotalImportedAndExportedProductsByCurrentMonth(){
+        return new ResponseEntity<>(goodsServices.statisticOfTheTotalImportedAndExportedProductsByCurrentMonth(),HttpStatus.OK);
     }
 
 }

@@ -84,5 +84,8 @@ public class BinPositionController {
     public ResponseEntity<Boolean>checkRemainingVolume(@PathVariable String binCode ,@RequestBody GoodsCheckedRequest goodsCheckedRequest){
         return new ResponseEntity<>(binLocationServices.checkRemainingVolumeForGoodsByBinCode(binCode,goodsCheckedRequest),HttpStatus.OK);
     }
-
+    @GetMapping("/find-by/{goodsCode}")
+    public ResponseEntity<List<BinPositionResponse>> findByGoodsCode(@PathVariable String goodsCode){
+        return new ResponseEntity<>(binLocationServices.filterByGoodsCode(goodsCode),HttpStatus.OK);
+    }
 }

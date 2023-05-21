@@ -152,9 +152,13 @@ public class InventoryDeliveryVoucherServiceImpl implements InventoryDeliveryVou
                 bin.setGoods(null);
                 bin.setRemainingVolume(bin.getVolume());
             }
+            if(bin.getMaxCapacity()==bin.getCurrentCapacity()){
+                bin.setStatus(EStatusStorage.FULL);
+            }
             else{
                 bin.setRemainingVolume(remainingVolume+ goods.getVolume()*detail.getQuantity());
             }
+
             BinPosition bin1 = binLocationRepository.save(bin);
             binList.add(bin1);
 

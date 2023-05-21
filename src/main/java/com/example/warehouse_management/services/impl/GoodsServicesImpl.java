@@ -9,6 +9,7 @@ import com.example.warehouse_management.payload.request.goods.GoodsAddRequest;
 import com.example.warehouse_management.payload.request.goods.GoodsRequest;
 import com.example.warehouse_management.payload.request.goods.UpdateGoodsRequest;
 import com.example.warehouse_management.payload.response.GoodsResponse;
+import com.example.warehouse_management.payload.response.GoodsStaticsResponse;
 import com.example.warehouse_management.repository.BinLocationRepository;
 import com.example.warehouse_management.repository.CategoryRepository;
 import com.example.warehouse_management.repository.GoodsRepository;
@@ -28,12 +29,10 @@ import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.text.ParseException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -157,6 +156,18 @@ public class GoodsServicesImpl implements GoodsServices {
     @Override
     public Map<String, Integer> countCurrentQuantityOfGoodsInWarehouse() {
         List<Object[]> objects = goodsRepository.countCurrentQuantityOfGoodsInWarehouse();
+        Map<String,Integer> map = new HashMap<>();
+        for (Object[] ob : objects){
+            String key = (String)ob[0];
+            Integer value = ((BigInteger) ob[1]).intValue();
+            map.put(key,value);
+        }
+        return map;
+    }
+
+    @Override
+    public Map<String, Integer> countCurrentQuantityOfGoodsByWarehouseCode(String warehouseCode) {
+        List<Object[]> objects = goodsRepository.countCurrentQuantityOfGoodsByWarehouseCode(warehouseCode);
         Map<String,Integer> map = new HashMap<>();
         for (Object[] ob : objects){
             String key = (String)ob[0];
@@ -306,27 +317,92 @@ public class GoodsServicesImpl implements GoodsServices {
     }
 
     @Override
-    public Map<String, Integer> statisticOfTheMostImportedProducts(int month) {
-        Map<String,Integer> map = new HashMap<>();
-        List<Object[]> objects = goodsRepository.statisticOfTheMostImportedProducts(month);
+    public List<GoodsStaticsResponse> statisticOfTheTop5ExportedProducts(int month) {
+        List<GoodsStaticsResponse> goodsStaticsResponseList = new ArrayList<>();
+        List<Object[]> objects = goodsRepository.statisticOfTheMostExportedProducts(month);
         for (Object[] ob : objects){
-            String key = (String)ob[0];
-            Integer value = ((BigInteger) ob[1]).intValue();
-            map.put(key,value);
+            GoodsStaticsResponse goodsStaticsResponse = new GoodsStaticsResponse();
+            goodsStaticsResponse.setName((String)ob[0]);
+            goodsStaticsResponse.setCode((String)ob[1]);
+            goodsStaticsResponse.setCategoryName((String)ob[2]);
+            Integer total = ((BigInteger) ob[3]).intValue();
+            goodsStaticsResponse.setTotal(total);
+            goodsStaticsResponseList.add(goodsStaticsResponse);
         }
-        return map;
+        return goodsStaticsResponseList;
     }
 
     @Override
-    public Map<String, Integer> statisticOfTheMostExportedProducts(int month) {
-        Map<String,Integer> map = new HashMap<>();
-        List<Object[]> objects = goodsRepository.statisticOfTheMostExportedProducts(month);
+    public List<GoodsStaticsResponse> statisticOfTheTop5ImportedProducts(int month) {
+        List<GoodsStaticsResponse> goodsStaticsResponseList = new ArrayList<>();
+        List<Object[]> objects = goodsRepository.statisticOfTheMostImportedProducts(month);
         for (Object[] ob : objects){
-            String key = (String)ob[0];
-            Integer value = ((BigInteger) ob[1]).intValue();
-            map.put(key,value);
+            GoodsStaticsResponse goodsStaticsResponse = new com.example.warehouse_management.payload.response.GoodsStaticsResponse();
+            goodsStaticsResponse.setName((String)ob[0]);
+            goodsStaticsResponse.setCode((String)ob[1]);
+            goodsStaticsResponse.setCategoryName((String)ob[2]);
+            Integer total = ((BigInteger) ob[3]).intValue();
+            goodsStaticsResponse.setTotal(total);
+            goodsStaticsResponseList.add(goodsStaticsResponse);
         }
-        return map;
+        return goodsStaticsResponseList;
+    }
+
+    @Override
+    public Map<String, Integer> statisticOfTheTotalImportedAndExportedProductsByCurrentMonth() {
+        Map<String,Integer> mapResponses = new HashMap<>();
+        LocalDate currentDate= LocalDate.now();
+        List<Object[]> objectsImported = goodsRepository.statisticImportedProducts(currentDate.getMonthValue());
+        List<Object[]> objectsExported = goodsRepository.statisticExportedProducts(currentDate.getMonthValue());
+        Integer sumImportedQuantity =0;
+        String keyImport = "importedQuantity";
+        Integer sumExportedQuantity =0;
+        String keyExport = "exportedQuantity";
+        for (Object[] ob : objectsImported){
+            Integer value = ((BigInteger) ob[1]).intValue();
+            sumImportedQuantity += value;
+
+        }
+        mapResponses.put(keyImport,sumImportedQuantity);
+        for (Object[] ob : objectsExported){
+            Integer value = ((BigInteger) ob[1]).intValue();
+            sumExportedQuantity += value;
+        }
+        mapResponses.put(keyExport,sumExportedQuantity);
+        return mapResponses;
+    }
+
+    @Override
+    public List<GoodsStaticsResponse> statisticOfTheTop1ImportedProducts(int month) {
+
+        List<GoodsStaticsResponse> goodsStaticsResponseList = new ArrayList<>();
+        List<Object[]> objects = goodsRepository.statisticOfTheTop1ImportedProducts(month);
+        for (Object[] ob : objects){
+            GoodsStaticsResponse goodsStaticsResponse = new com.example.warehouse_management.payload.response.GoodsStaticsResponse();
+            goodsStaticsResponse.setName((String)ob[0]);
+            goodsStaticsResponse.setCode((String)ob[1]);
+            goodsStaticsResponse.setCategoryName((String)ob[2]);
+            Integer total = ((BigInteger) ob[3]).intValue();
+            goodsStaticsResponse.setTotal(total);
+            goodsStaticsResponseList.add(goodsStaticsResponse);
+        }
+        return goodsStaticsResponseList;
+    }
+
+    @Override
+    public List<GoodsStaticsResponse> statisticOfTheTop1ExportedProducts(int month) {
+        List<GoodsStaticsResponse> goodsStaticsResponseList = new ArrayList<>();
+        List<Object[]> objects = goodsRepository.statisticOfTheTop1ExportedProducts(month);
+        for (Object[] ob : objects){
+            GoodsStaticsResponse goodsStaticsResponse = new com.example.warehouse_management.payload.response.GoodsStaticsResponse();
+            goodsStaticsResponse.setName((String)ob[0]);
+            goodsStaticsResponse.setCode((String)ob[1]);
+            goodsStaticsResponse.setCategoryName((String)ob[2]);
+            Integer total = ((BigInteger) ob[3]).intValue();
+            goodsStaticsResponse.setTotal(total);
+            goodsStaticsResponseList.add(goodsStaticsResponse);
+        }
+        return goodsStaticsResponseList;
     }
 
     public GoodsResponse mapperGoodResponse(Goods goods){

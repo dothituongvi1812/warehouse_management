@@ -171,22 +171,21 @@ public class BinLocationServicesImpl implements BinLocationServices {
 
     @Override
     public List<BinPositionResponse> getAll() {
-         binLocationRepository.findAll().stream()
-                .forEach(this::updateStatusForBin);
+//         binLocationRepository.findAll().stream()
+//                .forEach(this::updateStatusForBin);
         List<BinPositionResponse> responseList = binLocationRepository.findAll().stream()
                 .map(rowLocation -> mapperRowLocationResponse(rowLocation))
                 .collect(Collectors.toList());
-
-
-
         return responseList;
     }
 
     @Override
     public List<BinPositionResponse> getAllRowLocationByWarehouseCode(String warehouseCode) {
-        List<BinPositionResponse> binLocationRespons = binLocationRepository.getAllRowLocationByWarehouseCode(warehouseCode)
+//        binLocationRepository.findAll().stream()
+//                .forEach(this::updateStatusForBin);
+        List<BinPositionResponse> binLocationResponse = binLocationRepository.getAllRowLocationByWarehouseCode(warehouseCode)
                 .stream().map(item -> mapperRowLocationResponse(item)).collect(Collectors.toList());
-        return binLocationRespons;
+        return binLocationResponse;
     }
 
     @Override
@@ -255,6 +254,10 @@ public class BinLocationServicesImpl implements BinLocationServices {
         if(fromBinPosition.getCurrentCapacity()==0){
             fromBinPosition.setGoods(null);
             fromBinPosition.setStatus(EStatusStorage.EMPTY);
+            fromBinPosition.setMaxCapacity(0);
+        }
+        if(toBinPosition.getCurrentCapacity() == toBinPosition.getMaxCapacity()){
+            toBinPosition.setStatus(EStatusStorage.FULL);
         }
 
         List<BinPosition> binPositionList = Arrays.asList(toBinPosition, fromBinPosition);
@@ -264,6 +267,8 @@ public class BinLocationServicesImpl implements BinLocationServices {
 
     @Override
     public Page<BinPositionResponse> search(String keyword, String codeWarehouse,Integer page, Integer size) {
+//        binLocationRepository.findAll().stream()
+//                .forEach(this::updateStatusForBin);
         Pageable pageable = PageRequest.of(page, size);
         List<BinPositionResponse> binPositionResponseList = binLocationRepository
                 .search(keyword, codeWarehouse).stream().map(this::mapperRowLocationResponse)
@@ -300,6 +305,12 @@ public class BinLocationServicesImpl implements BinLocationServices {
     public BinPosition findOnePosition(int quantity, String goodsCode) {
         BinPosition binPosition = binLocationRepository.findOne(quantity,goodsCode);
         return binPosition;
+    }
+
+    @Override
+    public List<BinPositionResponse> filterByGoodsCode(String goodsCode) {
+
+        return null;
     }
 
     private String generateRowLocationName(int numberRow) {
@@ -350,9 +361,15 @@ public class BinLocationServicesImpl implements BinLocationServices {
         return binPositionResponseMapper;
     }
     private void updateStatusForBin(BinPosition bin){
-        if (bin.getCurrentCapacity() == bin.getMaxCapacity()){
-            bin.setStatus(EStatusStorage.FULL);
-            binLocationRepository.save(bin);
+        if(bin.getMaxCapacity()!=0 && bin.getCurrentCapacity()!=0){
+            if (bin.getCurrentCapacity() == bin.getMaxCapacity()&&bin.getGoods()!=null){
+                bin.setStatus(EStatusStorage.FULL);
+                binLocationRepository.save(bin);
+            }
         }
+        else{
+            bin.setStatus(EStatusStorage.EMPTY);
+        }
+
     }
 }

@@ -5,6 +5,7 @@ import com.example.warehouse_management.payload.request.goods.GoodsAddRequest;
 import com.example.warehouse_management.payload.request.goods.GoodsRequest;
 import com.example.warehouse_management.payload.request.goods.UpdateGoodsRequest;
 import com.example.warehouse_management.payload.response.GoodsResponse;
+import com.example.warehouse_management.payload.response.GoodsStaticsResponse;
 import org.springframework.data.domain.Page;
 
 import java.text.ParseException;
@@ -24,12 +25,16 @@ public interface GoodsServices {
     public List<GoodsResponse> getAll();
     public Integer getCurrentQuantityOfGoodsInWarehouse(String goodsCode);
     Map<String, Integer> countCurrentQuantityOfGoodsInWarehouse();
+    Map<String, Integer> countCurrentQuantityOfGoodsByWarehouseCode(String warehouseCode);
     public GoodsResponse updateGoods(String goodsCode, UpdateGoodsRequest updateGoodsRequest);
     public Map<String,Integer> reportImportedQuantityGoodsByDate(String date);
     public Map<String,Integer> reportExportedQuantityGoodsByDate(String date);
     public Map<String,Integer> reportSumQuantityImportedByPeriod(String fromDate,String toDate);
     public Map<String,Integer> reportSumQuantityExportedByPeriod(String fromDate,String toDate);
-    public Map<String,Integer> statisticOfTheMostImportedProducts(int month);
-    public Map<String,Integer> statisticOfTheMostExportedProducts(int month);
+    public List<GoodsStaticsResponse> statisticOfTheTop5ImportedProducts(int month);
+    public List<GoodsStaticsResponse> statisticOfTheTop5ExportedProducts(int month);
+    public Map<String,Integer> statisticOfTheTotalImportedAndExportedProductsByCurrentMonth();
+    public List<GoodsStaticsResponse> statisticOfTheTop1ImportedProducts(int month);
+    public List<GoodsStaticsResponse> statisticOfTheTop1ExportedProducts(int month);
 
 }
