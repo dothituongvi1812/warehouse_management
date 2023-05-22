@@ -3,6 +3,9 @@ package com.example.warehouse_management.services.impl;
 import com.example.warehouse_management.exception.ErrorException;
 import com.example.warehouse_management.exception.NotFoundGlobalException;
 import com.example.warehouse_management.models.goods.Goods;
+import com.example.warehouse_management.models.selling.SaleDetail;
+import com.example.warehouse_management.models.selling.SaleDetailPK;
+import com.example.warehouse_management.models.type.EStatusOfSellingGoods;
 import com.example.warehouse_management.utils.GoodsAndBinLocationToCreateVoucher;
 import com.example.warehouse_management.models.partner.Partner;
 import com.example.warehouse_management.models.purchase.PurchaseDetail;
@@ -106,8 +109,11 @@ public class InventoryReceiptServicesImpl implements InventoryReceiptServices {
                 purchaseDetail.setQuantityRemaining(quantityPurchased-object.getQuantity());
                 purchaseDetail.setStatus(EStatusOfPurchasingGoods.CREATED);
             }
-            if(purchaseDetail.getQuantityPurchased()>purchaseDetail.getQuantityRemaining()){
+            if(purchaseDetail.getQuantityPurchased()>purchaseDetail.getQuantityRemaining() && purchaseDetail.getQuantityRemaining()!=0 ){
                 purchaseDetail.setStatus(EStatusOfPurchasingGoods.NOT_DONE_CREATED);
+            }
+            if(purchaseDetail.getQuantityRemaining()==0){
+                purchaseDetail.setStatus(EStatusOfPurchasingGoods.CREATED);
             }
             purchaseDetailRepository.save(purchaseDetail);
             inventoryReceiptVoucherDetail.setGoods(goods);
@@ -119,6 +125,12 @@ public class InventoryReceiptServicesImpl implements InventoryReceiptServices {
         }
         savedVoucher.setInventoryReceiptVoucherDetails(inventoryReceiptVoucherDetailSet);
         receiptVoucherRepository.save(savedVoucher);
+        purchaseReceipt.getPurchaseDetails().forEach(e->{
+            if(e.getQuantityRemaining()==0){
+                e.setStatus(EStatusOfPurchasingGoods.CREATED);
+                purchaseDetailRepository.save(e);
+            }
+        });
 
         return mapperInventoryReceiptVoucher(savedVoucher);
 
@@ -242,6 +254,17 @@ public class InventoryReceiptServicesImpl implements InventoryReceiptServices {
         InventoryReceiptVoucher receiptVoucher = receiptVoucherRepository.findInventoryReceiptVoucherByCode(code);
         if(ObjectUtils.isEmpty(receiptVoucher))
             throw new NotFoundGlobalException("Không tìm thấy phiếu nhập "+receiptVoucher);
+        receiptVoucher.getInventoryReceiptVoucherDetails().forEach(e->{
+            PurchaseDetail purchaseDetail = purchaseDetailRepository.findByPurchaseDetailPK(new PurchaseDetailPK(e.getGoods().getId(),receiptVoucher.getId()));
+            purchaseDetail.setQuantityRemaining(purchaseDetail.getQuantityRemaining());
+            if(purchaseDetail.getQuantityRemaining() == purchaseDetail.getQuantityPurchased()){
+                purchaseDetail.setStatus(EStatusOfPurchasingGoods.NOT_YET_CREATED);
+            }
+            else{
+                purchaseDetail.setStatus(EStatusOfPurchasingGoods.NOT_DONE_CREATED);
+            }
+            purchaseDetailRepository.save(purchaseDetail);
+        });
         receiptVoucher.setCanceled(true);
         receiptVoucher.setStatus(EStatusOfVoucher.IS_CANCELED);
         receiptVoucherRepository.save(receiptVoucher);

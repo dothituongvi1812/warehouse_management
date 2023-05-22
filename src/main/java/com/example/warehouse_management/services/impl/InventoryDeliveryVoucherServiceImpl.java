@@ -4,6 +4,8 @@ import com.amazonaws.util.CollectionUtils;
 import com.example.warehouse_management.exception.ErrorException;
 import com.example.warehouse_management.exception.NotFoundGlobalException;
 import com.example.warehouse_management.models.goods.Goods;
+import com.example.warehouse_management.models.selling.SaleDetail;
+import com.example.warehouse_management.models.selling.SaleDetailPK;
 import com.example.warehouse_management.models.type.EStatusOfSellingGoods;
 import com.example.warehouse_management.repository.*;
 import com.example.warehouse_management.utils.GoodsDelivery;
@@ -63,6 +65,7 @@ public class InventoryDeliveryVoucherServiceImpl implements InventoryDeliveryVou
         List<GoodsDelivery> goodsDeliveryList = deliveryVoucherRequest.getGoodsRequests().stream()
                 .map(item->new GoodsDelivery(goodsServices.findGoodByCode(item.getGoodCode()), item.getQuantity())).collect(Collectors.toList());
         for (GoodsDelivery goodDelivery:goodsDeliveryList) {
+            SaleDetail saleDetail = saleDetailRepository.findBySaleDetailPK(new SaleDetailPK(goodDelivery.getGoods().getId(), saleReceipt.getId()));
             //tìm 1 vị trí đủ để xuất
             BinPosition binPosition = binLocationServices.findOnePosition(goodDelivery.getQuantity(),goodDelivery.getGoods().getCode());
             if(!ObjectUtils.isEmpty(binPosition)){
@@ -80,13 +83,19 @@ public class InventoryDeliveryVoucherServiceImpl implements InventoryDeliveryVou
                     if(currentQuantity>=goodDelivery.getQuantity()){
                         System.out.println("Tao phieu xuat");
                         rowLocationGoodsDeliveryTempList.add(new RowLocationGoodsDeliveryTemp(rl,goodDelivery));
+                        saleDetail.setStatus(EStatusOfSellingGoods.NOT_DONE_CREATED);
+//                        saleDetail.setQuantityRemaining(saleDetail.getQuantityRemaining()-goodDelivery.getQuantity());
                     }else{
                         if(sumQuantityOfGoods<rl.getCurrentCapacity()) {
                             GoodsDelivery goodsDelivery = new GoodsDelivery(goodDelivery.getGoods(),sumQuantityOfGoods);
                             rowLocationGoodsDeliveryTempList.add(new RowLocationGoodsDeliveryTemp(rl,goodsDelivery));
+//                            saleDetail.setQuantityRemaining(saleDetail.getQuantityRemaining()-goodDelivery.getQuantity());
+                            saleDetail.setStatus(EStatusOfSellingGoods.NOT_DONE_CREATED);
                         }else{
                             GoodsDelivery goodsDelivery = new GoodsDelivery(goodDelivery.getGoods(),currentQuantity);
                             rowLocationGoodsDeliveryTempList.add(new RowLocationGoodsDeliveryTemp(rl,goodsDelivery));
+//                            saleDetail.setQuantityRemaining(saleDetail.getQuantityRemaining()-goodDelivery.getQuantity());
+                            saleDetail.setStatus(EStatusOfSellingGoods.NOT_DONE_CREATED);
                             sumQuantityOfGoods = sumQuantityOfGoods -goodDelivery.getQuantity();
                         }
 
@@ -101,9 +110,6 @@ public class InventoryDeliveryVoucherServiceImpl implements InventoryDeliveryVou
                     e.setQuantityRemaining(e.getQuantityRemaining()-goodDelivery.getQuantity());
                     if(e.getQuantityRemaining()==0){
                         e.setStatus(EStatusOfSellingGoods.CREATED);
-                    }
-                    else{
-                        e.setStatus(EStatusOfSellingGoods.NOT_YET_CREATED);
                     }
                     saleDetailRepository.save(e);
                 }
@@ -131,6 +137,7 @@ public class InventoryDeliveryVoucherServiceImpl implements InventoryDeliveryVou
     @Override
     public List<BinPositionResponse> exportGoods(String deliveryVoucherCode) {
         InventoryDeliveryVoucher inventoryDeliveryVoucher = deliveryVoucherRepository.findByCode(deliveryVoucherCode);
+
         if (ObjectUtils.isEmpty(inventoryDeliveryVoucher))
             throw new NotFoundGlobalException("Không tìm thấy phiếu xuất "+ deliveryVoucherCode);
         if(inventoryDeliveryVoucher.isCanceled()==true)
@@ -239,6 +246,17 @@ public class InventoryDeliveryVoucherServiceImpl implements InventoryDeliveryVou
         InventoryDeliveryVoucher deliveryVoucher = deliveryVoucherRepository.findByCode(code);
         if(ObjectUtils.isEmpty(deliveryVoucher))
             throw new NotFoundGlobalException("Không tìm thấy phiếu xuất "+deliveryVoucher);
+        deliveryVoucher.getInventoryDeliveryVoucherDetails().forEach(e->{
+            SaleDetail saleDetail = saleDetailRepository.findBySaleDetailPK(new SaleDetailPK(e.getGoods().getId(),deliveryVoucher.getSaleReceipt().getId()));
+            saleDetail.setQuantityRemaining(saleDetail.getQuantityRemaining() + e.getQuantity());
+            if(saleDetail.getQuantityRemaining() == saleDetail.getQuantitySale()){
+                saleDetail.setStatus(EStatusOfSellingGoods.NOT_YET_CREATED);
+            }
+            else{
+                saleDetail.setStatus(EStatusOfSellingGoods.NOT_DONE_CREATED);
+            }
+            saleDetailRepository.save(saleDetail);
+        });
         deliveryVoucher.setCanceled(true);
         deliveryVoucher.setStatus(EStatusOfVoucher.IS_CANCELED);
         deliveryVoucherRepository.save(deliveryVoucher);

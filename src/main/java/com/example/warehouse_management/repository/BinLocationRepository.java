@@ -124,5 +124,10 @@ public interface BinLocationRepository extends CrudRepository<BinPosition,Long> 
             "limit 1")
     BinPosition findOne(int quantity, String goodsCode);
 
+    @Query(nativeQuery = true,value = "select bp.* from bin_positions bp \n" +
+            "join goods g on g.id = bp.id \n" +
+            "where g.code =:goodsCode")
+    List<BinPosition> findAllByGoodsCode(String goodsCode);
+
 
 }

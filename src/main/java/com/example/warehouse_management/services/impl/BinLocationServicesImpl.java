@@ -308,9 +308,11 @@ public class BinLocationServicesImpl implements BinLocationServices {
     }
 
     @Override
-    public List<BinPositionResponse> filterByGoodsCode(String goodsCode) {
-
-        return null;
+    public List<BinPositionResponse> findAllByGoodsCode(String goodsCode) {
+        List<BinPosition> binPositionList = binLocationRepository.findAllByGoodsCode(goodsCode);
+        List<BinPositionResponse> binPositionResponseList= binPositionList.stream().map(this::mapperRowLocationResponse)
+                .collect(Collectors.toList());
+        return binPositionResponseList;
     }
 
     private String generateRowLocationName(int numberRow) {

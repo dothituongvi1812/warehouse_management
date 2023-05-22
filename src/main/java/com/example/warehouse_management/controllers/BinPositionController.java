@@ -66,14 +66,17 @@ public class BinPositionController {
     }
     @PostMapping("/usable-position-by-goods/{codeWarehouse}")
     public ResponseEntity<List<BinPositionResponse>> getAllUsablePositionForGoods(@PathVariable String codeWarehouse, @Valid  @RequestBody GoodsCreatedReceiptVoucherRequest request){
+        logger.info("/usable-position-by-goods/"+codeWarehouse);
         return new ResponseEntity<>(binLocationServices.getAllUsablePositionForGoods(codeWarehouse,request),HttpStatus.OK);
     }
     @PostMapping("/move/{fromBinLocationCode}")
     public ResponseEntity<String> moveBin(@PathVariable String fromBinLocationCode,@RequestBody BinLocationMoveToRequest binLocationMoveToRequest){
+        logger.info("/move/"+fromBinLocationCode);
         return new ResponseEntity<>(binLocationServices.moveBin(fromBinLocationCode,binLocationMoveToRequest),HttpStatus.OK);
     }
     @GetMapping("/search/{keyword}")
     public ResponseEntity<Page<BinPositionResponse>> searchByCodeOrName(@PathVariable String keyword, @RequestParam("codeWarehouse") String codeWarehouse,@RequestParam Integer page, @RequestParam Integer size){
+        logger.info("/search/"+keyword);
         return new ResponseEntity<>(binLocationServices.search(keyword,codeWarehouse,page, size),HttpStatus.OK);
     }
     @GetMapping("filter-by/{columnLocationCode}")
@@ -84,8 +87,8 @@ public class BinPositionController {
     public ResponseEntity<Boolean>checkRemainingVolume(@PathVariable String binCode ,@RequestBody GoodsCheckedRequest goodsCheckedRequest){
         return new ResponseEntity<>(binLocationServices.checkRemainingVolumeForGoodsByBinCode(binCode,goodsCheckedRequest),HttpStatus.OK);
     }
-    @GetMapping("/find-by/{goodsCode}")
-    public ResponseEntity<List<BinPositionResponse>> findByGoodsCode(@PathVariable String goodsCode){
-        return new ResponseEntity<>(binLocationServices.filterByGoodsCode(goodsCode),HttpStatus.OK);
+    @GetMapping("/find-all-by/{goodsCode}")
+    public ResponseEntity<List<BinPositionResponse>> findAllByGoodsCode(@PathVariable String goodsCode){
+        return new ResponseEntity<>(binLocationServices.findAllByGoodsCode(goodsCode),HttpStatus.OK);
     }
 }

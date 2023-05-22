@@ -2,6 +2,7 @@ package com.example.warehouse_management.services.impl;
 
 import com.example.warehouse_management.exception.NotFoundGlobalException;
 import com.example.warehouse_management.models.partner.Partner;
+import com.example.warehouse_management.models.warehouse.BinPosition;
 import com.example.warehouse_management.payload.request.partner.PartnerRequest;
 import com.example.warehouse_management.payload.request.partner.UpdatePartnerRequest;
 import com.example.warehouse_management.payload.response.GoodsResponse;
@@ -18,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -57,7 +59,9 @@ public class PartnerServicesImpl implements PartnerServices {
     @Override
     public List<PartnerResponse> getAll() {
         List<PartnerResponse> responses=partnerRepository.findAll().stream()
-                .map(partner -> modelMapper.map(partner,PartnerResponse.class)).collect(Collectors.toList());
+                .sorted(Comparator.comparing(Partner::getId).reversed())
+                .map(partner -> modelMapper.map(partner,PartnerResponse.class))
+                .collect(Collectors.toList());
         return responses;
     }
 
@@ -66,6 +70,7 @@ public class PartnerServicesImpl implements PartnerServices {
         Pageable pageable = PageRequest.of(page,size);
         Page<Partner> page1 = partnerRepository.findAll(pageable);
         Page<PartnerResponse> responsePage = new PageImpl<>(page1.getContent().stream()
+                .sorted(Comparator.comparing(Partner::getId).reversed())
                 .map(item->modelMapper.map(item,PartnerResponse.class))
                 .collect(Collectors.toList())
                 ,pageable,page1.getTotalElements());

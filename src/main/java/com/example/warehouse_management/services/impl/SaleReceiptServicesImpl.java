@@ -154,7 +154,7 @@ public class SaleReceiptServicesImpl implements SaleReceiptServices {
             SaleDetailResponse saleDetailResponse = new SaleDetailResponse();
             saleDetailResponse.setGoods(goodsServices.mapperGoods(detail.getGoods()));
             saleDetailResponse.setQuantitySale(detail.getQuantitySale());
-            saleDetailResponse.setQuantityRemaining(detail.getQuantitySale());
+            saleDetailResponse.setQuantityRemaining(detail.getQuantityRemaining());
             saleDetailResponse.setStatus(detail.getStatus());
             saleDetailSet.add(saleDetailResponse);
         }
