@@ -15,7 +15,8 @@ import java.util.List;
 public interface InventoryDeliveryVoucherRepository extends CrudRepository<InventoryDeliveryVoucher,Long> {
     InventoryDeliveryVoucher findTopByOrderByIdDesc();
     InventoryDeliveryVoucher findByCode(String code);
-    @Query(nativeQuery = true,value = "select * from inventory_delivery_vouchers idv ")
+    @Query(nativeQuery = true,value = "select * from inventory_delivery_vouchers idv\n" +
+            "order by idv.create_date desc  ")
     Page<InventoryDeliveryVoucher> getPage(Pageable pageable);
     List<InventoryDeliveryVoucher> findAll();
 

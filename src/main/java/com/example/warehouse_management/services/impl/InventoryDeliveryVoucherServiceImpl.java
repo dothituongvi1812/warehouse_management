@@ -157,9 +157,10 @@ public class InventoryDeliveryVoucherServiceImpl implements InventoryDeliveryVou
             if(currentCapacity-detail.getQuantity()==0){
                 bin.setStatus(EStatusStorage.EMPTY);
                 bin.setGoods(null);
+                bin.setMaxCapacity(0);
                 bin.setRemainingVolume(bin.getVolume());
             }
-            if(bin.getMaxCapacity()==bin.getCurrentCapacity()){
+            if(bin.getCurrentCapacity()!=0 && bin.getMaxCapacity()==bin.getCurrentCapacity()){
                 bin.setStatus(EStatusStorage.FULL);
             }
             else{
@@ -189,7 +190,9 @@ public class InventoryDeliveryVoucherServiceImpl implements InventoryDeliveryVou
         Pageable pageable = PageRequest.of(page,size);
         Page<InventoryDeliveryVoucher> vouchers= deliveryVoucherRepository.getPage(pageable);
         Page<InventoryDeliveryVoucherResponse> pages = new PageImpl<InventoryDeliveryVoucherResponse>(vouchers.getContent()
-                .stream().map(this::mapperInventoryDeliveryVoucher).collect(Collectors.toList()), pageable,
+                .stream()
+                .sorted(Comparator.comparing(InventoryDeliveryVoucher::getCreateDate, Comparator.reverseOrder()))
+                .map(this::mapperInventoryDeliveryVoucher).collect(Collectors.toList()), pageable,
                 vouchers.getTotalElements());
         return pages;
     }
