@@ -2,6 +2,8 @@ package com.example.warehouse_management.services.impl;
 
 import com.example.warehouse_management.exception.ErrorException;
 import com.example.warehouse_management.exception.NotFoundGlobalException;
+import com.example.warehouse_management.models.type.EStatusStorage;
+import com.example.warehouse_management.models.warehouse.BinPosition;
 import com.example.warehouse_management.models.warehouse.ColumnPosition;
 import com.example.warehouse_management.models.warehouse.ShelfStorage;
 import com.example.warehouse_management.models.warehouse.Warehouse;
@@ -20,6 +22,7 @@ import com.example.warehouse_management.services.WarehouseServices;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
 import java.util.List;
@@ -78,8 +81,9 @@ public class WarehouseServicesImpl implements WarehouseServices {
         warehouse.setWidth(request.getWidth());
         warehouse.setAcreage(request.getLength()* request.getWidth());
         warehouse.setVolume(request.getLength()* request.getWidth()* request.getHeight());
+        warehouse.setStatus(EStatusStorage.EMPTY);
         Warehouse saveResponse=warehouseRepository.save(warehouse);
-        WarehouseResponse response=modelMapper.map(saveResponse, WarehouseResponse.class);
+        WarehouseResponse response=mapperWarehouseResponse(saveResponse);
         int numberOfShelve = getNumberOfShelve(request.getWidth(), request.getWidthShelf());
         // xử lý kệ
         int numberShelveInWarehouse = shelveStorageServices.findAll().size();
@@ -100,6 +104,13 @@ public class WarehouseServicesImpl implements WarehouseServices {
     }
     @Override
     public List<WarehouseResponse> findAll() {
+        warehouseRepository.findAll().stream().forEach(e->{
+            List<BinPosition> binPositionList = binLocationServices.findAllByStatusEmptyOrAvailable(e.getCode());
+            if(CollectionUtils.isEmpty(binPositionList)){
+                e.setStatus(EStatusStorage.FULL);
+                warehouseRepository.save(e);
+            }
+        });
         List<WarehouseResponse> responseList = warehouseRepository.findAll().stream().
                 map(item -> modelMapper.map(item,WarehouseResponse.class) )
                 .collect(Collectors.toList());
@@ -111,7 +122,7 @@ public class WarehouseServicesImpl implements WarehouseServices {
         Warehouse warehouse =warehouseRepository.findWarehouseByCode(code);
         if(warehouse==null)
             throw new NotFoundGlobalException("Không tìm thấy kho "+code);
-        return modelMapper.map(warehouse, WarehouseResponse.class);
+        return mapperWarehouseResponse(warehouse);
     }
 
     public String generateWarehouseCode(){
@@ -142,5 +153,23 @@ public class WarehouseServicesImpl implements WarehouseServices {
         for (ColumnPosition columnPosition : columnPositions) {
             binLocationServices.addRowLocations(new BinLocationRequest(columnPosition.getCode()));
         }
+    }
+    private WarehouseResponse mapperWarehouseResponse(Warehouse warehouse){
+        String status = null;
+        switch (warehouse.getStatus()) {
+            case FULL:
+                status = "Đã đầy";
+                break;
+            case EMPTY:
+                status = "Trống";
+                break;
+            case AVAILABLE:
+                status = "Còn chỗ";
+                break;
+        }
+        WarehouseResponse warehouseResponse = modelMapper.map(warehouse,WarehouseResponse.class);
+        warehouseResponse.setStatus(status);
+
+        return warehouseResponse;
     }
 }

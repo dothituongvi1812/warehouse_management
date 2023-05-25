@@ -1,5 +1,6 @@
 package com.example.warehouse_management.models.warehouse;
 
+import com.example.warehouse_management.models.type.EStatusStorage;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import lombok.Getter;
@@ -39,6 +40,9 @@ public class Warehouse {
     private double volume;
     @Column(name = "acreage", columnDefinition = "NUMERIC(5, 2) CHECK (acreage > 0)")
     private double acreage;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", columnDefinition = "VARCHAR(60) CHECK (status IN ('FULL', 'AVAILABLE', 'EMPTY'))")
+    private EStatusStorage status;
     @OneToMany(mappedBy = "warehouse")
     @JsonManagedReference
     private Set<ShelfStorage> shelfStorages;

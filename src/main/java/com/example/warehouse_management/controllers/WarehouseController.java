@@ -2,6 +2,7 @@ package com.example.warehouse_management.controllers;
 
 import com.example.warehouse_management.payload.request.warehouse.WarehouseRequest;
 import com.example.warehouse_management.payload.response.WarehouseResponse;
+import com.example.warehouse_management.services.BinLocationServices;
 import com.example.warehouse_management.services.WarehouseServices;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +20,8 @@ public class WarehouseController {
     private Logger logger = LoggerFactory.getLogger(getClass());
     @Autowired
     private WarehouseServices warehouseServices;
-
+    @Autowired
+    private BinLocationServices binLocationServices;
     @PostMapping("/add")
     public ResponseEntity<WarehouseResponse> addGeneralWarehouse(@Valid @RequestBody WarehouseRequest request){
         logger.info("/add");

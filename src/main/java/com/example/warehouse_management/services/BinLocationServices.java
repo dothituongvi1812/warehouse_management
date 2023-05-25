@@ -34,4 +34,5 @@ public interface BinLocationServices {
     boolean checkRemainingVolumeForGoodsByBinCode(String binCode,GoodsCheckedRequest goodsCheckedRequest);
     BinPosition findOnePosition(int quanity, String goodsCode);
     List<BinPositionResponse> findAllByGoodsCode(String goodsCode);
+    List<BinPosition> findAllByStatusEmptyOrAvailable(String warehouseCode);
 }

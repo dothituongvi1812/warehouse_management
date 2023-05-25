@@ -405,6 +405,14 @@ public class GoodsServicesImpl implements GoodsServices {
         return goodsStaticsResponseList;
     }
 
+    @Override
+    public List<GoodsResponse> getAllGoodsInWarehouse(String warehouseCode) {
+        List<GoodsResponse> goodsResponses = goodsRepository.getAllGoodsInWarehouse(warehouseCode).stream()
+                .distinct()
+                .map(this::mapperGoodResponse).collect(Collectors.toList());
+        return goodsResponses;
+    }
+
     public GoodsResponse mapperGoodResponse(Goods goods){
         String unit="";
         if(goods.getUnit().equals(EUnit.THUNG)){

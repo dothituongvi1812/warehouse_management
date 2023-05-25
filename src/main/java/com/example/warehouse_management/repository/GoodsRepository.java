@@ -120,4 +120,13 @@ public interface GoodsRepository extends CrudRepository<Goods,Long> {
             "limit 1")
     List<Object[]> statisticOfTheTop1ExportedProducts(int month);
 
+    @Query(nativeQuery = true,value = "select g.* from bin_positions bp \n" +
+            "join goods g ON bp.goods_id = g.id \n" +
+            "join column_positions cp ON bp.column_position_id = cp.id \n" +
+            "join shelf_storages ss on cp.shelf_storage_id = ss.id \n" +
+            "join warehouse w on ss.warehouse_id = w.id \n" +
+            "where w.code =:warehouseCode\n" +
+            "order by bp.current_capacity desc ")
+    List<Goods> getAllGoodsInWarehouse(String warehouseCode);
+
 }

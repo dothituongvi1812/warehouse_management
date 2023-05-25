@@ -201,11 +201,37 @@ public class BinLocationServicesImpl implements BinLocationServices {
         List<BinPosition> binPositions = binLocationRepository.findByGoodsCode(goods.getCode());
         List<BinPosition> usablePositonList = new ArrayList<>();
         if (!CollectionUtils.isEmpty(binPositions)) {
+            //  tổng số lượng có thể chứa của 2 bin đó là  bn
             usablePositonList = binLocationRepository.getAllUsablePositionForGoodsExisted(warehouseCode, volume, goods.getCode(), usingBinLocation).stream()
                     .sorted(Comparator.comparing(BinPosition::getCode)).collect(Collectors.toList());
+
             if(CollectionUtils.isEmpty(usablePositonList)){
-                usablePositonList = binLocationRepository.getAllUsablePositionForGoodsNotExisted(warehouseCode, usingBinLocation).stream()
-                        .sorted(Comparator.comparing(BinPosition::getCode)).collect(Collectors.toList());
+                // tìm vị trí gần
+                for (BinPosition e:binPositions) {
+                    String numberCode = e.getCode().substring(2);
+                    int number = Integer.parseInt(numberCode);
+                    String binPositionCode1 = "BP000"+ (number -1);
+                    String binPositionCode2 = "BP000"+ (number +1);
+                    BinPosition binPosition1 = binLocationRepository.findByCode(binPositionCode1);
+                    BinPosition binPosition2 = binLocationRepository.findByCode(binPositionCode2);
+                    if(binPosition1.getGoods()==null || binPosition1.getGoods().getCode().equals(e.getGoods().getCode())){
+                        if(binPosition1.getMaxCapacity()-binPosition1.getCurrentCapacity()>= request.getQuantity()){
+                            usablePositonList.add(binPosition1);
+                        }
+                    }
+                    if(binPosition2.getGoods()==null || binPosition2.getGoods().getCode().equals(e.getGoods().getCode())){
+                        if(binPosition2.getMaxCapacity()-binPosition1.getCurrentCapacity()>= request.getQuantity()){
+                            usablePositonList.add(binPosition2);
+                        }
+                    }
+
+                }
+                if(CollectionUtils.isEmpty(usablePositonList)){
+                    if(CollectionUtils.isEmpty(usablePositonList)){
+                        usablePositonList = binLocationRepository.getAllUsablePositionForGoodsNotExisted(warehouseCode, usingBinLocation).stream()
+                                .sorted(Comparator.comparing(BinPosition::getCode)).collect(Collectors.toList());
+                    }
+                }
             }
         } else {
             usablePositonList = binLocationRepository.getAllUsablePositionForGoodsNotExisted(warehouseCode, usingBinLocation).stream()
@@ -249,6 +275,9 @@ public class BinLocationServicesImpl implements BinLocationServices {
         double volumeGoods = quantity * toBinPosition.getGoods().getVolume();
         toBinPosition.setCurrentCapacity(toBinPosition.getCurrentCapacity() + quantity);
         toBinPosition.setRemainingVolume(toBinPosition.getRemainingVolume() - volumeGoods);
+        if(quantity == fromBinPosition.getCurrentCapacity()){
+            fromBinPosition.setStatus(EStatusStorage.EMPTY);
+        }
         fromBinPosition.setCurrentCapacity(fromBinPosition.getCurrentCapacity() - quantity);
         fromBinPosition.setRemainingVolume(fromBinPosition.getRemainingVolume() + volumeGoods);
         if(fromBinPosition.getCurrentCapacity()==0){
@@ -313,6 +342,12 @@ public class BinLocationServicesImpl implements BinLocationServices {
         List<BinPositionResponse> binPositionResponseList= binPositionList.stream().map(this::mapperRowLocationResponse)
                 .collect(Collectors.toList());
         return binPositionResponseList;
+    }
+
+    @Override
+    public List<BinPosition> findAllByStatusEmptyOrAvailable(String warehouseCode) {
+        List<BinPosition> binPositionList = binLocationRepository.findAllByStatusEmptyOrAvailable(warehouseCode);
+        return binPositionList;
     }
 
     private String generateRowLocationName(int numberRow) {

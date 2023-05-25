@@ -14,6 +14,7 @@ import lombok.Setter;
 public class WarehouseResponse {
     private Long id;
     private String code;
+    private String status;
     private Location location;
     private String name;
     private Double length;

@@ -61,12 +61,12 @@ public interface BinLocationRepository extends CrudRepository<BinPosition,Long> 
             "order by current_capacity desc ")
     List<BinPosition> findByGoodsNameEnoughToExport(String goodsName, int quantity);
 
-    @Query(nativeQuery = true,value = "select status,count(status) from bin_positions bl \n" +
+    @Query(nativeQuery = true,value = "select bl.status,count(bl.status) from bin_positions bl \n" +
             "join column_positions cl on bl.column_position_id = cl.id\n" +
             "join shelf_storages ss on ss.id = cl.shelf_storage_id \n" +
             "join warehouse w on w.id = ss.warehouse_id \n" +
             "where w.code  =:codeWarehouse\n" +
-            "group by status ")
+            "group by bl.status ")
     List<Object[]> reportStockPosition(String codeWarehouse);
     @Query(nativeQuery = true,
             value = "select rl.* from bin_positions rl \n" +
@@ -129,5 +129,11 @@ public interface BinLocationRepository extends CrudRepository<BinPosition,Long> 
             "where g.code =:goodsCode")
     List<BinPosition> findAllByGoodsCode(String goodsCode);
 
+    @Query(nativeQuery = true,value = "select * from bin_positions bp \n" +
+            "join column_positions cp ON bp.column_position_id = cp.id \n" +
+            "join shelf_storages ss on cp.shelf_storage_id = ss.id \n" +
+            "join warehouse w on ss.warehouse_id = w.id \n" +
+            "where w.code =:warehouseCode and  bp.status = 'EMPTY' or bp.status = 'AVAILABLE'")
+    List<BinPosition> findAllByStatusEmptyOrAvailable(String warehouseCode);
 
 }

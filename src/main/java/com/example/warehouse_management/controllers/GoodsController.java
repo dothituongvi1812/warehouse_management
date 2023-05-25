@@ -108,5 +108,9 @@ public class GoodsController {
     public ResponseEntity<Map<String,Integer>> statisticOfTheTotalImportedAndExportedProductsByCurrentMonth(){
         return new ResponseEntity<>(goodsServices.statisticOfTheTotalImportedAndExportedProductsByCurrentMonth(),HttpStatus.OK);
     }
+    @GetMapping("/get-all-in-warehouse-by/{warehouseCode}")
+    public ResponseEntity<List<GoodsResponse>> getAllGoodsInWarehouse(@PathVariable String warehouseCode){
+        return new ResponseEntity<>(goodsServices.getAllGoodsInWarehouse(warehouseCode),HttpStatus.OK);
+    }
 
 }
