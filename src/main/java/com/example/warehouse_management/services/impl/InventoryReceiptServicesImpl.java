@@ -179,8 +179,11 @@ public class InventoryReceiptServicesImpl implements InventoryReceiptServices {
     @Override
     public Page<InventoryReceiptVoucherResponse> getPageSortedByDate(Integer page, Integer size) {
         Pageable pageable = PageRequest.of(page,size);
-        List<InventoryReceiptVoucher> vouchers = receiptVoucherRepository.findAllBySortedCreateDate();
-        Page<InventoryReceiptVoucherResponse> pages = new PageImpl<InventoryReceiptVoucherResponse>(vouchers.stream().map(this::mapperInventoryReceiptVoucher)
+        List<InventoryReceiptVoucher> vouchers = receiptVoucherRepository.findAllBySortedCreateDate().
+                stream().sorted(Comparator.comparing(InventoryReceiptVoucher::getCreateDate).reversed())
+                .collect(Collectors.toList());
+        Page<InventoryReceiptVoucherResponse> pages = new PageImpl<InventoryReceiptVoucherResponse>(vouchers.stream()
+                .map(this::mapperInventoryReceiptVoucher)
                 .collect(Collectors.toList()), pageable,
                 vouchers.size());
         return pages;
@@ -191,7 +194,7 @@ public class InventoryReceiptServicesImpl implements InventoryReceiptServices {
     public List<InventoryReceiptVoucherResponse> findAll() {
         List<InventoryReceiptVoucherResponse> responseList = getAll().stream()
                 .map(item->mapperInventoryReceiptVoucher(item))
-                .sorted(Comparator.comparing(InventoryReceiptVoucherResponse::getCreateDate))
+                .sorted(Comparator.comparing(InventoryReceiptVoucherResponse::getCreateDate).reversed())
                 .collect(Collectors.toList());
         return responseList;
     }

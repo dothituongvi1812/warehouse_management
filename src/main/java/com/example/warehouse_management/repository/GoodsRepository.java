@@ -128,5 +128,24 @@ public interface GoodsRepository extends CrudRepository<Goods,Long> {
             "where w.code =:warehouseCode\n" +
             "order by bp.current_capacity desc ")
     List<Goods> getAllGoodsInWarehouse(String warehouseCode);
+    @Query(nativeQuery = true,value = "select g.\"name\",g.code ,c.\"name\" as categoryName ,sum(idvd.quantity) as total  from inventory_delivery_vouchers idv \n" +
+            "join inventory_delivery_voucher_details idvd on idv.id = idvd.delivery_voucher_id \n" +
+            "join goods g on g.id = idvd.goods_id \n" +
+            "join category c on c.id = g.category_id\n" +
+            "where idv.status ='EXPORTED'\n" +
+            "group by g.\"name\" ,g.code,c.\"name\"\n" +
+            "order by total desc\n" +
+            "limit 1")
+    List<Object[]> statisticOfTheTop1ExportedProducts();
+
+    @Query(nativeQuery = true,value = "select g.\"name\",g.code,c.\"name\" as categoryName ,sum(irvd.quantity) as total  from inventory_receipt_vouchers irv\n" +
+            "join inventory_receipt_voucher_details irvd on irv.id = irvd.inventory_receipt_voucher_id \n" +
+            "join goods g on g.id = irvd.goods_id\n" +
+            "join category c on c.id = g.category_id\n" +
+            "where irv.status ='IMPORTED'\n" +
+            "group by  g.\"name\" ,g.code,c.\"name\"\n" +
+            "order by total desc\n" +
+            "limit 1")
+    List<Object[]> statisticOfTheTop1ImportedProducts();
 
 }

@@ -113,4 +113,12 @@ public class GoodsController {
         return new ResponseEntity<>(goodsServices.getAllGoodsInWarehouse(warehouseCode),HttpStatus.OK);
     }
 
+    @GetMapping("/statistic-of-the-top1-exported-products")
+    public ResponseEntity<List<GoodsStaticsResponse>> statisticOfTheTop1ExportedProducts(){
+        return new ResponseEntity<>(goodsServices.statisticOfTheTop1ExportedProducts(),HttpStatus.OK);
+    }
+    @GetMapping("/statistic-of-the-top1-imported-products")
+    public ResponseEntity<List<GoodsStaticsResponse>> statisticOfTheTop1ImportedProducts(){
+        return new ResponseEntity<>(goodsServices.statisticOfTheTop1ImportedProducts(),HttpStatus.OK);
+    }
 }

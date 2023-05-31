@@ -37,5 +37,7 @@ public interface GoodsServices {
     public List<GoodsStaticsResponse> statisticOfTheTop1ImportedProducts(int month);
     public List<GoodsStaticsResponse> statisticOfTheTop1ExportedProducts(int month);
     public List<GoodsResponse> getAllGoodsInWarehouse(String warehouseCode);
+    public List<GoodsStaticsResponse> statisticOfTheTop1ExportedProducts();
+    public List<GoodsStaticsResponse> statisticOfTheTop1ImportedProducts();
 
 }

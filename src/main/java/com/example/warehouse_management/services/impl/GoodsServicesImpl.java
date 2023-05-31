@@ -412,7 +412,37 @@ public class GoodsServicesImpl implements GoodsServices {
                 .map(this::mapperGoodResponse).collect(Collectors.toList());
         return goodsResponses;
     }
+    @Override
+    public List<GoodsStaticsResponse> statisticOfTheTop1ExportedProducts() {
+        List<GoodsStaticsResponse> goodsStaticsResponseList = new ArrayList<>();
+        List<Object[]> objects = goodsRepository.statisticOfTheTop1ExportedProducts();
+        for (Object[] ob : objects){
+            GoodsStaticsResponse goodsStaticsResponse = new com.example.warehouse_management.payload.response.GoodsStaticsResponse();
+            goodsStaticsResponse.setName((String)ob[0]);
+            goodsStaticsResponse.setCode((String)ob[1]);
+            goodsStaticsResponse.setCategoryName((String)ob[2]);
+            Integer total = ((BigInteger) ob[3]).intValue();
+            goodsStaticsResponse.setTotal(total);
+            goodsStaticsResponseList.add(goodsStaticsResponse);
+        }
+        return goodsStaticsResponseList;
+    }
 
+    @Override
+    public List<GoodsStaticsResponse> statisticOfTheTop1ImportedProducts() {
+        List<GoodsStaticsResponse> goodsStaticsResponseList = new ArrayList<>();
+        List<Object[]> objects = goodsRepository.statisticOfTheTop1ImportedProducts();
+        for (Object[] ob : objects){
+            GoodsStaticsResponse goodsStaticsResponse = new com.example.warehouse_management.payload.response.GoodsStaticsResponse();
+            goodsStaticsResponse.setName((String)ob[0]);
+            goodsStaticsResponse.setCode((String)ob[1]);
+            goodsStaticsResponse.setCategoryName((String)ob[2]);
+            Integer total = ((BigInteger) ob[3]).intValue();
+            goodsStaticsResponse.setTotal(total);
+            goodsStaticsResponseList.add(goodsStaticsResponse);
+        }
+        return goodsStaticsResponseList;
+    }
     public GoodsResponse mapperGoodResponse(Goods goods){
         String unit="";
         if(goods.getUnit().equals(EUnit.THUNG)){

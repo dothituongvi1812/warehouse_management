@@ -208,7 +208,7 @@ public class InventoryDeliveryVoucherServiceImpl implements InventoryDeliveryVou
     public List<InventoryDeliveryVoucherResponse> getAll() {
         List<InventoryDeliveryVoucherResponse> responseList = deliveryVoucherRepository.findAll().stream()
                 .map(item->mapperInventoryDeliveryVoucher(item))
-                .sorted(Comparator.comparing(InventoryDeliveryVoucherResponse::getCreateDate))
+                .sorted(Comparator.comparing(InventoryDeliveryVoucherResponse::getCreateDate).reversed())
                 .collect(Collectors.toList());
         return responseList;
     }
