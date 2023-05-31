@@ -99,10 +99,12 @@ public class PurchaseReceiptServiceImpl implements PurchaseReceiptServices {
                 purchaseReceiptRepository.save(purchase);
             }
         });
-        List<PurchaseReceiptResponse> purchaseReceiptResponses = purchaseReceipts.stream()
+        List<PurchaseReceiptResponse> sortedPurchaseReceipts = purchaseReceiptRepository.findAll().stream()
+                .sorted(Comparator.comparing(PurchaseReceipt::getCreatedDate))
                 .map(this::mapperPurchaseReceiptResponse).collect(Collectors.toList());
+        System.out.println("sorted");
 
-        return purchaseReceiptResponses;
+        return sortedPurchaseReceipts;
     }
 
     @Override

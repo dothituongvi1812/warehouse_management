@@ -19,4 +19,8 @@ networks:
   java-project:
     external:
       name: java-project
+      ipam:
+        config:
+          - subnet: 172.18.0.2/16
+
 

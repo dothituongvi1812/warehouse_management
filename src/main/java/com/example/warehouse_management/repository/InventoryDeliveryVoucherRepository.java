@@ -16,7 +16,7 @@ public interface InventoryDeliveryVoucherRepository extends CrudRepository<Inven
     InventoryDeliveryVoucher findTopByOrderByIdDesc();
     InventoryDeliveryVoucher findByCode(String code);
     @Query(nativeQuery = true,value = "select * from inventory_delivery_vouchers idv\n" +
-            "order by idv.create_date desc  ")
+            "order by code desc")
     Page<InventoryDeliveryVoucher> getPage(Pageable pageable);
     List<InventoryDeliveryVoucher> findAll();
 

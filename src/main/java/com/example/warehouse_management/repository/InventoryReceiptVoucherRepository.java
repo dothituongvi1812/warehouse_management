@@ -16,9 +16,9 @@ public interface InventoryReceiptVoucherRepository extends CrudRepository<Invent
     InventoryReceiptVoucher findTopByOrderByIdDesc();
     InventoryReceiptVoucher findByCode(String code);
     @Query(nativeQuery = true,
-            value = "select * from inventory_receipt_vouchers irv \n" +
-                    "order by create_date desc ")
-    Page<InventoryReceiptVoucher> findAllBySortedCreateDate(Pageable pageable);
+            value = "select * from inventory_receipt_vouchers irv\n" +
+                    "order by code desc")
+    List<InventoryReceiptVoucher> findAllBySortedCreateDate();
     List<InventoryReceiptVoucher>  findAll();
     InventoryReceiptVoucher findInventoryReceiptVoucherByCode(String voucherCode);
     @Query(nativeQuery = true,value = "select * from inventory_receipt_vouchers irv\n" +

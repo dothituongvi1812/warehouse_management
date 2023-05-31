@@ -77,7 +77,7 @@ public class InventoryReceiptServicesImpl implements InventoryReceiptServices {
             }
 
         }
-
+        InventoryReceiptVoucher savedVoucher = new InventoryReceiptVoucher();
         PurchaseReceipt purchaseReceipt = purchaseReceiptServices.findPurchaseReceiptByCode(purchaseReceiptCode);
         User user = userRepository.findUserByEmail(receiptVoucherRequest.getEmail());
         InventoryReceiptVoucher inventoryReceiptVoucher = new InventoryReceiptVoucher();
@@ -86,7 +86,6 @@ public class InventoryReceiptServicesImpl implements InventoryReceiptServices {
         inventoryReceiptVoucher.setPurchaseReceipt(purchaseReceipt);
         inventoryReceiptVoucher.setCreatedBy(user);
         inventoryReceiptVoucher.setStatus(EStatusOfVoucher.NOT_YET_IMPORTED);
-        InventoryReceiptVoucher savedVoucher= receiptVoucherRepository.save(inventoryReceiptVoucher);
         Set<InventoryReceiptVoucherDetail> inventoryReceiptVoucherDetailSet = new HashSet<>();
         for(GoodsAndBinLocationToCreateVoucher object: receiptVoucherRequest.getGoodsToCreateVoucher()){
             InventoryReceiptVoucherDetail inventoryReceiptVoucherDetail = new InventoryReceiptVoucherDetail();
@@ -96,17 +95,18 @@ public class InventoryReceiptServicesImpl implements InventoryReceiptServices {
             purchaseDetailPK.setPurchaseId(purchaseReceipt.getId());
             purchaseDetailPK.setGoodsId(goods.getId());
             PurchaseDetail purchaseDetail = purchaseDetailRepository.findByPurchaseDetailPK(purchaseDetailPK);
-            int quantityPurchased = purchaseDetail.getQuantityPurchased();
+            int quantityRemaining = purchaseDetail.getQuantityRemaining();
             double volume = goods.getVolume() * object.getQuantity();
             if(binPosition.getRemainingVolume()<volume){
                int maxQuantity = (int) (binPosition.getRemainingVolume()/ goods.getVolume());
                 inventoryReceiptVoucherDetail.setQuantity(maxQuantity);
-                purchaseDetail.setQuantityRemaining(quantityPurchased-maxQuantity);
-                purchaseDetail.setStatus(EStatusOfPurchasingGoods.NOT_YET_CREATED);
+                throw new ErrorException(String.format("Số lượng quá nhiều. Sức chứa tối đa kệ %s là %d ",object.getBinLocationCode(),maxQuantity));
+//                purchaseDetail.setQuantityRemaining(quantityPurchased-maxQuantity);
+//                purchaseDetail.setStatus(EStatusOfPurchasingGoods.NOT_YET_CREATED);
             }
             else{
                 inventoryReceiptVoucherDetail.setQuantity(object.getQuantity());
-                purchaseDetail.setQuantityRemaining(quantityPurchased-object.getQuantity());
+                purchaseDetail.setQuantityRemaining(quantityRemaining-object.getQuantity());
                 purchaseDetail.setStatus(EStatusOfPurchasingGoods.CREATED);
             }
             if(purchaseDetail.getQuantityPurchased()>purchaseDetail.getQuantityRemaining() && purchaseDetail.getQuantityRemaining()!=0 ){
@@ -115,6 +115,7 @@ public class InventoryReceiptServicesImpl implements InventoryReceiptServices {
             if(purchaseDetail.getQuantityRemaining()==0){
                 purchaseDetail.setStatus(EStatusOfPurchasingGoods.CREATED);
             }
+             savedVoucher= receiptVoucherRepository.save(inventoryReceiptVoucher);
             purchaseDetailRepository.save(purchaseDetail);
             inventoryReceiptVoucherDetail.setGoods(goods);
             inventoryReceiptVoucherDetail.setBinPosition(binPosition);
@@ -178,10 +179,10 @@ public class InventoryReceiptServicesImpl implements InventoryReceiptServices {
     @Override
     public Page<InventoryReceiptVoucherResponse> getPageSortedByDate(Integer page, Integer size) {
         Pageable pageable = PageRequest.of(page,size);
-        Page<InventoryReceiptVoucher> vouchers = receiptVoucherRepository.findAllBySortedCreateDate(pageable);
-        Page<InventoryReceiptVoucherResponse> pages = new PageImpl<InventoryReceiptVoucherResponse>(vouchers.getContent()
-                .stream().map(this::mapperInventoryReceiptVoucher).collect(Collectors.toList()), pageable,
-                vouchers.getTotalElements());
+        List<InventoryReceiptVoucher> vouchers = receiptVoucherRepository.findAllBySortedCreateDate();
+        Page<InventoryReceiptVoucherResponse> pages = new PageImpl<InventoryReceiptVoucherResponse>(vouchers.stream().map(this::mapperInventoryReceiptVoucher)
+                .collect(Collectors.toList()), pageable,
+                vouchers.size());
         return pages;
 
     }

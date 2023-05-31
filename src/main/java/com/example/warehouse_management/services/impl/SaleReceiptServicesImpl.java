@@ -8,6 +8,7 @@ import com.example.warehouse_management.models.selling.SaleDetailPK;
 import com.example.warehouse_management.models.selling.SaleReceipt;
 import com.example.warehouse_management.models.type.EStatusOfPurchasingGoods;
 import com.example.warehouse_management.models.type.EStatusOfSellingGoods;
+import com.example.warehouse_management.models.type.EStatusSaleReceipt;
 import com.example.warehouse_management.models.warehouse.BinPosition;
 import com.example.warehouse_management.payload.request.goods.GoodsToSaleRequest;
 import com.example.warehouse_management.payload.request.sale.SaleReceiptRequest;
@@ -29,10 +30,7 @@ import org.springframework.util.ObjectUtils;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -63,6 +61,7 @@ public class SaleReceiptServicesImpl implements SaleReceiptServices {
         saleReceipt.setPartner(partnerServices.findPartnerByCode(saleReceiptRequest.getPartnerCode()));
         saleReceipt.setCode(generateSaleReceipt());
         saleReceipt.setCreatedDate(new Date());
+        saleReceipt.setStatus(EStatusSaleReceipt.NOT_DONE_YET);
         SaleReceipt saveSaleReceipt= saleReceiptRepository.save(saleReceipt);
         Set<SaleDetail> saleDetails = new HashSet<>();
         for (GoodsToSaleRequest goodsRequest: saleReceiptRequest.getGoodsToSaleRequests()) {
@@ -82,13 +81,14 @@ public class SaleReceiptServicesImpl implements SaleReceiptServices {
 
         }
         saveSaleReceipt.setSaleDetails(saleDetails);
-        return mapperPurchaseReceiptResponse(saleReceiptRepository.save(saveSaleReceipt));
+        return mapperSaleReceiptResponse(saleReceiptRepository.save(saveSaleReceipt));
     }
 
     @Override
     public List<SaleReceiptResponse> getAll() {
         List<SaleReceiptResponse> saleReceiptResponses = saleReceiptRepository.findAll().stream()
-                .map(this::mapperPurchaseReceiptResponse).collect(Collectors.toList());
+                .sorted(Comparator.comparing(SaleReceipt::getCreatedDate))
+                .map(this::mapperSaleReceiptResponse).collect(Collectors.toList());
         return saleReceiptResponses;
     }
 
@@ -102,7 +102,7 @@ public class SaleReceiptServicesImpl implements SaleReceiptServices {
 
     @Override
     public SaleReceiptResponse getSaleReceiptByCode(String saleReceiptCode) {
-        return mapperPurchaseReceiptResponse(findSaleReceiptByCode(saleReceiptCode));
+        return mapperSaleReceiptResponse(findSaleReceiptByCode(saleReceiptCode));
     }
 
     @Override
@@ -111,12 +111,12 @@ public class SaleReceiptServicesImpl implements SaleReceiptServices {
         Page<SaleReceiptResponse> pages= null;
         if(code!=null){
             List<SaleReceiptResponse> responseList = saleReceiptRepository.searchByCode(code).stream()
-                    .map(item -> mapperPurchaseReceiptResponse(item)).collect(Collectors.toList());
+                    .map(item -> mapperSaleReceiptResponse(item)).collect(Collectors.toList());
             pages = new PageImpl<>(responseList,pageable,responseList.size());
         }
         else if( createdBy!=null){
             List<SaleReceiptResponse> responseList = saleReceiptRepository.searchByCreatedBy(createdBy).stream()
-                    .map(item -> mapperPurchaseReceiptResponse(item)).collect(Collectors.toList());
+                    .map(item -> mapperSaleReceiptResponse(item)).collect(Collectors.toList());
             pages = new PageImpl<>(responseList,pageable,responseList.size());
         }
         else{
@@ -134,7 +134,7 @@ public class SaleReceiptServicesImpl implements SaleReceiptServices {
                 Timestamp from = new Timestamp(parsedFromDate.getTime());
                 Timestamp to = new Timestamp(parsedToDate.getTime());
                 List<SaleReceiptResponse> responseList = saleReceiptRepository.searchByCreatedDate(from, to).stream()
-                        .map(item -> mapperPurchaseReceiptResponse(item)).collect(Collectors.toList());
+                        .map(item -> mapperSaleReceiptResponse(item)).collect(Collectors.toList());
                 pages = new PageImpl<>(responseList,pageable,responseList.size());
             } catch (ParseException e) {
                 throw new RuntimeException(e);
@@ -143,11 +143,12 @@ public class SaleReceiptServicesImpl implements SaleReceiptServices {
        return pages;
     }
 
-    private SaleReceiptResponse mapperPurchaseReceiptResponse(SaleReceipt saleReceipt){
+    private SaleReceiptResponse mapperSaleReceiptResponse(SaleReceipt saleReceipt){
         SaleReceiptResponse response = new SaleReceiptResponse();
         response.setCode(saleReceipt.getCode());
         response.setCreatedDate(saleReceipt.getCreatedDate());
         response.setCreatedBy(saleReceipt.getCreatedBy().getFullName());
+        response.setStatus(saleReceipt.getStatus());
         response.setPartner(modelMapper.map(saleReceipt.getPartner(), PartnerResponse.class));
         Set<SaleDetailResponse> saleDetailSet = new HashSet<>();
         for (SaleDetail detail:saleReceipt.getSaleDetails()) {

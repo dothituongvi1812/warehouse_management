@@ -6,12 +6,10 @@ import com.example.warehouse_management.exception.NotFoundGlobalException;
 import com.example.warehouse_management.models.goods.Goods;
 import com.example.warehouse_management.models.selling.SaleDetail;
 import com.example.warehouse_management.models.selling.SaleDetailPK;
-import com.example.warehouse_management.models.type.EStatusOfSellingGoods;
+import com.example.warehouse_management.models.type.*;
 import com.example.warehouse_management.repository.*;
 import com.example.warehouse_management.utils.GoodsDelivery;
 import com.example.warehouse_management.models.selling.SaleReceipt;
-import com.example.warehouse_management.models.type.EStatusOfVoucher;
-import com.example.warehouse_management.models.type.EStatusStorage;
 import com.example.warehouse_management.models.user.User;
 import com.example.warehouse_management.models.voucher.*;
 import com.example.warehouse_management.models.warehouse.BinPosition;
@@ -112,6 +110,15 @@ public class InventoryDeliveryVoucherServiceImpl implements InventoryDeliveryVou
                         e.setStatus(EStatusOfSellingGoods.CREATED);
                     }
                     saleDetailRepository.save(e);
+                }
+            });
+            saleReceipt.getSaleDetails().stream().forEach(e->{
+                int flag=0;
+                if(!(e.getStatus().equals(EStatusOfSellingGoods.CREATED))){
+                    flag=1;
+                }
+                if(flag==0){
+                    saleReceipt.setStatus(EStatusSaleReceipt.DONE);
                 }
             });
             saleReceiptRepository.save(saleReceipt);

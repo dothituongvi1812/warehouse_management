@@ -79,10 +79,10 @@ public interface BinLocationRepository extends CrudRepository<BinPosition,Long> 
     @Query(nativeQuery = true,value = "select bl.* from bin_positions bl\n" +
             "join column_positions cl ON bl.column_position_id = cl.id\n" +
             "join shelf_storages ss on cl.shelf_storage_id = ss.id\n" +
-            "join warehouse w on ss.warehouse_id = w.id \n" +
-            "where w.code =:warehouseCode and bl.status = 'EMPTY'\n" +
+            "join warehouse w on ss.warehouse_id = w.id\n" +
+            "where w.code =:warehouseCode and bl.status = 'EMPTY' and bl.remaining_volume >=:volume\n" +
             "and bl.id not in :usingBinLocation")
-    List<BinPosition> getAllUsablePositionForGoodsNotExisted(String warehouseCode, List<Long> usingBinLocation);
+    List<BinPosition> getAllUsablePositionForGoodsNotExisted(String warehouseCode, List<Long> usingBinLocation,double volume );
 
     @Query(nativeQuery = true,value = "select bl.* from bin_positions bl\n" +
             "join column_positions cl ON bl.column_position_id = cl.id \n" +
@@ -136,4 +136,13 @@ public interface BinLocationRepository extends CrudRepository<BinPosition,Long> 
             "where w.code =:warehouseCode and  bp.status = 'EMPTY' or bp.status = 'AVAILABLE'")
     List<BinPosition> findAllByStatusEmptyOrAvailable(String warehouseCode);
 
+    @Query(nativeQuery = true,value = "select  bl.* from bin_positions bl\n" +
+            "join column_positions cl ON bl.column_position_id = cl.id\n" +
+            "join shelf_storages ss on cl.shelf_storage_id = ss.id\n" +
+            "join warehouse w on ss.warehouse_id = w.id\n" +
+            "where w.code =:warehouseCode and bl.status = 'EMPTY'\n" +
+            "and bl.id not in :usingBinLocation\n" +
+            "order by bl.remaining_volume desc \n" +
+            "limit 1")
+    BinPosition findBinPositionByMaxRemainingVolume(String warehouseCode,List<Long> usingBinLocation);
 }

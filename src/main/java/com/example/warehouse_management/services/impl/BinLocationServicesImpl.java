@@ -228,16 +228,20 @@ public class BinLocationServicesImpl implements BinLocationServices {
                 }
                 if(CollectionUtils.isEmpty(usablePositonList)){
                     if(CollectionUtils.isEmpty(usablePositonList)){
-                        usablePositonList = binLocationRepository.getAllUsablePositionForGoodsNotExisted(warehouseCode, usingBinLocation).stream()
+                        usablePositonList = binLocationRepository.getAllUsablePositionForGoodsNotExisted(warehouseCode, usingBinLocation,volume).stream()
                                 .sorted(Comparator.comparing(BinPosition::getCode)).collect(Collectors.toList());
                     }
                 }
             }
         } else {
-            usablePositonList = binLocationRepository.getAllUsablePositionForGoodsNotExisted(warehouseCode, usingBinLocation).stream()
+            usablePositonList = binLocationRepository.getAllUsablePositionForGoodsNotExisted(warehouseCode, usingBinLocation,volume).stream()
                     .sorted(Comparator.comparing(BinPosition::getCode)).collect(Collectors.toList());
         }
-
+        if(CollectionUtils.isEmpty(usablePositonList)){
+            BinPosition binPosition = binLocationRepository.findBinPositionByMaxRemainingVolume(warehouseCode,usingBinLocation);
+            int maxCapacity= (int) (binPosition.getRemainingVolume()/goods.getVolume());
+            throw new ErrorException(String.format("Số lượng quá nhiều, hiện tại kệ trong kho chứa hàng %s tối đa %d thùng",goods.getName(),maxCapacity));
+        }
         List<BinPositionResponse> responseList = usablePositonList.stream().map(this::mapperRowLocationResponse)
                 .sorted(Comparator.comparing(BinPositionResponse::getNameShelf)
                         .thenComparing(BinPositionResponse::getNameColumn))

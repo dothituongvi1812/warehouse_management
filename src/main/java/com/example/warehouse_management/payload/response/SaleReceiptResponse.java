@@ -1,6 +1,8 @@
 package com.example.warehouse_management.payload.response;
 
 
+import com.example.warehouse_management.models.type.EStatusPurchaseReceipt;
+import com.example.warehouse_management.models.type.EStatusSaleReceipt;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,5 +16,6 @@ public class SaleReceiptResponse {
     private String createdBy;
     private Set<SaleDetailResponse> saleDetailResponses;
     private Date createdDate;
+    private EStatusSaleReceipt status;
 
 }
